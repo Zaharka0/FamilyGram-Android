@@ -37,6 +37,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DialogObject;
+import org.telegram.messenger.FamilyController;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaDataController;
@@ -100,6 +101,10 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
     @Keep
     private int accountsAllRow;
     private int accountsInfoRow;
+    private int familySectionRow;
+    private int familyModeRow;
+    private int keepDeletedRow;
+    private int familyInfoRow;
 
     private int notificationsServiceRow;
     private int notificationsServiceConnectionRow;
@@ -175,6 +180,11 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
             accountsAllRow = -1;
             accountsInfoRow = -1;
         }
+
+        familySectionRow = rowCount++;
+        familyModeRow = rowCount++;
+        keepDeletedRow = rowCount++;
+        familyInfoRow = rowCount++;
 
         notificationsSectionRow = rowCount++;
         privateRow = rowCount++;
@@ -736,6 +746,18 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 } else {
                     ConnectionsManager.getInstance(currentAccount).setPushConnectionEnabled(false);
                 }
+            } else if (position == familyModeRow) {
+                enabled = FamilyController.isOnlyFamilyMode();
+                FamilyController.setOnlyFamilyMode(!enabled);
+                for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+                    if (UserConfig.getInstance(a).isClientActivated()) {
+                        NotificationCenter.getInstance(a).postNotificationName(NotificationCenter.dialogsNeedReload);
+                        NotificationsController.getInstance(a).showNotifications();
+                    }
+                }
+            } else if (position == keepDeletedRow) {
+                enabled = FamilyController.isKeepDeleted();
+                FamilyController.setKeepDeleted(!enabled);
             } else if (position == accountsAllRow) {
                 SharedPreferences preferences = MessagesController.getGlobalNotificationsSettings();
                 enabled = preferences.getBoolean("AllAccounts", true);
@@ -938,6 +960,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     position == badgeNumberSection || position == otherSection2Row || position == resetSection2Row ||
                     position == callsSection2Row || position == callsSectionRow || position == badgeNumberSection2Row ||
                     position == accountsSectionRow || position == accountsInfoRow || position == resetNotificationsSectionRow ||
+                    position == familySectionRow || position == familyInfoRow ||
                     position == eventsSection2Row);
         }
 
@@ -997,6 +1020,8 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                         headerCell.setText(getString("BadgeNumber", R.string.BadgeNumber));
                     } else if (position == accountsSectionRow) {
                         headerCell.setText(getString("ShowNotificationsFor", R.string.ShowNotificationsFor));
+                    } else if (position == familySectionRow) {
+                        headerCell.setText(getString(R.string.FamilySection));
                     }
                     break;
                 }
@@ -1033,6 +1058,10 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                         checkCell.setTextAndCheck(getString("Vibrate", R.string.Vibrate), preferences.getBoolean("EnableCallVibrate", true), true);
                     } else if (position == accountsAllRow) {
                         checkCell.setTextAndCheck(getString("AllAccounts", R.string.AllAccounts), MessagesController.getGlobalNotificationsSettings().getBoolean("AllAccounts", true), false);
+                    } else if (position == familyModeRow) {
+                        checkCell.setTextAndCheck(getString(R.string.FamilyOnlyMode), FamilyController.isOnlyFamilyMode(), true);
+                    } else if (position == keepDeletedRow) {
+                        checkCell.setTextAndCheck(getString(R.string.FamilyKeepDeleted), FamilyController.isKeepDeleted(), false);
                     }
                     break;
                 }
@@ -1187,6 +1216,8 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     TextInfoPrivacyCell textCell = (TextInfoPrivacyCell) holder.itemView;
                     if (position == accountsInfoRow) {
                         textCell.setText(getString("ShowNotificationsForInfo", R.string.ShowNotificationsForInfo));
+                    } else if (position == familyInfoRow) {
+                        textCell.setText(getString(R.string.FamilyOnlyModeInfo));
                     }
                     break;
                 }
@@ -1197,13 +1228,13 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         public int getItemViewType(int position) {
             if (position == eventsSectionRow || position == otherSectionRow || position == resetSectionRow ||
                     position == callsSectionRow || position == badgeNumberSection || position == inappSectionRow ||
-                    position == notificationsSectionRow || position == accountsSectionRow) {
+                    position == notificationsSectionRow || position == accountsSectionRow || position == familySectionRow) {
                 return 0;
             } else if (position == inappSoundRow || position == inappVibrateRow || position == notificationsServiceConnectionRow ||
                     position == inappPreviewRow || position == contactJoinedRow || position == pinnedMessageRow ||
                     position == notificationsServiceRow || position == badgeNumberMutedRow || position == badgeNumberMessagesRow ||
                     position == badgeNumberShowRow || position == inappPriorityRow || position == inchatSoundRow ||
-                    position == androidAutoAlertRow || position == accountsAllRow) {
+                    position == androidAutoAlertRow || position == accountsAllRow || position == familyModeRow || position == keepDeletedRow) {
                 return 1;
             } else if (position == resetNotificationsRow) {
                 return 2;
@@ -1213,7 +1244,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     position == resetSection2Row || position == callsSection2Row || position == badgeNumberSection2Row ||
                     position == resetNotificationsSectionRow) {
                 return 4;
-            } else if (position == accountsInfoRow) {
+            } else if (position == accountsInfoRow || position == familyInfoRow) {
                 return 6;
             } else {
                 return 5;

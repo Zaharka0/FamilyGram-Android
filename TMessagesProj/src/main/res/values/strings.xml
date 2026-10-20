@@ -11548,4 +11548,11 @@
     <string name="CreateManagedBotUsernameBotLimit">This bot already has a Premium username. Remove it before adding another.</string>
     <string name="CreateManagedBotUsernameSuffixMissing">The username must end in %1$s.</string>
     <string name="CreateManagedBotUsernameCheckFailed">Couldn\'t check this username. Please try again.</string>
+    <string name="FamilyAdd">Add to family</string>
+    <string name="FamilyRemove">Remove from family</string>
+    <string name="FamilySection">FAMILYGRAM</string>
+    <string name="FamilyOnlyMode">Only family notifications</string>
+    <string name="FamilyOnlyModeInfo">Only family notifications: only chats added to family make sounds and notifications, everything else stays silent (login codes from Telegram still arrive). Keep deleted: messages deleted by the other person stay in your chat and are marked as deleted.</string>
+    <string name="FamilyKeepDeleted">Keep messages deleted by others</string>
+    <string name="FamilyDeletedMark">deleted</string>
 </resources>

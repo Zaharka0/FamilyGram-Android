@@ -263,4 +263,11 @@
     <string name="RemindTodayAt">\'Отправить сегодня в\' HH:mm</string>
     <string name="RemindDayAt">\'Отправить\' d MMM \'в\' HH:mm</string>
     <string name="RemindDayYearAt">\'Напомнить\' d MMM yyyy \'в\' HH:mm</string>
+    <string name="FamilyAdd">В семью</string>
+    <string name="FamilyRemove">Убрать из семьи</string>
+    <string name="FamilySection">FAMILYGRAM</string>
+    <string name="FamilyOnlyMode">Уведомления только от семьи</string>
+    <string name="FamilyOnlyModeInfo">Уведомления только от семьи: звук и уведомления приходят только от чатов, добавленных в семью, остальные молчат (коды входа от Telegram всё равно приходят). Сохранять удалённые: сообщения, которые удалил собеседник, остаются в вашем чате с пометкой «удалено».</string>
+    <string name="FamilyKeepDeleted">Сохранять сообщения, удалённые собеседником</string>
+    <string name="FamilyDeletedMark">удалено</string>
 </resources>
