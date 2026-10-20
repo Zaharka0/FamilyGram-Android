@@ -1,0 +1,91 @@
+name: Android APK
+
+# FamilyGram: manual APK build.
+# Needs two repository secrets: API_ID and API_HASH
+# (Settings -> Secrets and variables -> Actions).
+on:
+  workflow_dispatch:
+    inputs:
+      abis:
+        description: "CPU architectures to build (arm64-v8a fits almost every modern phone)"
+        type: choice
+        default: arm64-v8a
+        options:
+          - arm64-v8a
+          - armeabi-v7a
+          - "armeabi-v7a, arm64-v8a"
+          - "armeabi-v7a, arm64-v8a, x86, x86_64"
+
+jobs:
+  apk:
+    name: Build APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Check API credentials.
+        env:
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+        run: |
+          if [ -z "$API_ID" ] || [ -z "$API_HASH" ]; then
+            echo "::error::Add repository secrets API_ID and API_HASH (Settings -> Secrets and variables -> Actions)."
+            exit 1
+          fi
+          case "$API_ID" in (*[!0-9]*) echo "::error::API_ID must be a number."; exit 1;; esac
+
+      - name: Free up disk space.
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/lib/node_modules /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force >/dev/null 2>&1 || true
+          df -h /
+
+      - name: Clone.
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 1
+
+      - uses: actions/setup-java@v4
+        name: JDK 17.
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Android SDK and NDK.
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platforms;android-36" "build-tools;36.0.0" \
+            "ndk;27.2.12479018" "cmake;3.22.1"
+
+      - name: Insert API credentials and ABI list.
+        env:
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+          ABIS: ${{ inputs.abis }}
+        run: |
+          B=TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java
+          sed -i "s|public static int APP_ID = 0;.*|public static int APP_ID = ${API_ID};|" $B
+          sed -i "s|public static String APP_HASH = \"\";.*|public static String APP_HASH = \"${API_HASH}\";|" $B
+          grep -c "APP_ID = ${API_ID};" $B
+
+          LIST=$(echo "$ABIS" | tr -d ' ' | sed 's/,/", "/g; s/^/"/; s/$/"/')
+          sed -i "s|abiFilters \"armeabi-v7a\", \"arm64-v8a\", \"x86\", \"x86_64\"|abiFilters ${LIST}|" TMessagesProj_App/build.gradle
+          grep -n "abiFilters" TMessagesProj_App/build.gradle
+
+      - name: Build APK.
+        run: ./gradlew --no-daemon --stacktrace :TMessagesProj_App:assembleAfatRelease
+
+      - name: Collect APK.
+        run: |
+          mkdir apk
+          find TMessagesProj_App/build/outputs/apk -name '*.apk' -exec cp -v {} apk/ \;
+          ls -lh apk
+
+      - uses: actions/upload-artifact@v4
+        name: Upload APK.
+        with:
+          name: FamilyGram-apk
+          path: apk/*.apk
+          retention-days: 14
