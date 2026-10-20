@@ -19,7 +19,7 @@ on:
 jobs:
   apk:
     name: Build APK
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 360
 
     steps:
@@ -41,12 +41,12 @@ jobs:
           df -h /
 
       - name: Clone.
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 1
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         name: JDK 17.
         with:
           distribution: temurin
@@ -54,10 +54,23 @@ jobs:
 
       - name: Android SDK and NDK.
         run: |
-          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
-            "platforms;android-36" "build-tools;36.0.0" \
+          set -x
+          # Own SDK folder: does not depend on what the runner image ships.
+          export ANDROID_HOME="$HOME/android-sdk"
+          mkdir -p "$ANDROID_HOME/cmdline-tools"
+          curl -fsSL -o "$RUNNER_TEMP/cmdtools.zip" https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip
+          unzip -q "$RUNNER_TEMP/cmdtools.zip" -d "$RUNNER_TEMP/cmdtools"
+          mv "$RUNNER_TEMP/cmdtools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          java -version
+          yes | "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --licenses > /dev/null || true
+          "$SDKMANAGER" --sdk_root="$ANDROID_HOME" \
+            "platform-tools" "platforms;android-36" "build-tools;36.0.0" \
             "ndk;27.2.12479018" "cmake;3.22.1"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+          ls "$ANDROID_HOME" "$ANDROID_HOME/ndk"
 
       - name: Insert API credentials and ABI list.
         env:
@@ -83,7 +96,7 @@ jobs:
           find TMessagesProj_App/build/outputs/apk -name '*.apk' -exec cp -v {} apk/ \;
           ls -lh apk
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: Upload APK.
         with:
           name: FamilyGram-apk
