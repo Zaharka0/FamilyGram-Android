@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FGTitle" formatted="false">FamilyGram</string>
+    <string name="FGSearch" formatted="false">Search FamilyGram</string>
+    <string name="FGsettings" formatted="false">FamilyGram settings</string>
+    <string name="FGSettingsInfo" formatted="false">Family features, privacy, appearance and updates</string>
+    <string name="FGicons" formatted="false">Application icons</string>
+    <string name="FGIconsInfo" formatted="false">Built-in launcher icons and photo shortcuts</string>
+    <string name="FGwidget" formatted="false">Couple widget</string>
+    <string name="FGWidgetInfo" formatted="false">Your photo, days together and one tap to open your chat</string>
+    <string name="FGtasks" formatted="false">Shopping and tasks</string>
+    <string name="FGtasksInfo" formatted="false">Shared items with a bought or done checkmark</string>
+    <string name="FGcalendar" formatted="false">Family calendar</string>
+    <string name="FGcalendarInfo" formatted="false">Birthdays, trips and meetings in one timeline</string>
+    <string name="FGalbum" formatted="false">Our album</string>
+    <string name="FGalbumInfo" formatted="false">Photos and videos from your partner chat, with date navigation</string>
+    <string name="FGours" formatted="false">Ours</string>
+    <string name="FGoursInfo" formatted="false">Messages you chose to keep together</string>
+    <string name="FGhug" formatted="false">Hugs</string>
+    <string name="FGhugInfo" formatted="false">Send a little animation and a gentle haptic greeting</string>
+    <string name="FGquestion" formatted="false">Question of the day</string>
+    <string name="FGquestionInfo" formatted="false">Answer the same question and open your answers together</string>
+    <string name="FGgoals" formatted="false">Shared goals</string>
+    <string name="FGgoalsInfo" formatted="false">A goal amount, manually recorded contributions and shared progress</string>
+    <string name="FGwatch" formatted="false">Watch together</string>
+    <string name="FGwatchInfo" formatted="false">Watch a video from your chat with shared playback controls</string>
+    <string name="FGvoice" formatted="false">Voice messages</string>
+    <string name="FGvoiceInfo" formatted="false">An unheard queue, silence skipping and saved playback position</string>
+    <string name="FGgames" formatted="false">Games for two</string>
+    <string name="FGgamesInfo" formatted="false">Resumable tic-tac-toe and four-in-a-row</string>
+    <string name="FGbill" formatted="false">Split a bill</string>
+    <string name="FGbillInfo" formatted="false">Choose who shares each item; amounts add up exactly</string>
+    <string name="FGstats" formatted="false">Conversation statistics</string>
+    <string name="FGstatsInfo" formatted="false">Messages, voice duration, active months and emoji</string>
+    <string name="FGChooseChat" formatted="false">Choose conversation</string>
+    <string name="FGChooseChatInfo" formatted="false">Select a conversation for shared FamilyGram cards</string>
+    <string name="FGNoChats" formatted="false">Open a conversation first, then return here</string>
+    <string name="FGCancel" formatted="false">Cancel</string>
+    <string name="FGClose" formatted="false">Close</string>
+    <string name="FGSave" formatted="false">Save and send</string>
+    <string name="FGYou" formatted="false">You</string>
+    <string name="FGInvalid" formatted="false">Check the entered values</string>
+    <string name="FGRequired" formatted="false">Enter text within the character limit</string>
+    <string name="FGTooLong" formatted="false">Text is too long</string>
+    <string name="FGAddTask" formatted="false">Add an item</string>
+    <string name="FGAddTaskInfo" formatted="false">Each item is sent to this chat; its state is shared</string>
+    <string name="FGTaskTitle" formatted="false">Item</string>
+    <string name="FGTaskTitleHint" formatted="false">For example: milk or book tickets</string>
+    <string name="FGListName" formatted="false">List name</string>
+    <string name="FGListNameHint" formatted="false">Shopping, home, plans…</string>
+    <string name="FGShopping" formatted="false">Shopping</string>
+    <string name="FGMarkBought" formatted="false">Bought / done</string>
+    <string name="FGUndoDone" formatted="false">Uncheck</string>
+    <string name="FGToggleTask" formatted="false">Change checkmark</string>
+    <string name="FGAddEvent" formatted="false">Add to family calendar</string>
+    <string name="FGEventTitle" formatted="false">Event</string>
+    <string name="FGEventTitleHint" formatted="false">Birthday, trip or meeting</string>
+    <string name="FGWhen" formatted="false">Date and time</string>
+    <string name="FGWhenHint" formatted="false">Tap to choose</string>
+    <string name="FGAnnual" formatted="false">Repeat every year: 1 = yes, 0 = no</string>
+    <string name="FGAnnualHint" formatted="false">1 for a birthday; 0 for a one-time event</string>
+    <string name="FGDateFormat" formatted="false">Use YYYY-MM-DD HH:mm</string>
+    <string name="FGYearly" formatted="false">Every year</string>
+    <string name="FGCancelEvent" formatted="false">Cancel event</string>
+    <string name="FGOpenMessage" formatted="false">Open original message</string>
+    <string name="FGPartner" formatted="false">My partner</string>
+    <string name="FGChoosePartnerInfo" formatted="false">Choose your partner in FamilyGram settings</string>
+    <string name="FGPairOnly" formatted="false">Choose your partner chat to use this feature</string>
+    <string name="FGOpenAlbum" formatted="false">Open our photos and videos</string>
+    <string name="FGAlbumDateInfo" formatted="false">Use the calendar in the media screen to jump to a date</string>
+    <string name="FGOursHelp" formatted="false">Select a message in your chat and choose “Add to Ours”. Shared bookmarks are visible to both of you.</string>
+    <string name="FGAddToOurs" formatted="false">Add to Ours</string>
+    <string name="FGRemoveBookmark" formatted="false">Remove my bookmark</string>
+    <string name="FGLoadHistoryFirst" formatted="false">Refresh or load earlier history to find older messages</string>
+    <string name="FGSendHug" formatted="false">Hug my partner</string>
+    <string name="FGSendingHug" formatted="false">Sending you a hug</string>
+    <string name="FGHugSent" formatted="false">A hug for you two</string>
+    <string name="FGHugReceived" formatted="false">You received a hug</string>
+    <string name="FGHugBack" formatted="false">Hug back</string>
+    <string name="FGQuestionHelp" formatted="false">Both answers open after both people have answered. Keep this device until your answer opens. The daily question changes at midnight UTC.</string>
+    <string name="FGNoAnswers" formatted="false">Neither of you has answered yet</string>
+    <string name="FGWaitingAnswer" formatted="false">Waiting for both answers</string>
+    <string name="FGPartnerAnswered" formatted="false">Your partner has answered. Your turn!</string>
+    <string name="FGAnswer" formatted="false">Answer the question</string>
+    <string name="FGAnswerText" formatted="false">Your answer</string>
+    <string name="FGAnswerTextHint" formatted="false">Up to 600 characters</string>
+    <string name="FGRetryReveal" formatted="false">Retry opening answers</string>
+    <string name="FGAddGoal" formatted="false">Create a goal</string>
+    <string name="FGGoalTitle" formatted="false">Goal</string>
+    <string name="FGGoalTitleHint" formatted="false">For example: our trip</string>
+    <string name="FGTarget" formatted="false">Target amount</string>
+    <string name="FGTargetHint" formatted="false">10000.00</string>
+    <string name="FGCurrency" formatted="false">Currency code</string>
+    <string name="FGCurrencyHint" formatted="false">Three letters, for example RUB or EUR</string>
+    <string name="FGAmount" formatted="false">Contribution amount</string>
+    <string name="FGAmountHint" formatted="false">For example: 1500.50</string>
+    <string name="FGNote" formatted="false">Comment</string>
+    <string name="FGNoteHint" formatted="false">Optional, up to 300 characters</string>
+    <string name="FGContribute" formatted="false">Record a contribution</string>
+    <string name="FGManualMoney" formatted="false">Contributions are a manual record. Each confirmed entry adds to the shared total.</string>
+    <string name="FGWatchHelp" formatted="false">Both people explicitly join on their phones. Pause and seek changes travel through your chat; network delays can affect synchronization.</string>
+    <string name="FGChooseVideo" formatted="false">Choose a video from this chat</string>
+    <string name="FGNoMedia" formatted="false">No suitable downloaded history found. Load earlier history, or choose a newer video.</string>
+    <string name="FGWatchSession" formatted="false">Video session</string>
+    <string name="FGJoinWatch" formatted="false">Join this video</string>
+    <string name="FGDownloadingVideo" formatted="false">Downloading the video…</string>
+    <string name="FGVideoError" formatted="false">Unable to play this video</string>
+    <string name="FGWatchConnected" formatted="false">Joined. Playback controls are shared.</string>
+    <string name="FGPlay" formatted="false">Play</string>
+    <string name="FGPause" formatted="false">Pause</string>
+    <string name="FGSkipSilence" formatted="false">Skip silence in voice messages</string>
+    <string name="FGSkipSilenceInfo" formatted="false">Shortens pauses during voice playback without changing the recording</string>
+    <string name="FGVoiceHelp" formatted="false">Playback position is saved on this phone. One-time and disappearing recordings are excluded.</string>
+    <string name="FGLoadVoice" formatted="false">Show unheard voice messages</string>
+    <string name="FGVoiceQueueInfo" formatted="false">The queue uses downloaded history; older messages appear after synchronization</string>
+    <string name="FGNoVoice" formatted="false">No unheard voice messages in loaded history</string>
+    <string name="FGQueue" formatted="false">Queue</string>
+    <string name="FGPlayQueue" formatted="false">Play in order</string>
+    <string name="FGPairGame" formatted="false">Choose a personal conversation for a two-player game</string>
+    <string name="FGNewTTT" formatted="false">Tic-tac-toe</string>
+    <string name="FGNewFour" formatted="false">Four in a row</string>
+    <string name="FGGameHelp" formatted="false">Join, then take turns. Your moves remain in the chat history.</string>
+    <string name="FGFourHelp" formatted="false">Pick a column. Connect four counters horizontally, vertically or diagonally.</string>
+    <string name="FGWaitingPlayer" formatted="false">Waiting for the second player</string>
+    <string name="FGJoinGame" formatted="false">Join the game</string>
+    <string name="FGGameMove" formatted="false">Move</string>
+    <string name="FGWinner" formatted="false">Winner:</string>
+    <string name="FGDraw" formatted="false">Draw</string>
+    <string name="FGTurn" formatted="false">Turn:</string>
+    <string name="FGSplitBill" formatted="false">Split a bill</string>
+    <string name="FGItems" formatted="false">Items and participants</string>
+    <string name="FGItemsHint" formatted="false">One item per line: Pizza;1200;Anna,Sasha. For equal shares: Bill;1500;Anna,Sasha.</string>
+    <string name="FGAllStats" formatted="false">All-time statistics</string>
+    <string name="FGStatsCoverage" formatted="false">Statistics include the history loaded on this phone</string>
+    <string name="FGYearCard" formatted="false">Year in review</string>
+    <string name="FGYearCardInfo" formatted="false">Show a summary and optionally send it to this chat</string>
+    <string name="FGSendToChat" formatted="false">Send to chat</string>
+    <string name="FGHistoryComplete" formatted="false">History indexing finished</string>
+    <string name="FGHistoryPartial" formatted="false">Only part of the history is indexed</string>
+    <string name="FGSyncing" formatted="false">Loading history — tap to stop</string>
+    <string name="FGRefresh" formatted="false">Refresh recent messages</string>
+    <string name="FGRefreshInfo" formatted="false">Fetch the latest shared changes without marking messages as read</string>
+    <string name="FGLoadAllHistory" formatted="false">Load earlier history</string>
+    <string name="FGMore" formatted="false">Show more</string>
+    <string name="FGTogetherSince" formatted="false">Together since</string>
+    <string name="FGNotSet" formatted="false">Not set</string>
+    <string name="FGReset" formatted="false">Reset</string>
+    <string name="FGDaysTogether" formatted="false">days together</string>
+    <string name="FGPrivateScreen" formatted="false">Private screen</string>
+    <string name="FGPrivateScreenInfo" formatted="false">Cover the interface and block app screenshots until you show it again</string>
+    <string name="FGScreenHidden" formatted="false">The content is hidden</string>
+    <string name="FGShowContent" formatted="false">Show content</string>
+    <string name="FGLegacySettings" formatted="false">These existing family and ghost controls currently apply across accounts on this device.</string>
+    <string name="FGFamilyOnly" formatted="false">Notifications only from family</string>
+    <string name="FGFamilyOnlyInfo" formatted="false">Other conversations stay silent; login codes still arrive</string>
+    <string name="FGKeepDeleted" formatted="false">Keep deleted messages</string>
+    <string name="FGKeepDeletedInfo" formatted="false">Keep already received messages when the other person deletes them</string>
+    <string name="FGGhostRead" formatted="false">Hide read receipts</string>
+    <string name="FGGhostReadInfo" formatted="false">Do not send the existing chat-read signals guarded by this client</string>
+    <string name="FGGhostTyping" formatted="false">Hide typing</string>
+    <string name="FGGhostTypingInfo" formatted="false">Suppress typing and similar activity indicators</string>
+    <string name="FGGhostOnline" formatted="false">Hide online status</string>
+    <string name="FGGhostOnlineInfo" formatted="false">Send offline; the family exception uses Telegram privacy settings</string>
+    <string name="FGGhostFamily" formatted="false">Family exception</string>
+    <string name="FGGhostFamilyInfo" formatted="false">Family may see reading, typing and online activity</string>
+    <string name="FGUpdates" formatted="false">FamilyGram updates</string>
+    <string name="FGUpdatesInfo" formatted="false">Check published APK releases on your GitHub repository</string>
+    <string name="FGUpdateChecks" formatted="false">Check for updates when opening the app</string>
+    <string name="FGUpdateChecksInfo" formatted="false">Once a day; notify about a new stable APK release</string>
+    <string name="FGNoRelease" formatted="false">No stable FamilyGram release has been published yet. APK build artifacts are separate from published releases.</string>
+    <string name="FGNoApk" formatted="false">This release does not contain an APK</string>
+    <string name="FGUpToDate" formatted="false">You are up to date</string>
+    <string name="FGUpdateError" formatted="false">Unable to check for updates. Try again later.</string>
+    <string name="FGDownloadApk" formatted="false">Download APK</string>
+    <string name="FGIconPhotoInfo" formatted="false">Built-in app icons are stored in the APK. A gallery photo can be used for an additional home-screen shortcut.</string>
+    <string name="FGAddPhotoShortcut" formatted="false">Create a photo shortcut</string>
+    <string name="FGShortcutInfo" formatted="false">Choose a photo, then confirm adding it in your launcher</string>
+    <string name="FGBuiltInIcon" formatted="false">Use this built-in application icon</string>
+    <string name="FGChoosePhoto" formatted="false">Choose a photo</string>
+    <string name="FGWidgetPhotoInfo" formatted="false">A photo you choose for the couple widget</string>
+    <string name="FGAddWidget" formatted="false">Add the couple widget</string>
+    <string name="FGWidgetManual" formatted="false">Open your home screen widget picker and choose FamilyGram</string>
+    <string name="FGWidgetConfigure" formatted="false">Choose the widget account</string>
+    <string name="FGCoupleWidget" formatted="false">FamilyGram couple</string>
+    <string name="FGPhotoSaved" formatted="false">Photo saved</string>
+    <string name="FGPhotoError" formatted="false">Unable to open this photo</string>
+    <string name="FGConfirmShortcut" formatted="false">Confirm adding the photo shortcut in your launcher</string>
+    <string name="FGShortcutUnsupported" formatted="false">This launcher does not support adding photo shortcuts</string>
+    <string name="FGQuickReaction" formatted="false">Random heart or kiss</string>
+    <string name="FGQuickReactionInfo" formatted="false">React to your partner’s latest message, or use the message menu</string>
+    <string name="FGSelectMessageReaction" formatted="false">Choose your partner’s message and tap the random reaction in its menu</string>
+    <string name="FGReactionsUnavailable" formatted="false">These reactions are not available from Telegram right now</string>
+    <string name="FGOpenCard" formatted="false">Open FamilyGram card</string>
+    <string name="FGBookmarkShortcut" formatted="false">★ Ours</string>
+    <string name="FGQuickPairReaction" formatted="false">❤ / 💋</string>
+</resources>

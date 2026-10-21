@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FGTitle" formatted="false">FamilyGram</string>
+    <string name="FGSearch" formatted="false">Поиск по FamilyGram</string>
+    <string name="FGsettings" formatted="false">Настройки FamilyGram</string>
+    <string name="FGSettingsInfo" formatted="false">Семейные функции, приватность, оформление и обновления</string>
+    <string name="FGicons" formatted="false">Иконки приложения</string>
+    <string name="FGIconsInfo" formatted="false">Встроенные иконки и фото-ярлыки запуска</string>
+    <string name="FGwidget" formatted="false">Виджет для пары</string>
+    <string name="FGWidgetInfo" formatted="false">Ваше фото, дни вместе и открытие чата одним нажатием</string>
+    <string name="FGtasks" formatted="false">Покупки и дела</string>
+    <string name="FGtasksInfo" formatted="false">Общие пункты с отметкой «куплено» или «готово»</string>
+    <string name="FGcalendar" formatted="false">Календарь семьи</string>
+    <string name="FGcalendarInfo" formatted="false">Дни рождения, поездки и встречи в одной ленте</string>
+    <string name="FGalbum" formatted="false">Альбом пары</string>
+    <string name="FGalbumInfo" formatted="false">Фото и видео из чата с половинкой с переходом по дате</string>
+    <string name="FGours" formatted="false">Наше</string>
+    <string name="FGoursInfo" formatted="false">Сообщения, которые вы решили сохранить вместе</string>
+    <string name="FGhug" formatted="false">Объятия</string>
+    <string name="FGhugInfo" formatted="false">Небольшая анимация и лёгкий виброотклик для половинки</string>
+    <string name="FGquestion" formatted="false">Вопрос дня</string>
+    <string name="FGquestionInfo" formatted="false">Ответьте на один вопрос и откройте ответы вместе</string>
+    <string name="FGgoals" formatted="false">Общая копилка</string>
+    <string name="FGgoalsInfo" formatted="false">Сумма цели, ручной учёт взносов и общий прогресс</string>
+    <string name="FGwatch" formatted="false">Совместный просмотр</string>
+    <string name="FGwatchInfo" formatted="false">Смотрите видео из чата с общими паузой и перемоткой</string>
+    <string name="FGvoice" formatted="false">Голосовые сообщения</string>
+    <string name="FGvoiceInfo" formatted="false">Очередь непрослушанных, пропуск тишины и сохранение позиции</string>
+    <string name="FGgames" formatted="false">Игры на двоих</string>
+    <string name="FGgamesInfo" formatted="false">Крестики-нолики и «Четыре в ряд» с сохранением партии</string>
+    <string name="FGbill" formatted="false">Разделить счёт</string>
+    <string name="FGbillInfo" formatted="false">Укажите участников каждой покупки: доли сойдутся до копейки</string>
+    <string name="FGstats" formatted="false">Статистика переписки</string>
+    <string name="FGstatsInfo" formatted="false">Сообщения, длительность голосовых, активные месяцы и эмодзи</string>
+    <string name="FGChooseChat" formatted="false">Выбрать чат</string>
+    <string name="FGChooseChatInfo" formatted="false">Выберите чат для общих карточек FamilyGram</string>
+    <string name="FGNoChats" formatted="false">Сначала откройте переписку, затем вернитесь сюда</string>
+    <string name="FGCancel" formatted="false">Отмена</string>
+    <string name="FGClose" formatted="false">Закрыть</string>
+    <string name="FGSave" formatted="false">Сохранить и отправить</string>
+    <string name="FGYou" formatted="false">Вы</string>
+    <string name="FGInvalid" formatted="false">Проверьте введённые данные</string>
+    <string name="FGRequired" formatted="false">Введите текст в пределах ограничения</string>
+    <string name="FGTooLong" formatted="false">Слишком длинный текст</string>
+    <string name="FGAddTask" formatted="false">Добавить пункт</string>
+    <string name="FGAddTaskInfo" formatted="false">Каждый пункт отправляется в этот чат, отметка видна обоим</string>
+    <string name="FGTaskTitle" formatted="false">Пункт</string>
+    <string name="FGTaskTitleHint" formatted="false">Например: молоко или заказать билеты</string>
+    <string name="FGListName" formatted="false">Название списка</string>
+    <string name="FGListNameHint" formatted="false">Покупки, дом, планы…</string>
+    <string name="FGShopping" formatted="false">Покупки</string>
+    <string name="FGMarkBought" formatted="false">Куплено / готово</string>
+    <string name="FGUndoDone" formatted="false">Снять отметку</string>
+    <string name="FGToggleTask" formatted="false">Поменять отметку</string>
+    <string name="FGAddEvent" formatted="false">Добавить в календарь семьи</string>
+    <string name="FGEventTitle" formatted="false">Событие</string>
+    <string name="FGEventTitleHint" formatted="false">День рождения, поездка или встреча</string>
+    <string name="FGWhen" formatted="false">Дата и время</string>
+    <string name="FGWhenHint" formatted="false">Нажмите, чтобы выбрать</string>
+    <string name="FGAnnual" formatted="false">Повторять ежегодно: 1 — да, 0 — нет</string>
+    <string name="FGAnnualHint" formatted="false">1 для дня рождения, 0 для разового события</string>
+    <string name="FGDateFormat" formatted="false">Используйте ГГГГ-ММ-ДД ЧЧ:мм</string>
+    <string name="FGYearly" formatted="false">Ежегодно</string>
+    <string name="FGCancelEvent" formatted="false">Отменить событие</string>
+    <string name="FGOpenMessage" formatted="false">Открыть исходное сообщение</string>
+    <string name="FGPartner" formatted="false">Моя половинка</string>
+    <string name="FGChoosePartnerInfo" formatted="false">Выберите половинку в настройках FamilyGram</string>
+    <string name="FGPairOnly" formatted="false">Для этой функции выберите чат с половинкой</string>
+    <string name="FGOpenAlbum" formatted="false">Открыть наши фото и видео</string>
+    <string name="FGAlbumDateInfo" formatted="false">Для перехода к дате используйте календарь на экране медиа</string>
+    <string name="FGOursHelp" formatted="false">В меню сообщения выберите «В Наше». Общие закладки будут видны вам обоим.</string>
+    <string name="FGAddToOurs" formatted="false">В Наше</string>
+    <string name="FGRemoveBookmark" formatted="false">Убрать мою закладку</string>
+    <string name="FGLoadHistoryFirst" formatted="false">Обновите или загрузите раннюю историю, чтобы найти старые сообщения</string>
+    <string name="FGSendHug" formatted="false">Обнять половинку</string>
+    <string name="FGSendingHug" formatted="false">Обнимаю тебя</string>
+    <string name="FGHugSent" formatted="false">Объятия для вас двоих</string>
+    <string name="FGHugReceived" formatted="false">Вас обнимают</string>
+    <string name="FGHugBack" formatted="false">Обнять в ответ</string>
+    <string name="FGQuestionHelp" formatted="false">Ответы откроются после ответа обоих. Сохраните этот телефон до открытия вашего ответа. Новый вопрос появляется в полночь UTC.</string>
+    <string name="FGNoAnswers" formatted="false">Пока никто не ответил</string>
+    <string name="FGWaitingAnswer" formatted="false">Ожидаем ответы обоих</string>
+    <string name="FGPartnerAnswered" formatted="false">Половинка уже ответила. Теперь ваша очередь!</string>
+    <string name="FGAnswer" formatted="false">Ответить на вопрос</string>
+    <string name="FGAnswerText" formatted="false">Ваш ответ</string>
+    <string name="FGAnswerTextHint" formatted="false">До 600 символов</string>
+    <string name="FGRetryReveal" formatted="false">Повторить открытие ответов</string>
+    <string name="FGAddGoal" formatted="false">Создать копилку</string>
+    <string name="FGGoalTitle" formatted="false">Цель</string>
+    <string name="FGGoalTitleHint" formatted="false">Например: на нашу поездку</string>
+    <string name="FGTarget" formatted="false">Сумма цели</string>
+    <string name="FGTargetHint" formatted="false">10000.00</string>
+    <string name="FGCurrency" formatted="false">Код валюты</string>
+    <string name="FGCurrencyHint" formatted="false">Три латинские буквы, например RUB или EUR</string>
+    <string name="FGAmount" formatted="false">Сумма взноса</string>
+    <string name="FGAmountHint" formatted="false">Например: 1500.50</string>
+    <string name="FGNote" formatted="false">Комментарий</string>
+    <string name="FGNoteHint" formatted="false">Необязательно, до 300 символов</string>
+    <string name="FGContribute" formatted="false">Добавить взнос</string>
+    <string name="FGManualMoney" formatted="false">Это ручной учёт взносов. Каждая подтверждённая запись прибавляется к общей сумме.</string>
+    <string name="FGWatchHelp" formatted="false">Каждый присоединяется на своём телефоне. Пауза и перемотка передаются через чат; задержки сети влияют на синхронизацию.</string>
+    <string name="FGChooseVideo" formatted="false">Выбрать видео из этого чата</string>
+    <string name="FGNoMedia" formatted="false">Подходящее видео не найдено в загруженной истории. Загрузите раннюю историю или выберите более новое видео.</string>
+    <string name="FGWatchSession" formatted="false">Сеанс просмотра</string>
+    <string name="FGJoinWatch" formatted="false">Присоединиться к просмотру</string>
+    <string name="FGDownloadingVideo" formatted="false">Загружаем видео…</string>
+    <string name="FGVideoError" formatted="false">Не удалось воспроизвести видео</string>
+    <string name="FGWatchConnected" formatted="false">Вы присоединились. Управление просмотром общее.</string>
+    <string name="FGPlay" formatted="false">Воспроизвести</string>
+    <string name="FGPause" formatted="false">Пауза</string>
+    <string name="FGSkipSilence" formatted="false">Пропускать тишину в голосовых</string>
+    <string name="FGSkipSilenceInfo" formatted="false">Сокращает паузы при прослушивании, сохраняя исходную запись</string>
+    <string name="FGVoiceHelp" formatted="false">Позиция прослушивания сохраняется на этом телефоне. Одноразовые и исчезающие записи исключены.</string>
+    <string name="FGLoadVoice" formatted="false">Показать непрослушанные голосовые</string>
+    <string name="FGVoiceQueueInfo" formatted="false">Очередь строится по загруженной истории. Более старые сообщения появятся после синхронизации</string>
+    <string name="FGNoVoice" formatted="false">В загруженной истории нет непрослушанных голосовых</string>
+    <string name="FGQueue" formatted="false">Очередь</string>
+    <string name="FGPlayQueue" formatted="false">Слушать по порядку</string>
+    <string name="FGPairGame" formatted="false">Для игры на двоих выберите личную переписку</string>
+    <string name="FGNewTTT" formatted="false">Крестики-нолики</string>
+    <string name="FGNewFour" formatted="false">Четыре в ряд</string>
+    <string name="FGGameHelp" formatted="false">Присоединитесь и ходите по очереди. Ходы сохраняются в истории чата.</string>
+    <string name="FGFourHelp" formatted="false">Выберите столбец. Соберите четыре фишки по горизонтали, вертикали или диагонали.</string>
+    <string name="FGWaitingPlayer" formatted="false">Ожидаем второго игрока</string>
+    <string name="FGJoinGame" formatted="false">Присоединиться к игре</string>
+    <string name="FGGameMove" formatted="false">Ход</string>
+    <string name="FGWinner" formatted="false">Победитель:</string>
+    <string name="FGDraw" formatted="false">Ничья</string>
+    <string name="FGTurn" formatted="false">Ходит:</string>
+    <string name="FGSplitBill" formatted="false">Разделить счёт</string>
+    <string name="FGItems" formatted="false">Покупки и участники</string>
+    <string name="FGItemsHint" formatted="false">Каждая покупка с новой строки: Пицца;1200;Аня,Саша. Для равного деления: Счёт;1500;Аня,Саша.</string>
+    <string name="FGAllStats" formatted="false">За всё время</string>
+    <string name="FGStatsCoverage" formatted="false">Статистика учитывает историю, загруженную на этом телефоне</string>
+    <string name="FGYearCard" formatted="false">Итоги года</string>
+    <string name="FGYearCardInfo" formatted="false">Посмотреть итоговую карточку и при желании отправить в этот чат</string>
+    <string name="FGSendToChat" formatted="false">Отправить в чат</string>
+    <string name="FGHistoryComplete" formatted="false">Индексация истории завершена</string>
+    <string name="FGHistoryPartial" formatted="false">Проиндексирована часть истории</string>
+    <string name="FGSyncing" formatted="false">Загружаем историю — нажмите, чтобы остановить</string>
+    <string name="FGRefresh" formatted="false">Обновить последние сообщения</string>
+    <string name="FGRefreshInfo" formatted="false">Получить последние общие изменения без отметки о прочтении</string>
+    <string name="FGLoadAllHistory" formatted="false">Загрузить раннюю историю</string>
+    <string name="FGMore" formatted="false">Показать ещё</string>
+    <string name="FGTogetherSince" formatted="false">Вместе с</string>
+    <string name="FGNotSet" formatted="false">Не задано</string>
+    <string name="FGReset" formatted="false">Сбросить</string>
+    <string name="FGDaysTogether" formatted="false">дн. вместе</string>
+    <string name="FGPrivateScreen" formatted="false">Приватный экран</string>
+    <string name="FGPrivateScreenInfo" formatted="false">Закрыть интерфейс и запретить снимки приложения до повторного открытия</string>
+    <string name="FGScreenHidden" formatted="false">Содержимое скрыто</string>
+    <string name="FGShowContent" formatted="false">Показать содержимое</string>
+    <string name="FGLegacySettings" formatted="false">Эти существующие настройки семьи и призрака пока действуют для всех аккаунтов на устройстве.</string>
+    <string name="FGFamilyOnly" formatted="false">Уведомления только от семьи</string>
+    <string name="FGFamilyOnlyInfo" formatted="false">Остальные чаты молчат, коды входа продолжают приходить</string>
+    <string name="FGKeepDeleted" formatted="false">Сохранять удалённые сообщения</string>
+    <string name="FGKeepDeletedInfo" formatted="false">Оставлять уже полученные сообщения после удаления собеседником</string>
+    <string name="FGGhostRead" formatted="false">Скрывать прочтение</string>
+    <string name="FGGhostReadInfo" formatted="false">Не отправлять сигналы прочтения, которые блокирует текущая версия клиента</string>
+    <string name="FGGhostTyping" formatted="false">Скрывать «печатает…»</string>
+    <string name="FGGhostTypingInfo" formatted="false">Не отправлять индикаторы набора и похожих действий</string>
+    <string name="FGGhostOnline" formatted="false">Скрывать онлайн</string>
+    <string name="FGGhostOnlineInfo" formatted="false">Отправлять офлайн; семейное исключение использует настройки приватности Telegram</string>
+    <string name="FGGhostFamily" formatted="false">Исключение для семьи</string>
+    <string name="FGGhostFamilyInfo" formatted="false">Семья может видеть прочтение, набор текста и онлайн</string>
+    <string name="FGUpdates" formatted="false">Обновления FamilyGram</string>
+    <string name="FGUpdatesInfo" formatted="false">Проверить опубликованные APK-релизы в вашем репозитории GitHub</string>
+    <string name="FGUpdateChecks" formatted="false">Проверять обновления при открытии приложения</string>
+    <string name="FGUpdateChecksInfo" formatted="false">Раз в день; сообщать о новом стабильном APK-релизе</string>
+    <string name="FGNoRelease" formatted="false">Стабильный релиз FamilyGram ещё не опубликован. Артефакты сборок APK и опубликованные релизы — разные вещи.</string>
+    <string name="FGNoApk" formatted="false">В этом релизе нет APK</string>
+    <string name="FGUpToDate" formatted="false">Установлена актуальная версия</string>
+    <string name="FGUpdateError" formatted="false">Не удалось проверить обновления. Попробуйте позже.</string>
+    <string name="FGDownloadApk" formatted="false">Скачать APK</string>
+    <string name="FGIconPhotoInfo" formatted="false">Встроенные иконки приложения находятся внутри APK. Фото из галереи можно использовать для отдельного ярлыка на рабочем столе.</string>
+    <string name="FGAddPhotoShortcut" formatted="false">Создать фото-ярлык</string>
+    <string name="FGShortcutInfo" formatted="false">Выберите фото и подтвердите добавление ярлыка в лаунчере</string>
+    <string name="FGBuiltInIcon" formatted="false">Использовать эту встроенную иконку приложения</string>
+    <string name="FGChoosePhoto" formatted="false">Выбрать фото</string>
+    <string name="FGWidgetPhotoInfo" formatted="false">Ваше фото для виджета пары</string>
+    <string name="FGAddWidget" formatted="false">Добавить виджет пары</string>
+    <string name="FGWidgetManual" formatted="false">Откройте список виджетов на рабочем столе и выберите FamilyGram</string>
+    <string name="FGWidgetConfigure" formatted="false">Выберите аккаунт для виджета</string>
+    <string name="FGCoupleWidget" formatted="false">Пара FamilyGram</string>
+    <string name="FGPhotoSaved" formatted="false">Фото сохранено</string>
+    <string name="FGPhotoError" formatted="false">Не удалось открыть это фото</string>
+    <string name="FGConfirmShortcut" formatted="false">Подтвердите добавление фото-ярлыка в лаунчере</string>
+    <string name="FGShortcutUnsupported" formatted="false">Этот лаунчер не поддерживает добавление фото-ярлыков</string>
+    <string name="FGQuickReaction" formatted="false">Случайное сердечко или поцелуй</string>
+    <string name="FGQuickReactionInfo" formatted="false">Реакция на последнее сообщение половинки; также доступна в меню сообщения</string>
+    <string name="FGSelectMessageReaction" formatted="false">Выберите сообщение половинки и нажмите случайную реакцию в его меню</string>
+    <string name="FGReactionsUnavailable" formatted="false">Эти реакции сейчас недоступны со стороны Telegram</string>
+    <string name="FGOpenCard" formatted="false">Открыть карточку FamilyGram</string>
+    <string name="FGBookmarkShortcut" formatted="false">★ Наше</string>
+    <string name="FGQuickPairReaction" formatted="false">❤ / 💋</string>
+</resources>

@@ -6,6 +6,10 @@ name: Android APK
 on:
   workflow_dispatch:
     inputs:
+      publish_release:
+        description: "Publish a stable FamilyGram APK release (requires a new familygram/VERSION)"
+        type: boolean
+        default: false
       abis:
         description: "CPU architectures to build (arm64-v8a fits almost every modern phone)"
         type: choice
@@ -15,6 +19,9 @@ on:
           - armeabi-v7a
           - "armeabi-v7a, arm64-v8a"
           - "armeabi-v7a, arm64-v8a, x86, x86_64"
+
+permissions:
+  contents: read
 
 jobs:
   apk:
@@ -102,3 +109,26 @@ jobs:
           name: FamilyGram-apk
           path: apk/*.apk
           retention-days: 14
+
+  release:
+    if: ${{ inputs.publish_release }}
+    needs: apk
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v7
+        with:
+          name: FamilyGram-apk
+          path: apk
+      - name: Publish stable APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          VERSION=$(cat familygram/VERSION)
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then exit 1; fi
+          gh release create "familygram-$VERSION" apk/*.apk --target "$GITHUB_SHA" --title "FamilyGram $VERSION" --notes-file familygram/CHANGELOG.md

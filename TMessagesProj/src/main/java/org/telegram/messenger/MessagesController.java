@@ -10525,7 +10525,7 @@ public class MessagesController extends BaseController implements NotificationCe
                         }
 
                         TL_account.updateStatus req = new TL_account.updateStatus();
-                        req.offline = FamilyController.shouldHideOnline();
+                        req.offline = FamilyController.shouldHideOnline(currentAccount);
                         statusRequest = getConnectionsManager().sendRequest(req, (response, error) -> {
                             if (error == null) {
                                 lastStatusUpdateTime = System.currentTimeMillis();
@@ -21921,6 +21921,9 @@ public class MessagesController extends BaseController implements NotificationCe
     public boolean updateInterfaceWithMessages(long dialogId, ArrayList<MessageObject> messages, int mode) {
         if (messages == null || messages.isEmpty()) {
             return false;
+        }
+        if (mode == 0 && getUserConfig().isClientActivated()) {
+            for (MessageObject message : messages) org.telegram.messenger.family.FamilyDataController.getInstance(currentAccount).ingest(message);
         }
         final boolean scheduled = mode == ChatActivity.MODE_SCHEDULED;
         final boolean quickReplies = mode == ChatActivity.MODE_QUICK_REPLIES;

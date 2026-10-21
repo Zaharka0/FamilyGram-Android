@@ -628,6 +628,14 @@
             android:name=".voip.CallNotificationSoundProvider"
             android:exported="true"/>
 
+        <activity android:name="org.telegram.messenger.family.FamilyWidgetConfigureActivity" android:exported="true" android:excludeFromRecents="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" /></intent-filter>
+        </activity>
+        <receiver android:name="org.telegram.messenger.family.FamilyPairWidget" android:exported="false" android:label="@string/FGCoupleWidget">
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/family_pair_widget_info" />
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
+        </receiver>
+
         <receiver android:name=".ChatsWidgetProvider" android:exported="false">
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/chats_widget_info" />

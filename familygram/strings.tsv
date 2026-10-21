@@ -1,0 +1,193 @@
+Title	FamilyGram	FamilyGram
+Search	Search FamilyGram	Поиск по FamilyGram
+settings	FamilyGram settings	Настройки FamilyGram
+SettingsInfo	Family features, privacy, appearance and updates	Семейные функции, приватность, оформление и обновления
+icons	Application icons	Иконки приложения
+IconsInfo	Built-in launcher icons and photo shortcuts	Встроенные иконки и фото-ярлыки запуска
+widget	Couple widget	Виджет для пары
+WidgetInfo	Your photo, days together and one tap to open your chat	Ваше фото, дни вместе и открытие чата одним нажатием
+tasks	Shopping and tasks	Покупки и дела
+tasksInfo	Shared items with a bought or done checkmark	Общие пункты с отметкой «куплено» или «готово»
+calendar	Family calendar	Календарь семьи
+calendarInfo	Birthdays, trips and meetings in one timeline	Дни рождения, поездки и встречи в одной ленте
+album	Our album	Альбом пары
+albumInfo	Photos and videos from your partner chat, with date navigation	Фото и видео из чата с половинкой с переходом по дате
+ours	Ours	Наше
+oursInfo	Messages you chose to keep together	Сообщения, которые вы решили сохранить вместе
+hug	Hugs	Объятия
+hugInfo	Send a little animation and a gentle haptic greeting	Небольшая анимация и лёгкий виброотклик для половинки
+question	Question of the day	Вопрос дня
+questionInfo	Answer the same question and open your answers together	Ответьте на один вопрос и откройте ответы вместе
+goals	Shared goals	Общая копилка
+goalsInfo	A goal amount, manually recorded contributions and shared progress	Сумма цели, ручной учёт взносов и общий прогресс
+watch	Watch together	Совместный просмотр
+watchInfo	Watch a video from your chat with shared playback controls	Смотрите видео из чата с общими паузой и перемоткой
+voice	Voice messages	Голосовые сообщения
+voiceInfo	An unheard queue, silence skipping and saved playback position	Очередь непрослушанных, пропуск тишины и сохранение позиции
+games	Games for two	Игры на двоих
+gamesInfo	Resumable tic-tac-toe and four-in-a-row	Крестики-нолики и «Четыре в ряд» с сохранением партии
+bill	Split a bill	Разделить счёт
+billInfo	Choose who shares each item; amounts add up exactly	Укажите участников каждой покупки: доли сойдутся до копейки
+stats	Conversation statistics	Статистика переписки
+statsInfo	Messages, voice duration, active months and emoji	Сообщения, длительность голосовых, активные месяцы и эмодзи
+ChooseChat	Choose conversation	Выбрать чат
+ChooseChatInfo	Select a conversation for shared FamilyGram cards	Выберите чат для общих карточек FamilyGram
+NoChats	Open a conversation first, then return here	Сначала откройте переписку, затем вернитесь сюда
+Cancel	Cancel	Отмена
+Close	Close	Закрыть
+Save	Save and send	Сохранить и отправить
+You	You	Вы
+Invalid	Check the entered values	Проверьте введённые данные
+Required	Enter text within the character limit	Введите текст в пределах ограничения
+TooLong	Text is too long	Слишком длинный текст
+AddTask	Add an item	Добавить пункт
+AddTaskInfo	Each item is sent to this chat; its state is shared	Каждый пункт отправляется в этот чат, отметка видна обоим
+TaskTitle	Item	Пункт
+TaskTitleHint	For example: milk or book tickets	Например: молоко или заказать билеты
+ListName	List name	Название списка
+ListNameHint	Shopping, home, plans…	Покупки, дом, планы…
+Shopping	Shopping	Покупки
+MarkBought	Bought / done	Куплено / готово
+UndoDone	Uncheck	Снять отметку
+ToggleTask	Change checkmark	Поменять отметку
+AddEvent	Add to family calendar	Добавить в календарь семьи
+EventTitle	Event	Событие
+EventTitleHint	Birthday, trip or meeting	День рождения, поездка или встреча
+When	Date and time	Дата и время
+WhenHint	Tap to choose	Нажмите, чтобы выбрать
+Annual	Repeat every year: 1 = yes, 0 = no	Повторять ежегодно: 1 — да, 0 — нет
+AnnualHint	1 for a birthday; 0 for a one-time event	1 для дня рождения, 0 для разового события
+DateFormat	Use YYYY-MM-DD HH:mm	Используйте ГГГГ-ММ-ДД ЧЧ:мм
+Yearly	Every year	Ежегодно
+CancelEvent	Cancel event	Отменить событие
+OpenMessage	Open original message	Открыть исходное сообщение
+Partner	My partner	Моя половинка
+ChoosePartnerInfo	Choose your partner in FamilyGram settings	Выберите половинку в настройках FamilyGram
+PairOnly	Choose your partner chat to use this feature	Для этой функции выберите чат с половинкой
+OpenAlbum	Open our photos and videos	Открыть наши фото и видео
+AlbumDateInfo	Use the calendar in the media screen to jump to a date	Для перехода к дате используйте календарь на экране медиа
+OursHelp	Select a message in your chat and choose “Add to Ours”. Shared bookmarks are visible to both of you.	В меню сообщения выберите «В Наше». Общие закладки будут видны вам обоим.
+AddToOurs	Add to Ours	В Наше
+RemoveBookmark	Remove my bookmark	Убрать мою закладку
+LoadHistoryFirst	Refresh or load earlier history to find older messages	Обновите или загрузите раннюю историю, чтобы найти старые сообщения
+SendHug	Hug my partner	Обнять половинку
+SendingHug	Sending you a hug	Обнимаю тебя
+HugSent	A hug for you two	Объятия для вас двоих
+HugReceived	You received a hug	Вас обнимают
+HugBack	Hug back	Обнять в ответ
+QuestionHelp	Both answers open after both people have answered. Keep this device until your answer opens. The daily question changes at midnight UTC.	Ответы откроются после ответа обоих. Сохраните этот телефон до открытия вашего ответа. Новый вопрос появляется в полночь UTC.
+NoAnswers	Neither of you has answered yet	Пока никто не ответил
+WaitingAnswer	Waiting for both answers	Ожидаем ответы обоих
+PartnerAnswered	Your partner has answered. Your turn!	Половинка уже ответила. Теперь ваша очередь!
+Answer	Answer the question	Ответить на вопрос
+AnswerText	Your answer	Ваш ответ
+AnswerTextHint	Up to 600 characters	До 600 символов
+RetryReveal	Retry opening answers	Повторить открытие ответов
+AddGoal	Create a goal	Создать копилку
+GoalTitle	Goal	Цель
+GoalTitleHint	For example: our trip	Например: на нашу поездку
+Target	Target amount	Сумма цели
+TargetHint	10000.00	10000.00
+Currency	Currency code	Код валюты
+CurrencyHint	Three letters, for example RUB or EUR	Три латинские буквы, например RUB или EUR
+Amount	Contribution amount	Сумма взноса
+AmountHint	For example: 1500.50	Например: 1500.50
+Note	Comment	Комментарий
+NoteHint	Optional, up to 300 characters	Необязательно, до 300 символов
+Contribute	Record a contribution	Добавить взнос
+ManualMoney	Contributions are a manual record. Each confirmed entry adds to the shared total.	Это ручной учёт взносов. Каждая подтверждённая запись прибавляется к общей сумме.
+WatchHelp	Both people explicitly join on their phones. Pause and seek changes travel through your chat; network delays can affect synchronization.	Каждый присоединяется на своём телефоне. Пауза и перемотка передаются через чат; задержки сети влияют на синхронизацию.
+ChooseVideo	Choose a video from this chat	Выбрать видео из этого чата
+NoMedia	No suitable downloaded history found. Load earlier history, or choose a newer video.	Подходящее видео не найдено в загруженной истории. Загрузите раннюю историю или выберите более новое видео.
+WatchSession	Video session	Сеанс просмотра
+JoinWatch	Join this video	Присоединиться к просмотру
+DownloadingVideo	Downloading the video…	Загружаем видео…
+VideoError	Unable to play this video	Не удалось воспроизвести видео
+WatchConnected	Joined. Playback controls are shared.	Вы присоединились. Управление просмотром общее.
+Play	Play	Воспроизвести
+Pause	Pause	Пауза
+SkipSilence	Skip silence in voice messages	Пропускать тишину в голосовых
+SkipSilenceInfo	Shortens pauses during voice playback without changing the recording	Сокращает паузы при прослушивании, сохраняя исходную запись
+VoiceHelp	Playback position is saved on this phone. One-time and disappearing recordings are excluded.	Позиция прослушивания сохраняется на этом телефоне. Одноразовые и исчезающие записи исключены.
+LoadVoice	Show unheard voice messages	Показать непрослушанные голосовые
+VoiceQueueInfo	The queue uses downloaded history; older messages appear after synchronization	Очередь строится по загруженной истории. Более старые сообщения появятся после синхронизации
+NoVoice	No unheard voice messages in loaded history	В загруженной истории нет непрослушанных голосовых
+Queue	Queue	Очередь
+PlayQueue	Play in order	Слушать по порядку
+PairGame	Choose a personal conversation for a two-player game	Для игры на двоих выберите личную переписку
+NewTTT	Tic-tac-toe	Крестики-нолики
+NewFour	Four in a row	Четыре в ряд
+GameHelp	Join, then take turns. Your moves remain in the chat history.	Присоединитесь и ходите по очереди. Ходы сохраняются в истории чата.
+FourHelp	Pick a column. Connect four counters horizontally, vertically or diagonally.	Выберите столбец. Соберите четыре фишки по горизонтали, вертикали или диагонали.
+WaitingPlayer	Waiting for the second player	Ожидаем второго игрока
+JoinGame	Join the game	Присоединиться к игре
+GameMove	Move	Ход
+Winner	Winner:	Победитель:
+Draw	Draw	Ничья
+Turn	Turn:	Ходит:
+SplitBill	Split a bill	Разделить счёт
+Items	Items and participants	Покупки и участники
+ItemsHint	One item per line: Pizza;1200;Anna,Sasha. For equal shares: Bill;1500;Anna,Sasha.	Каждая покупка с новой строки: Пицца;1200;Аня,Саша. Для равного деления: Счёт;1500;Аня,Саша.
+AllStats	All-time statistics	За всё время
+StatsCoverage	Statistics include the history loaded on this phone	Статистика учитывает историю, загруженную на этом телефоне
+YearCard	Year in review	Итоги года
+YearCardInfo	Show a summary and optionally send it to this chat	Посмотреть итоговую карточку и при желании отправить в этот чат
+SendToChat	Send to chat	Отправить в чат
+HistoryComplete	History indexing finished	Индексация истории завершена
+HistoryPartial	Only part of the history is indexed	Проиндексирована часть истории
+Syncing	Loading history — tap to stop	Загружаем историю — нажмите, чтобы остановить
+Refresh	Refresh recent messages	Обновить последние сообщения
+RefreshInfo	Fetch the latest shared changes without marking messages as read	Получить последние общие изменения без отметки о прочтении
+LoadAllHistory	Load earlier history	Загрузить раннюю историю
+More	Show more	Показать ещё
+TogetherSince	Together since	Вместе с
+NotSet	Not set	Не задано
+Reset	Reset	Сбросить
+DaysTogether	days together	дн. вместе
+PrivateScreen	Private screen	Приватный экран
+PrivateScreenInfo	Cover the interface and block app screenshots until you show it again	Закрыть интерфейс и запретить снимки приложения до повторного открытия
+ScreenHidden	The content is hidden	Содержимое скрыто
+ShowContent	Show content	Показать содержимое
+LegacySettings	These existing family and ghost controls currently apply across accounts on this device.	Эти существующие настройки семьи и призрака пока действуют для всех аккаунтов на устройстве.
+FamilyOnly	Notifications only from family	Уведомления только от семьи
+FamilyOnlyInfo	Other conversations stay silent; login codes still arrive	Остальные чаты молчат, коды входа продолжают приходить
+KeepDeleted	Keep deleted messages	Сохранять удалённые сообщения
+KeepDeletedInfo	Keep already received messages when the other person deletes them	Оставлять уже полученные сообщения после удаления собеседником
+GhostRead	Hide read receipts	Скрывать прочтение
+GhostReadInfo	Do not send the existing chat-read signals guarded by this client	Не отправлять сигналы прочтения, которые блокирует текущая версия клиента
+GhostTyping	Hide typing	Скрывать «печатает…»
+GhostTypingInfo	Suppress typing and similar activity indicators	Не отправлять индикаторы набора и похожих действий
+GhostOnline	Hide online status	Скрывать онлайн
+GhostOnlineInfo	Send offline; the family exception uses Telegram privacy settings	Отправлять офлайн; семейное исключение использует настройки приватности Telegram
+GhostFamily	Family exception	Исключение для семьи
+GhostFamilyInfo	Family may see reading, typing and online activity	Семья может видеть прочтение, набор текста и онлайн
+Updates	FamilyGram updates	Обновления FamilyGram
+UpdatesInfo	Check published APK releases on your GitHub repository	Проверить опубликованные APK-релизы в вашем репозитории GitHub
+UpdateChecks	Check for updates when opening the app	Проверять обновления при открытии приложения
+UpdateChecksInfo	Once a day; notify about a new stable APK release	Раз в день; сообщать о новом стабильном APK-релизе
+NoRelease	No stable FamilyGram release has been published yet. APK build artifacts are separate from published releases.	Стабильный релиз FamilyGram ещё не опубликован. Артефакты сборок APK и опубликованные релизы — разные вещи.
+NoApk	This release does not contain an APK	В этом релизе нет APK
+UpToDate	You are up to date	Установлена актуальная версия
+UpdateError	Unable to check for updates. Try again later.	Не удалось проверить обновления. Попробуйте позже.
+DownloadApk	Download APK	Скачать APK
+IconPhotoInfo	Built-in app icons are stored in the APK. A gallery photo can be used for an additional home-screen shortcut.	Встроенные иконки приложения находятся внутри APK. Фото из галереи можно использовать для отдельного ярлыка на рабочем столе.
+AddPhotoShortcut	Create a photo shortcut	Создать фото-ярлык
+ShortcutInfo	Choose a photo, then confirm adding it in your launcher	Выберите фото и подтвердите добавление ярлыка в лаунчере
+BuiltInIcon	Use this built-in application icon	Использовать эту встроенную иконку приложения
+ChoosePhoto	Choose a photo	Выбрать фото
+WidgetPhotoInfo	A photo you choose for the couple widget	Ваше фото для виджета пары
+AddWidget	Add the couple widget	Добавить виджет пары
+WidgetManual	Open your home screen widget picker and choose FamilyGram	Откройте список виджетов на рабочем столе и выберите FamilyGram
+WidgetConfigure	Choose the widget account	Выберите аккаунт для виджета
+CoupleWidget	FamilyGram couple	Пара FamilyGram
+PhotoSaved	Photo saved	Фото сохранено
+PhotoError	Unable to open this photo	Не удалось открыть это фото
+ConfirmShortcut	Confirm adding the photo shortcut in your launcher	Подтвердите добавление фото-ярлыка в лаунчере
+ShortcutUnsupported	This launcher does not support adding photo shortcuts	Этот лаунчер не поддерживает добавление фото-ярлыков
+QuickReaction	Random heart or kiss	Случайное сердечко или поцелуй
+QuickReactionInfo	React to your partner’s latest message, or use the message menu	Реакция на последнее сообщение половинки; также доступна в меню сообщения
+SelectMessageReaction	Choose your partner’s message and tap the random reaction in its menu	Выберите сообщение половинки и нажмите случайную реакцию в его меню
+ReactionsUnavailable	These reactions are not available from Telegram right now	Эти реакции сейчас недоступны со стороны Telegram
+OpenCard	Open FamilyGram card	Открыть карточку FamilyGram
+BookmarkShortcut	★ Ours	★ Наше
+QuickPairReaction	❤ / 💋	❤ / 💋

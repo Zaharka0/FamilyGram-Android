@@ -4502,6 +4502,7 @@ public class MessageObject {
         inlineKeyboardSource = null;
 
         BotInlineKeyboard.Builder builder = new BotInlineKeyboard.Builder();
+        builder.addKeyboardSource(org.telegram.messenger.family.FamilyCards.buttons(this));
 
         if (messageOwner != null && messageOwner.reply_markup instanceof TLRPC.TL_replyInlineMarkup && ((TLRPC.TL_replyInlineMarkup) messageOwner.reply_markup).rows != null) {
             builder.addBotKeyboard((TLRPC.TL_replyInlineMarkup) messageOwner.reply_markup);
@@ -6112,6 +6113,7 @@ public class MessageObject {
             }
         }
 
+        org.telegram.messenger.family.FamilyCards.decorate(this);
         if (messageText == null) {
             messageText = "";
         }

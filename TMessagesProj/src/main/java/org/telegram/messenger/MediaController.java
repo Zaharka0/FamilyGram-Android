@@ -1661,6 +1661,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                                     currentPlayingMessageObject.audioProgress = value;
                                     currentPlayingMessageObject.audioProgressSec = (int) (lastProgress / 1000);
                                     currentPlayingMessageObject.bufferedProgress = bufferedValue;
+                                    org.telegram.messenger.family.FamilyVoice.save(currentPlayingMessageObject, false);
                                     if (value >= 0 && shouldSavePositionForCurrentAudio != null && SystemClock.elapsedRealtime() - lastSaveTime >= 1000) {
                                         final String saveFor = shouldSavePositionForCurrentAudio;
                                         lastSaveTime = SystemClock.elapsedRealtime();
@@ -2369,6 +2370,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         } else {
             boolean post = audioPlayer != null;
             final MessageObject currentMessageObject = playingMessageObject;
+            org.telegram.messenger.family.FamilyVoice.save(playingMessageObject, true);
             float progress = playingMessageObject.audioProgress;
             int duration = playingMessageObject.audioPlayerDuration;
             if (paused || audioPlayer == null || !audioPlayer.isPlaying() || duration * progress > 1f) {
@@ -2478,6 +2480,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     }
 
     public void cleanupPlayer(boolean notify, boolean stopService, boolean byVoiceEnd, boolean transferPlayerToPhotoViewer) {
+        if (byVoiceEnd && playingMessageObject != null && playingMessageObject.isVoice()) playingMessageObject.audioProgress=1;
+        org.telegram.messenger.family.FamilyVoice.save(playingMessageObject, true);
         if (stopService && restoreMusicPlaylistState()) {
             return;
         }
@@ -2630,6 +2634,9 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         goingToShowMessageObject = null;
     }
 
+    public void applyFamilySilence() {
+        if (audioPlayer != null && playingMessageObject != null) audioPlayer.setSkipSilence(playingMessageObject.isVoice() && org.telegram.messenger.family.FamilyVoice.skipSilence(playingMessageObject.currentAccount));
+    }
     private boolean isSamePlayingMessage(MessageObject messageObject) {
         return playingMessageObject != null && playingMessageObject.getDialogId() == messageObject.getDialogId() && playingMessageObject.getId() == messageObject.getId() && ((playingMessageObject.eventId == 0) == (messageObject.eventId == 0));
     }
@@ -3642,6 +3649,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     }
 
     public boolean playMessage(final MessageObject messageObject, boolean silent) {
+        org.telegram.messenger.family.FamilyVoice.restore(messageObject);
         if (messageObject == null) {
             return false;
         }
@@ -3887,6 +3895,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             }
             try {
                 audioPlayer = new VideoPlayer();
+                audioPlayer.setSkipSilence(messageObject.isVoice() && org.telegram.messenger.family.FamilyVoice.skipSilence(messageObject.currentAccount));
                 int tag = ++playerNum;
                 audioPlayer.setDelegate(new VideoPlayer.VideoPlayerDelegate() {
                     @Override
@@ -4325,6 +4334,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
     }
 
     public boolean pauseMessage(MessageObject messageObject, boolean smoothFade) {
+        org.telegram.messenger.family.FamilyVoice.save(messageObject, true);
         if (audioPlayer == null && videoPlayer == null || messageObject == null || playingMessageObject == null || !isSamePlayingMessage(messageObject)) {
             return false;
         }
