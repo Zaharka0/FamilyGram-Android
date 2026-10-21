@@ -68,9 +68,14 @@ public final class FamilyDataController implements NotificationCenter.Notificati
             }
         });
         // Migrate the old device-wide partner only into the currently selected account.
-        if (!prefs.contains("initialized")) {
+        if (self>0 && !prefs.contains("initialized")) {
             SharedPreferences.Editor e = prefs.edit().putBoolean("initialized", true);
-            if (account == UserConfig.selectedAccount) e.putLong("partner", FamilyController.getPartnerId()).putLong("since", FamilyController.getTogetherSince());
+            SharedPreferences legacy=c.getSharedPreferences("familygram",Context.MODE_PRIVATE);
+            long owner=legacy.getLong("workspace_migration_owner",0);
+            if (account == UserConfig.selectedAccount && (owner==0||owner==self)) {
+                e.putLong("partner",FamilyController.getPartnerId()).putLong("since",FamilyController.getTogetherSince());
+                legacy.edit().putLong("workspace_migration_owner",self).apply();
+            }
             e.apply();
         }
     }

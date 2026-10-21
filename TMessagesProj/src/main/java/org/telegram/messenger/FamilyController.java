@@ -422,7 +422,7 @@ public class FamilyController {
     }
 
     public static void setTogetherSince(long millis) {
-        prefs().edit().putLong(KEY_TOGETHER, millis).apply();
+        prefs().edit().putLong(KEY_TOGETHER, millis).putLong("workspace_migration_owner",UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId()).apply();
         org.telegram.messenger.family.FamilyDataController.legacyChanged(UserConfig.selectedAccount,millis,false);
     }
 
@@ -435,7 +435,7 @@ public class FamilyController {
     }
 
     public static void setPartnerId(long id) {
-        prefs().edit().putLong(KEY_PARTNER, id).apply();
+        prefs().edit().putLong(KEY_PARTNER, id).putLong("workspace_migration_owner",UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId()).apply();
         org.telegram.messenger.family.FamilyDataController.legacyChanged(UserConfig.selectedAccount,id,true);
     }
 
