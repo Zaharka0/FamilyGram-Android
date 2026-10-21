@@ -354,7 +354,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
     public void message(long dialog,int id,java.util.function.Consumer<MessageObject> callback){
         if(dialog<=0||id<=0){callback.accept(null);return;}
         TLRPC.TL_messages_getMessages req=new TLRPC.TL_messages_getMessages();
-        TLRPC.TL_inputMessageID input=new TLRPC.TL_inputMessageID();input.id=id;req.id.add(input);
+        req.id.add(id);
         ConnectionsManager.getInstance(account).sendRequest(req,(response,error)->AndroidUtilities.runOnUIThread(()->{
             if(!alive())return;
             if(error==null&&response instanceof TLRPC.messages_Messages){

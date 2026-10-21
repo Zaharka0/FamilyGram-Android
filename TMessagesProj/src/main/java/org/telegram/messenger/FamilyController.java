@@ -401,11 +401,13 @@ public class FamilyController {
                     TL_account.privacyRules result = (TL_account.privacyRules) response;
                     messages.putUsers(result.users, false);
                     messages.putChats(result.chats, false);
-                    if(familyOnly)activeFamilyPrivacy.add(privacyUid);else activeFamilyPrivacy.remove(privacyUid);
-                    p.edit().putBoolean(activeKey,familyOnly).apply();
+                    final boolean settingsChanged;
+                    synchronized(lock){settingsChanged=familyOnly!=wantsFamilyOnlyLastSeen()||!snapshot.equals(family);}
+                    if(familyOnly&&!settingsChanged)activeFamilyPrivacy.add(privacyUid);else activeFamilyPrivacy.remove(privacyUid);
+                    p.edit().putBoolean(activeKey,familyOnly&&!settingsChanged).apply();
                     if (!familyOnly) p.edit().remove(backupKey).remove(fullKey).apply();
                     contacts.setPrivacyRules(result.rules, ContactsController.PRIVACY_RULES_TYPE_LASTSEEN);
-                    if(familyOnly!=wantsFamilyOnlyLastSeen())syncLastSeen();
+                    if(settingsChanged)syncLastSeen();
                 }
             }));
         }

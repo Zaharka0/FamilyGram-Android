@@ -25,6 +25,11 @@ with tempfile.TemporaryDirectory(prefix='familygram-tests-') as output:
     for name in ['TMessagesProj/src/main/AndroidManifest.xml','TMessagesProj/src/main/res/layout/family_pair_widget.xml','TMessagesProj/src/main/res/xml/family_pair_widget_info.xml']:
         ET.parse(name)
     new_files=list(Path('TMessagesProj/src/main/java/org/telegram/messenger/family').glob('*.java'))+[Path('TMessagesProj/src/main/java/org/telegram/ui/FamilyHubActivity.java'),Path('TMessagesProj/src/main/java/org/telegram/ui/FamilyWatchActivity.java')]
+    schema=Path('TMessagesProj/src/main/java/org/telegram/tgnet/TLRPC.java').read_text()
+    tl_classes=set(re.findall(r'\b(?:class|enum)\s+(\w+)',schema))
+    for source_file in new_files:
+        referenced=set(re.findall(r'TLRPC\.(\w+)',source_file.read_text()))
+        assert referenced <= tl_classes,f'{source_file}: unknown Telegram types {referenced-tl_classes}'
     direct=set()
     for p in new_files:
         text=p.read_text()
