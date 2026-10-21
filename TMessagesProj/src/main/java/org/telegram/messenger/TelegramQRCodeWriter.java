@@ -194,9 +194,15 @@ public final class TelegramQRCodeWriter {
       centerDrawable.setBounds(imageX, imageX, imageX + imageSize, imageX + imageSize);
       centerDrawable.draw(canvas);
     } else {
-      Bitmap icon = SvgHelper.getBitmap(readRes(R.raw.qr_logo), imageSize, imageSize, false);
-      canvas.drawBitmap(icon, imageX, imageX, null);
-      icon.recycle();
+      Bitmap source = android.graphics.BitmapFactory.decodeResource(ApplicationLoader.applicationContext.getResources(), R.drawable.logo_middle);
+      if (source != null) {
+        Bitmap icon = Bitmap.createScaledBitmap(source, imageSize, imageSize, true);
+        canvas.drawBitmap(icon, imageX, imageX, null);
+        if (icon != source) {
+          icon.recycle();
+        }
+        source.recycle();
+      }
     }
 
     canvas.setBitmap(null);

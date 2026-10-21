@@ -370,9 +370,7 @@ public class QrActivity extends BaseFragment {
         rootLayout.addView(qrView);
 
         logoImageView = new RLottieImageView(context);
-        logoImageView.setAutoRepeat(true);
-        logoImageView.setAnimation(R.raw.plane_logo_plain, 60, 60);
-        logoImageView.playAnimation();
+        logoImageView.setImageResource(R.drawable.logo_middle);
         rootLayout.addView(logoImageView);
 
         avatarImageView = new BackupImageView(context);

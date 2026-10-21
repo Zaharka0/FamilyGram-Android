@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * FamilyGram: local (device-only) list of "family" chats and the
@@ -29,7 +30,17 @@ public class FamilyController {
     private static Boolean keepDeleted;
     private static LinkedHashSet<String> deletedKeys;
 
+    private static final Pattern BRAND_PATTERN = Pattern.compile("(?<![\\w/.@#-])Telegram(?!\\w|\\.(?:org|me)\\b)");
+
     private FamilyController() {
+    }
+
+    /** Replaces the word "Telegram" with "FamilyGram" in texts; links and domains stay untouched. */
+    public static String rebrand(String text) {
+        if (text == null || text.indexOf("Telegram") < 0) {
+            return text;
+        }
+        return BRAND_PATTERN.matcher(text).replaceAll("FamilyGram");
     }
 
     private static SharedPreferences prefs() {

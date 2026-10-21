@@ -165,9 +165,8 @@ public class QRCodeBottomSheet extends BottomSheet {
     }
 
     public void setCenterAnimation(int resId) {
-        iconImage.setAutoRepeat(true);
-        iconImage.setAnimation(resId, 60, 60);
-        iconImage.playAnimation();
+        // FamilyGram: static avatar instead of the animated Telegram plane
+        iconImage.setImageResource(R.drawable.logo_middle);
     }
 
     public void setCenterImage(int resId) {

@@ -1259,7 +1259,7 @@ public class LocaleController {
                     name = null;
                 }
                 if (name != null && name.equals("string") && value != null && attrName != null && value.length() != 0 && attrName.length() != 0) {
-                    stringMap.put(attrName, value);
+                    stringMap.put(attrName, preserveEscapes ? value : FamilyController.rebrand(value));
                     name = null;
                     value = null;
                     attrName = null;

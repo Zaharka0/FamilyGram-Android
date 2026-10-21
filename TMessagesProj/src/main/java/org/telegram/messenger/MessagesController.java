@@ -6847,6 +6847,9 @@ public class MessagesController extends BaseController implements NotificationCe
         if (user == null) {
             return false;
         }
+        if (user.id == 777000 && "Telegram".equals(user.first_name)) {
+            user.first_name = "FamilyGram";
+        }
         fromCache = fromCache && user.id / 1000 != 333 && user.id != 777000;
         TLRPC.User oldUser = users.get(user.id);
         if (oldUser == user && !force) {
