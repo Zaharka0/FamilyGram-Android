@@ -79,7 +79,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
             if(dialog==0){row(t("ChooseChat"),t("ChooseChatInfo"),()->chooseChat(false));if(!query.isEmpty())settings();return;}
             String[] sections={"tasks","calendar","album","ours","hug","question","goals","watch","voice","games","bill","stats"};
             for(String section:sections)row(t(section),t(section+"Info"),()->open(section));
-            row(t("QuickReaction"),t("QuickReactionInfo"),()->FamilyActions.reactToLatest(currentAccount,dialog,this));
+            if(dialog==data.partner())row(t("QuickReaction"),t("QuickReactionInfo"),()->FamilyActions.reactToLatest(currentAccount,dialog,this));
             if(!query.isEmpty())settings();
             syncRows();restoreScroll(y);return;
         }
