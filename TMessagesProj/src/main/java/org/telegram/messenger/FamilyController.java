@@ -3,8 +3,12 @@ package org.telegram.messenger;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.tgnet.tl.TL_account;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -23,6 +27,12 @@ public class FamilyController {
     private static final String KEY_KEEP_DELETED = "keep_deleted";
     private static final String KEY_DELETED_SET = "deleted_ids";
     private static final int MAX_DELETED = 30000;
+    private static final String KEY_GHOST_READ = "ghost_read";
+    private static final String KEY_GHOST_TYPING = "ghost_typing";
+    private static final String KEY_GHOST_ONLINE = "ghost_online";
+    private static final String KEY_GHOST_FAMILY = "ghost_family";
+    private static final String KEY_TOGETHER = "together_since";
+    private static final String KEY_PARTNER = "partner_id";
 
     private static final Object lock = new Object();
     private static HashSet<Long> family;
@@ -214,6 +224,228 @@ public class FamilyController {
         synchronized (lock) {
             return deletedKeys.contains(deletedKey(account, dialogKey, message.id));
         }
+    }
+
+    // ---- Ghost mode -------------------------------------------------------
+
+    private static boolean flag(String key) {
+        try {
+            return prefs().getBoolean(key, false);
+        } catch (Exception e) {
+            FileLog.e(e);
+            return false;
+        }
+    }
+
+    private static void setFlag(String key, boolean value) {
+        prefs().edit().putBoolean(key, value).apply();
+    }
+
+    public static boolean isGhostNoRead() {
+        return flag(KEY_GHOST_READ);
+    }
+
+    public static boolean isGhostNoTyping() {
+        return flag(KEY_GHOST_TYPING);
+    }
+
+    public static boolean isGhostNoOnline() {
+        return flag(KEY_GHOST_ONLINE);
+    }
+
+    public static boolean isGhostFamilyExempt() {
+        return flag(KEY_GHOST_FAMILY);
+    }
+
+    public static void setGhostNoRead(boolean value) {
+        setFlag(KEY_GHOST_READ, value);
+    }
+
+    public static void setGhostNoTyping(boolean value) {
+        setFlag(KEY_GHOST_TYPING, value);
+    }
+
+    public static void setGhostNoOnline(boolean value) {
+        setFlag(KEY_GHOST_ONLINE, value);
+    }
+
+    public static void setGhostFamilyExempt(boolean value) {
+        setFlag(KEY_GHOST_FAMILY, value);
+    }
+
+    /** Do not tell the other person that we read the chat. */
+    public static boolean shouldHideRead(long dialogId) {
+        return isGhostNoRead() && !(isGhostFamilyExempt() && isFamily(dialogId));
+    }
+
+    /** Do not show "typing..." in this chat. */
+    public static boolean shouldHideTyping(long dialogId) {
+        return isGhostNoTyping() && !(isGhostFamilyExempt() && isFamily(dialogId));
+    }
+
+    /** True: always send "offline". With the family exception the online status is shown normally and Last seen privacy limits it to family. */
+    public static boolean shouldHideOnline() {
+        return isGhostNoOnline() && !isGhostFamilyExempt();
+    }
+
+    /** True: only family may see when we are online (server side privacy rule). */
+    public static boolean wantsFamilyOnlyLastSeen() {
+        return isGhostNoOnline() && isGhostFamilyExempt();
+    }
+
+    public static void sendOfflineNow() {
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            if (!UserConfig.getInstance(a).isClientActivated()) {
+                continue;
+            }
+            TL_account.updateStatus req = new TL_account.updateStatus();
+            req.offline = true;
+            ConnectionsManager.getInstance(a).sendRequest(req, (response, error) -> {
+
+            });
+        }
+    }
+
+    /**
+     * Makes the server side "Last seen" privacy match the ghost settings:
+     * "Nobody, except family" while the family exception is on, and puts the
+     * previous basic choice (everybody / contacts / nobody) back afterwards.
+     */
+    public static void syncLastSeen() {
+        final boolean familyOnly = wantsFamilyOnlyLastSeen();
+        ensureLoaded();
+        final HashSet<Long> snapshot;
+        synchronized (lock) {
+            snapshot = new HashSet<>(family);
+        }
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            if (!UserConfig.getInstance(a).isClientActivated()) {
+                continue;
+            }
+            final int account = a;
+            final String backupKey = "lastseen_backup_" + account;
+            final SharedPreferences p = prefs();
+            final ContactsController contacts = ContactsController.getInstance(account);
+            final MessagesController messages = MessagesController.getInstance(account);
+            TL_account.setPrivacy req = new TL_account.setPrivacy();
+            req.key = new TLRPC.TL_inputPrivacyKeyStatusTimestamp();
+            if (familyOnly) {
+                if (!p.contains(backupKey)) {
+                    ArrayList<TLRPC.PrivacyRule> rules = contacts.getPrivacyRules(ContactsController.PRIVACY_RULES_TYPE_LASTSEEN);
+                    if (rules == null) {
+                        continue;
+                    }
+                    String kind = "nobody";
+                    for (int i = 0; i < rules.size(); i++) {
+                        TLRPC.PrivacyRule rule = rules.get(i);
+                        if (rule instanceof TLRPC.TL_privacyValueAllowAll) {
+                            kind = "all";
+                            break;
+                        } else if (rule instanceof TLRPC.TL_privacyValueAllowContacts) {
+                            kind = "contacts";
+                            break;
+                        } else if (rule instanceof TLRPC.TL_privacyValueDisallowAll) {
+                            kind = "nobody";
+                            break;
+                        }
+                    }
+                    p.edit().putString(backupKey, kind).apply();
+                }
+                TLRPC.TL_inputPrivacyValueAllowUsers users = new TLRPC.TL_inputPrivacyValueAllowUsers();
+                for (Long id : snapshot) {
+                    if (id == null || id <= 0) {
+                        continue;
+                    }
+                    TLRPC.User user = messages.getUser(id);
+                    if (user == null) {
+                        continue;
+                    }
+                    TLRPC.InputUser inputUser = messages.getInputUser(user);
+                    if (inputUser != null && !(inputUser instanceof TLRPC.TL_inputUserEmpty)) {
+                        users.users.add(inputUser);
+                    }
+                }
+                if (!users.users.isEmpty()) {
+                    req.rules.add(users);
+                }
+                req.rules.add(new TLRPC.TL_inputPrivacyValueDisallowAll());
+            } else {
+                String kind = p.getString(backupKey, null);
+                if (kind == null) {
+                    continue;
+                }
+                if ("all".equals(kind)) {
+                    req.rules.add(new TLRPC.TL_inputPrivacyValueAllowAll());
+                } else if ("contacts".equals(kind)) {
+                    req.rules.add(new TLRPC.TL_inputPrivacyValueAllowContacts());
+                } else {
+                    req.rules.add(new TLRPC.TL_inputPrivacyValueDisallowAll());
+                }
+            }
+            ConnectionsManager.getInstance(account).sendRequest(req, (response, error) -> {
+                if (error == null && response instanceof TL_account.privacyRules) {
+                    TL_account.privacyRules result = (TL_account.privacyRules) response;
+                    messages.putUsers(result.users, false);
+                    messages.putChats(result.chats, false);
+                    contacts.setPrivacyRules(result.rules, ContactsController.PRIVACY_RULES_TYPE_LASTSEEN);
+                    if (!familyOnly) {
+                        p.edit().remove(backupKey).apply();
+                    }
+                }
+            });
+        }
+    }
+
+    // ---- Days together ----------------------------------------------------
+
+    public static long getTogetherSince() {
+        try {
+            return prefs().getLong(KEY_TOGETHER, 0);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static void setTogetherSince(long millis) {
+        prefs().edit().putLong(KEY_TOGETHER, millis).apply();
+    }
+
+    public static long getPartnerId() {
+        try {
+            return prefs().getLong(KEY_PARTNER, 0);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static void setPartnerId(long id) {
+        prefs().edit().putLong(KEY_PARTNER, id).apply();
+    }
+
+    public static boolean isPartner(long id) {
+        long partner = getPartnerId();
+        return partner != 0 && partner == id;
+    }
+
+    /** Days since the chosen date; the first day counts as day 1. 0 when no date is set. */
+    public static int getDaysTogether() {
+        long since = getTogetherSince();
+        if (since <= 0) {
+            return 0;
+        }
+        Calendar start = Calendar.getInstance();
+        start.setTimeInMillis(since);
+        start.set(Calendar.HOUR_OF_DAY, 0);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+        start.set(Calendar.MILLISECOND, 0);
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        long days = Math.round((today.getTimeInMillis() - start.getTimeInMillis()) / 86400000.0);
+        return days < 0 ? 0 : (int) days + 1;
     }
 
     /**

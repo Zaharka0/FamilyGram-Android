@@ -581,6 +581,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Nullable
     private ActionBarMenuSubItem pin2Item;
     private ActionBarMenuSubItem familyItem;
+    private ActionBarMenuSubItem partnerItem;
     @Nullable
     private ActionBarMenuSubItem addToFolderItem;
     @Nullable
@@ -715,6 +716,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private final static int remove_from_folder = 110;
     private final static int community_ungroup = 111;
     private final static int family_toggle = 112;
+    private final static int partner_toggle = 113;
 
     private final static int ARCHIVE_ITEM_STATE_PINNED = 0;
     private final static int ARCHIVE_ITEM_STATE_SHOWED = 1;
@@ -4011,6 +4013,25 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         undoView.showWithAction(did, UndoView.ACTION_REMOVED_FROM_FOLDER, neverShow.size(), filter, null, null);
                     }
                     hideActionMode(false);
+                } else if (id == partner_toggle) {
+                    if (selectedDialogs.size() == 1 && selectedDialogs.get(0) > 0) {
+                        long did = selectedDialogs.get(0);
+                        if (FamilyController.isPartner(did)) {
+                            FamilyController.setPartnerId(0);
+                        } else {
+                            FamilyController.setPartnerId(did);
+                            if (!FamilyController.isFamily(did)) {
+                                FamilyController.setFamily(did, true);
+                                FamilyController.syncLastSeen();
+                            }
+                            if (FamilyController.getTogetherSince() <= 0) {
+                                android.widget.Toast.makeText(getParentActivity(), LocaleController.getString(R.string.FamilyPickDate), android.widget.Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        getMessagesController().sortDialogs(null);
+                        DialogsActivity.this.getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
+                    }
+                    hideActionMode(true);
                 } else if (id == family_toggle) {
                     boolean addToFamily = false;
                     for (int a = 0; a < selectedDialogs.size(); a++) {
@@ -4022,6 +4043,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     for (int a = 0; a < selectedDialogs.size(); a++) {
                         FamilyController.setFamily(selectedDialogs.get(a), addToFamily);
                     }
+                    FamilyController.syncLastSeen();
                     getMessagesController().sortDialogs(null);
                     DialogsActivity.this.getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
                     hideActionMode(true);
@@ -6768,6 +6790,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         clearItem = otherItem.addSubItem(clear, R.drawable.msg_clear, LocaleController.getString(R.string.ClearHistory));
         blockItem = otherItem.addSubItem(block, R.drawable.msg_block, LocaleController.getString(R.string.BlockUser));
         familyItem = otherItem.addSubItem(family_toggle, R.drawable.msg_fave, LocaleController.getString(R.string.FamilyAdd));
+        partnerItem = otherItem.addSubItem(partner_toggle, R.drawable.msg_fave, LocaleController.getString(R.string.FamilyPartnerSet));
 
         muteItem.setOnLongClickListener(e -> {
             performSelectedDialogsAction(selectedDialogs, mute, true, true);
@@ -9965,6 +9988,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 addToFolderItem.setVisibility(View.VISIBLE);
             } else {
                 addToFolderItem.setVisibility(View.GONE);
+            }
+        }
+        if (partnerItem != null) {
+            boolean single = selectedDialogs.size() == 1 && selectedDialogs.get(0) > 0;
+            partnerItem.setVisibility(single ? View.VISIBLE : View.GONE);
+            if (single) {
+                partnerItem.setTextAndIcon(LocaleController.getString(FamilyController.isPartner(selectedDialogs.get(0)) ? R.string.FamilyPartnerUnset : R.string.FamilyPartnerSet), R.drawable.msg_fave);
             }
         }
         if (familyItem != null) {

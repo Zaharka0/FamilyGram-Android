@@ -105,6 +105,11 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
     private int familyModeRow;
     private int keepDeletedRow;
     private int familyInfoRow;
+    private int ghostReadRow;
+    private int ghostTypingRow;
+    private int ghostOnlineRow;
+    private int ghostFamilyRow;
+    private int togetherRow;
 
     private int notificationsServiceRow;
     private int notificationsServiceConnectionRow;
@@ -184,6 +189,11 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         familySectionRow = rowCount++;
         familyModeRow = rowCount++;
         keepDeletedRow = rowCount++;
+        ghostReadRow = rowCount++;
+        ghostTypingRow = rowCount++;
+        ghostOnlineRow = rowCount++;
+        ghostFamilyRow = rowCount++;
+        togetherRow = rowCount++;
         familyInfoRow = rowCount++;
 
         notificationsSectionRow = rowCount++;
@@ -758,6 +768,53 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
             } else if (position == keepDeletedRow) {
                 enabled = FamilyController.isKeepDeleted();
                 FamilyController.setKeepDeleted(!enabled);
+            } else if (position == ghostReadRow) {
+                enabled = FamilyController.isGhostNoRead();
+                FamilyController.setGhostNoRead(!enabled);
+            } else if (position == ghostTypingRow) {
+                enabled = FamilyController.isGhostNoTyping();
+                FamilyController.setGhostNoTyping(!enabled);
+            } else if (position == ghostOnlineRow) {
+                enabled = FamilyController.isGhostNoOnline();
+                FamilyController.setGhostNoOnline(!enabled);
+                if (!enabled) {
+                    FamilyController.sendOfflineNow();
+                }
+                FamilyController.syncLastSeen();
+            } else if (position == ghostFamilyRow) {
+                enabled = FamilyController.isGhostFamilyExempt();
+                FamilyController.setGhostFamilyExempt(!enabled);
+                if (FamilyController.isGhostNoOnline()) {
+                    if (!enabled) {
+                        // family exception on: show online normally, privacy rule hides it from others
+                    } else {
+                        FamilyController.sendOfflineNow();
+                    }
+                    FamilyController.syncLastSeen();
+                }
+            } else if (position == togetherRow) {
+                java.util.Calendar c = java.util.Calendar.getInstance();
+                long since = FamilyController.getTogetherSince();
+                if (since > 0) {
+                    c.setTimeInMillis(since);
+                }
+                final int row = position;
+                android.app.DatePickerDialog dlg = new android.app.DatePickerDialog(getParentActivity(), (view1, y, m, d) -> {
+                    java.util.Calendar sel = java.util.Calendar.getInstance();
+                    sel.set(y, m, d, 12, 0, 0);
+                    FamilyController.setTogetherSince(sel.getTimeInMillis());
+                    if (listAdapter != null) {
+                        listAdapter.notifyItemChanged(row);
+                    }
+                }, c.get(java.util.Calendar.YEAR), c.get(java.util.Calendar.MONTH), c.get(java.util.Calendar.DAY_OF_MONTH));
+                dlg.getDatePicker().setMaxDate(System.currentTimeMillis());
+                dlg.setButton(android.content.DialogInterface.BUTTON_NEUTRAL, getString(R.string.FamilyDateClear), (d2, w) -> {
+                    FamilyController.setTogetherSince(0);
+                    if (listAdapter != null) {
+                        listAdapter.notifyItemChanged(row);
+                    }
+                });
+                dlg.show();
             } else if (position == accountsAllRow) {
                 SharedPreferences preferences = MessagesController.getGlobalNotificationsSettings();
                 enabled = preferences.getBoolean("AllAccounts", true);
@@ -1061,7 +1118,15 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     } else if (position == familyModeRow) {
                         checkCell.setTextAndCheck(getString(R.string.FamilyOnlyMode), FamilyController.isOnlyFamilyMode(), true);
                     } else if (position == keepDeletedRow) {
-                        checkCell.setTextAndCheck(getString(R.string.FamilyKeepDeleted), FamilyController.isKeepDeleted(), false);
+                        checkCell.setTextAndCheck(getString(R.string.FamilyKeepDeleted), FamilyController.isKeepDeleted(), true);
+                    } else if (position == ghostReadRow) {
+                        checkCell.setTextAndCheck(getString(R.string.GhostNoRead), FamilyController.isGhostNoRead(), true);
+                    } else if (position == ghostTypingRow) {
+                        checkCell.setTextAndCheck(getString(R.string.GhostNoTyping), FamilyController.isGhostNoTyping(), true);
+                    } else if (position == ghostOnlineRow) {
+                        checkCell.setTextAndCheck(getString(R.string.GhostNoOnline), FamilyController.isGhostNoOnline(), true);
+                    } else if (position == ghostFamilyRow) {
+                        checkCell.setTextAndCheck(getString(R.string.GhostFamilyExempt), FamilyController.isGhostFamilyExempt(), true);
                     }
                     break;
                 }
@@ -1176,7 +1241,10 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 case 5: {
                     TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
                     SharedPreferences preferences = MessagesController.getNotificationsSettings(currentAccount);
-                    if (position == callsRingtoneRow) {
+                    if (position == togetherRow) {
+                        long since = FamilyController.getTogetherSince();
+                        textCell.setTextAndValue(getString(R.string.FamilyTogetherDate), since > 0 ? java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(new java.util.Date(since)) : getString(R.string.FamilyNotSet), false);
+                    } else if (position == callsRingtoneRow) {
                         String value = preferences.getString("CallsRingtone", getString("DefaultRingtone", R.string.DefaultRingtone));
                         if (value.equals("NoSound")) {
                             value = getString("NoSound", R.string.NoSound);
@@ -1234,7 +1302,8 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     position == inappPreviewRow || position == contactJoinedRow || position == pinnedMessageRow ||
                     position == notificationsServiceRow || position == badgeNumberMutedRow || position == badgeNumberMessagesRow ||
                     position == badgeNumberShowRow || position == inappPriorityRow || position == inchatSoundRow ||
-                    position == androidAutoAlertRow || position == accountsAllRow || position == familyModeRow || position == keepDeletedRow) {
+                    position == androidAutoAlertRow || position == accountsAllRow || position == familyModeRow || position == keepDeletedRow ||
+                    position == ghostReadRow || position == ghostTypingRow || position == ghostOnlineRow || position == ghostFamilyRow) {
                 return 1;
             } else if (position == resetNotificationsRow) {
                 return 2;

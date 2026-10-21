@@ -11555,4 +11555,15 @@
     <string name="FamilyOnlyModeInfo">Only family notifications: only chats added to family make sounds and notifications, everything else stays silent (login codes from FamilyGram still arrive). Keep deleted: messages deleted by the other person stay in your chat and are marked as deleted.</string>
     <string name="FamilyKeepDeleted">Keep messages deleted by others</string>
     <string name="FamilyDeletedMark">deleted</string>
+    <string name="GhostNoRead">Ghost: don\'t mark chats as read</string>
+    <string name="GhostNoTyping">Ghost: don\'t show "typing…"</string>
+    <string name="GhostNoOnline">Ghost: hide that I\'m online</string>
+    <string name="GhostFamilyExempt">Family exception: family sees everything</string>
+    <string name="FamilyTogetherDate">Together since</string>
+    <string name="FamilyNotSet">Not set</string>
+    <string name="FamilyDateClear">Clear</string>
+    <string name="FamilyPickDate">Now choose the date: Settings → Notifications → Together since</string>
+    <string name="FamilyPartnerSet">My other half</string>
+    <string name="FamilyPartnerUnset">Not my other half</string>
+    <string name="FamilyDaysTogether">%1$d days together</string>
 </resources>

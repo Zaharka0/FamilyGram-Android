@@ -270,4 +270,15 @@
     <string name="FamilyOnlyModeInfo">Уведомления только от семьи: звук и уведомления приходят только от чатов, добавленных в семью, остальные молчат (коды входа от FamilyGram всё равно приходят). Сохранять удалённые: сообщения, которые удалил собеседник, остаются в вашем чате с пометкой «удалено».</string>
     <string name="FamilyKeepDeleted">Сохранять сообщения, удалённые собеседником</string>
     <string name="FamilyDeletedMark">удалено</string>
+    <string name="GhostNoRead">Призрак: не отмечать чаты прочитанными</string>
+    <string name="GhostNoTyping">Призрак: не показывать «печатает…»</string>
+    <string name="GhostNoOnline">Призрак: скрывать, что я в сети</string>
+    <string name="FamilyDaysTogether">%1$d дн. вместе</string>
+    <string name="GhostFamilyExempt">Исключение для семьи: семья видит всё</string>
+    <string name="FamilyTogetherDate">Вместе с</string>
+    <string name="FamilyNotSet">Не задано</string>
+    <string name="FamilyDateClear">Сбросить</string>
+    <string name="FamilyPickDate">Теперь выберите дату: Настройки → Уведомления → Вместе с</string>
+    <string name="FamilyPartnerSet">Моя половинка</string>
+    <string name="FamilyPartnerUnset">Не моя половинка</string>
 </resources>

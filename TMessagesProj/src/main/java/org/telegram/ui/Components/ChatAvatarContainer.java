@@ -45,6 +45,7 @@ import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.ImageReceiver;
+import org.telegram.messenger.FamilyController;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
@@ -1281,6 +1282,10 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             }
             useOnlineColor = true;
             setTypingAnimation(true);
+        }
+        if (user != null && FamilyController.isPartner(user.id) && FamilyController.getDaysTogether() > 0
+                && MessagesController.getInstance(currentAccount).getPrintingStringType(parentFragment.getDialogId(), parentFragment.getThreadId()) == null) {
+            newSubtitle = TextUtils.concat(newSubtitle == null ? "" : newSubtitle, " · ", LocaleController.formatString(R.string.FamilyDaysTogether, FamilyController.getDaysTogether()));
         }
         lastSubtitleColorKey = useOnlineColor ? Theme.key_chat_status : Theme.key_actionBarDefaultSubtitle;
         if (lastSubtitle == null) {
