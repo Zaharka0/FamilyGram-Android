@@ -201,7 +201,7 @@ public final class FamilyCore {
                         if (card != null) break;
                         if (op.kind.equals("goal")) cents(op.get("target"));
                         if (op.kind.equals("bill")) splitBill(op.get("items"));
-                        if (op.kind.equals("event") && (op.number("at") <= 0 || op.number("at") > 32503680000000L)) break;
+                        if (op.kind.equals("event") && (Long.parseLong(op.get("at")) < -5364662400000L || Long.parseLong(op.get("at")) > 32503680000000L)) break;
                         if ((op.kind.equals("task") || op.kind.equals("event") || op.kind.equals("goal")) && op.get("title").trim().isEmpty()) break;
                         card = new Card(e);
                         if (op.kind.equals("game")) card.game = new Game(e.actor, op.get("mode"));

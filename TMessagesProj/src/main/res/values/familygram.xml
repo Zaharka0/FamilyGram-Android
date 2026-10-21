@@ -57,8 +57,8 @@
     <string name="FGEventTitleHint" formatted="false">Birthday, trip or meeting</string>
     <string name="FGWhen" formatted="false">Date and time</string>
     <string name="FGWhenHint" formatted="false">Tap to choose</string>
-    <string name="FGAnnual" formatted="false">Repeat every year: 1 = yes, 0 = no</string>
-    <string name="FGAnnualHint" formatted="false">1 for a birthday; 0 for a one-time event</string>
+    <string name="FGAnnual" formatted="false">Repeat every year</string>
+    <string name="FGAnnualHint" formatted="false">Repeat birthdays and anniversaries every year</string>
     <string name="FGDateFormat" formatted="false">Use YYYY-MM-DD HH:mm</string>
     <string name="FGYearly" formatted="false">Every year</string>
     <string name="FGCancelEvent" formatted="false">Cancel event</string>
@@ -193,4 +193,14 @@
     <string name="FGOpenCard" formatted="false">Open FamilyGram card</string>
     <string name="FGBookmarkShortcut" formatted="false">★ Ours</string>
     <string name="FGQuickPairReaction" formatted="false">❤ / 💋</string>
+    <string name="FGAddBillItem" formatted="false">Add an item to the bill</string>
+    <string name="FGBillBuilder" formatted="false">Add each purchase, its amount and the people sharing it. Check the totals, then send the bill.</string>
+    <string name="FGItemName" formatted="false">Purchase</string>
+    <string name="FGItemNameHint" formatted="false">For example: pizza</string>
+    <string name="FGParticipants" formatted="false">Who shares this purchase</string>
+    <string name="FGParticipantsHint" formatted="false">Names separated by commas, for example Anna, Sasha</string>
+    <string name="FGRemoveItem" formatted="false">Remove this item</string>
+    <string name="FGSendBill" formatted="false">Send the bill</string>
+    <string name="FGBillDraft" formatted="false">Bill draft</string>
+    <string name="FGAdd" formatted="false">Add</string>
 </resources>

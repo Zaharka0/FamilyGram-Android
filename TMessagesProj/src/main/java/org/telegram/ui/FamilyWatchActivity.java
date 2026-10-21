@@ -23,7 +23,8 @@ public final class FamilyWatchActivity extends BaseFragment implements FamilyDat
     private TextView status;
     private Button join,play;
     private SeekBar seek;
-    private boolean joined,destroyed,dragging,loading,firstApply=true;
+    private boolean joined,destroyed,dragging,loading;
+    private FamilyCore.Op pendingControl;
     private int lastApplied;
     private final Runnable tick=new Runnable(){public void run(){
         if(destroyed||!joined)return;
@@ -63,12 +64,19 @@ public final class FamilyWatchActivity extends BaseFragment implements FamilyDat
         if(!joined||destroyed)return;
         FamilyCore.Card current=data.card(dialog,session);
         String ref=current!=null?current.latest.op.get("ref"):FamilyDataController.reference(video.messageOwner,video.isOut()?data.self:dialog);
-        data.send(dialog,"video",session,"🎬 "+FamilyText.get(playing?"Play":"Pause")+" · "+position/1000+" s",FamilyCore.fields("ref",ref,"message",""+video.getId(),"position",""+position,"playing",playing?"1":"0"),video);
+        pendingControl=data.send(dialog,"video",session,"🎬 "+FamilyText.get(playing?"Play":"Pause")+" · "+position/1000+" s",FamilyCore.fields("ref",ref,"message",""+video.getId(),"position",""+position,"playing",playing?"1":"0"),video);
     }
     @Override public void changed(long changed){if(changed==dialog)applyRemote();}
     private void applyRemote(){
         if(player==null||!joined||dragging||destroyed)return;FamilyCore.Card c=data.card(dialog,session);if(c==null||c.latest.id==lastApplied||player.getDuration()<=0)return;
-        if(c.latest.actor==data.self&&!firstApply){lastApplied=c.latest.id;return;}firstApply=false;lastApplied=c.latest.id;
+        if(pendingControl!=null){
+            int order=Long.compare(c.latest.op.number("clock"),pendingControl.number("clock"));
+            if(order==0)order=c.latest.op.get("nonce").compareTo(pendingControl.get("nonce"));
+            if(order==0)order=Long.compare(c.latest.actor,data.self);
+            if(order<0)return;
+            pendingControl=null;
+        }
+        lastApplied=c.latest.id;
         boolean playing=c.latest.op.get("playing").equals("1");long position=c.latest.op.number("position");
         if(playing)position+=Math.max(0,org.telegram.tgnet.ConnectionsManager.getInstance(currentAccount).getCurrentTime()*1000L-c.latest.date*1000L);
         position=Math.min(player.getDuration(),Math.max(0,position));player.seekTo(position);if(playing&&position<player.getDuration())player.play();else player.pause();

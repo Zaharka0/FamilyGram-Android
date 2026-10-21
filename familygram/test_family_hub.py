@@ -15,6 +15,8 @@ with tempfile.TemporaryDirectory(prefix='familygram-tests-') as output:
     files += [str(p) for p in Path('TMessagesProj/src/main/java/org/telegram/messenger/family').glob('*.java')]
     files += [f'TMessagesProj/src/main/java/org/telegram/ui/{name}.java' for name in ['ChatActivity','LaunchActivity','SettingsActivity','FamilyHubActivity','FamilyWatchActivity','Components/VideoPlayer']]
     subprocess.run([java,'-cp',output,'CheckJavaSyntax',*files],check=True)
+    update_source=Path('TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyUpdates.java').read_text()
+    assert re.search(r'VERSION="([^"]+)"',update_source).group(1)==Path('familygram/VERSION').read_text().strip(),'Update/release version mismatch'
     en=ET.parse('TMessagesProj/src/main/res/values/familygram.xml').getroot()
     ru=ET.parse('TMessagesProj/src/main/res/values-ru/familygram.xml').getroot()
     keys=[x.attrib['name'] for x in en]

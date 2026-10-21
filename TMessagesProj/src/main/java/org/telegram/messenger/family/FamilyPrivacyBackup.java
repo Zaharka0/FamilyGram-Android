@@ -19,10 +19,10 @@ public final class FamilyPrivacyBackup {
    else if(rule instanceof TLRPC.TL_privacyValueAllowPremium)out=new TLRPC.TL_inputPrivacyValueAllowPremium();
    else if(rule instanceof TLRPC.TL_privacyValueAllowBots)out=new TLRPC.TL_inputPrivacyValueAllowBots();
    else if(rule instanceof TLRPC.TL_privacyValueDisallowBots)out=new TLRPC.TL_inputPrivacyValueDisallowBots();
-   else if(rule instanceof TLRPC.TL_privacyValueAllowChatParticipants){TLRPC.TL_inputPrivacyValueAllowChatParticipants r=new TLRPC.TL_inputPrivacyValueAllowChatParticipants();r.chats.addAll(rule.chats);out=r;}
-   else if(rule instanceof TLRPC.TL_privacyValueDisallowChatParticipants){TLRPC.TL_inputPrivacyValueDisallowChatParticipants r=new TLRPC.TL_inputPrivacyValueDisallowChatParticipants();r.chats.addAll(rule.chats);out=r;}
-   else if(rule instanceof TLRPC.TL_privacyValueAllowUsers){TLRPC.TL_inputPrivacyValueAllowUsers r=new TLRPC.TL_inputPrivacyValueAllowUsers();r.users.addAll(users(rule.users,messages));out=r;}
-   else if(rule instanceof TLRPC.TL_privacyValueDisallowUsers){TLRPC.TL_inputPrivacyValueDisallowUsers r=new TLRPC.TL_inputPrivacyValueDisallowUsers();r.users.addAll(users(rule.users,messages));out=r;}
+   else if(rule instanceof TLRPC.TL_privacyValueAllowChatParticipants){TLRPC.TL_inputPrivacyValueAllowChatParticipants r=new TLRPC.TL_inputPrivacyValueAllowChatParticipants();r.chats.addAll(((TLRPC.TL_privacyValueAllowChatParticipants)rule).chats);out=r;}
+   else if(rule instanceof TLRPC.TL_privacyValueDisallowChatParticipants){TLRPC.TL_inputPrivacyValueDisallowChatParticipants r=new TLRPC.TL_inputPrivacyValueDisallowChatParticipants();r.chats.addAll(((TLRPC.TL_privacyValueDisallowChatParticipants)rule).chats);out=r;}
+   else if(rule instanceof TLRPC.TL_privacyValueAllowUsers){TLRPC.TL_inputPrivacyValueAllowUsers r=new TLRPC.TL_inputPrivacyValueAllowUsers();r.users.addAll(users(((TLRPC.TL_privacyValueAllowUsers)rule).users,messages));out=r;}
+   else if(rule instanceof TLRPC.TL_privacyValueDisallowUsers){TLRPC.TL_inputPrivacyValueDisallowUsers r=new TLRPC.TL_inputPrivacyValueDisallowUsers();r.users.addAll(users(((TLRPC.TL_privacyValueDisallowUsers)rule).users,messages));out=r;}
    else throw new IllegalArgumentException("Unsupported privacy rule");
    converted.add(out);
   }

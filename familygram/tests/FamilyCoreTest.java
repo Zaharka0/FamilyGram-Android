@@ -45,6 +45,9 @@ public class FamilyCoreTest {
         for(FamilyCore.Entry entry:log)remapped.add(new FamilyCore.Entry(1000000-entry.id*17,entry.date,entry.actor,entry.op));
         check(FamilyCore.reduce(log,10,20).get("t").done==FamilyCore.reduce(remapped,10,20).get("t").done);
         check(FamilyCore.reduce(log,10,20).get("g").saved==FamilyCore.reduce(remapped,10,20).get("g").saved);
+        ArrayList<FamilyCore.Entry> dates=new ArrayList<>();dates.add(e(1,10,op("event","birthday","title","Birthday","at","-946771200000","annual","1")));
+        check(FamilyCore.reduce(dates,10,20).containsKey("birthday"));
+        dates.add(e(2,10,op("event","invalid","title","Bad date","at","not-a-date")));check(!FamilyCore.reduce(dates,10,20).containsKey("invalid"));
         for(int i=0;i<5000;i++){StringBuilder f=new StringBuilder();for(int j=0;j<random.nextInt(50);j++)f.append((char)random.nextInt(150));FamilyCore.unpack(f.toString());checks++;}
         System.out.println("FamilyGram core: "+checks+" checks passed");
     }

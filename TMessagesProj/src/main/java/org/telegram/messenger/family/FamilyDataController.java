@@ -51,7 +51,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
     private volatile boolean disposed;
     private final Object clockLock = new Object();
     private long logicalClock;
-    private static final class Scan { int request, offset, count; boolean all, cancelled; }
+    private static final class Scan { int request, offset, count, knownHead, newHead; boolean all, cancelled; }
     private FamilyDataController(int account, long self) {
         this.account = account; this.self = self;
         Context c = ApplicationLoader.applicationContext;
@@ -63,6 +63,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.messageReceivedByServer);
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.privacyRulesUpdated);
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.messagesDeleted);
+                NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.removeAllMessagesFromDialog);
                 if(FamilyController.wantsFamilyOnlyLastSeen())FamilyController.syncLastSeen();
             }
         });
@@ -176,6 +177,12 @@ public final class FamilyDataController implements NotificationCenter.Notificati
         });
     }
     @Override public void didReceivedNotification(int id, int currentAccount, Object... args) {
+        if(id==NotificationCenter.removeAllMessagesFromDialog && args.length>0 && args[0] instanceof Long){
+            long dialog=(Long)args[0];cancelSync(dialog);
+            SharedPreferences.Editor editor=prefs.edit().remove("complete_"+dialog).remove("offset_"+dialog).remove("scanned_"+dialog).remove("synced_head_"+dialog).remove("bill_draft_"+dialog);
+            for(String key:prefs.getAll().keySet())if(key.startsWith("voice_"+dialog+"_")||key.startsWith("answer_"+dialog+"_"))editor.remove(key);editor.apply();
+            queue.postRunnable(()->{if(!alive())return;for(String table:new String[]{"ops","refs","history"})db.getWritableDatabase().delete(table,"dialog=?",new String[]{""+dialog});states.remove(dialog);loaded.remove(dialog);notifyChanged(dialog);});
+        }
         if(id==NotificationCenter.messagesDeleted && args.length>2 && !Boolean.TRUE.equals(args[2]) && args[0] instanceof ArrayList && args[1] instanceof Long){
             ArrayList<Integer> ids=new ArrayList<>((ArrayList<Integer>)args[0]);long channel=(Long)args[1];
             queue.postRunnable(()->{if(!alive())return;try{
@@ -190,10 +197,10 @@ public final class FamilyDataController implements NotificationCenter.Notificati
         if(id==NotificationCenter.privacyRulesUpdated && FamilyController.wantsFamilyOnlyLastSeen() && FamilyController.shouldHideOnline(account)) FamilyController.syncLastSeen();
         if (id == NotificationCenter.messageReceivedByServer && args.length > 6 && !Boolean.TRUE.equals(args[6]) && args[2] instanceof TLRPC.Message) ingest((TLRPC.Message) args[2], true);
     }
-    public void send(long dialog, String kind, String entity, String human, Map<String,String> data) {
-        send(dialog,kind,entity,human,data,null);
+    public FamilyCore.Op send(long dialog, String kind, String entity, String human, Map<String,String> data) {
+        return send(dialog,kind,entity,human,data,null);
     }
-    public void send(long dialog, String kind, String entity, String human, Map<String,String> data, MessageObject replyTo) {
+    public FamilyCore.Op send(long dialog, String kind, String entity, String human, Map<String,String> data, MessageObject replyTo) {
         if (!alive() || dialog == 0 || DialogObject.isEncryptedDialog(dialog) || dialog == self) throw new IllegalArgumentException("Choose a normal conversation");
         Map<String,String> payload=new HashMap<>(data);
         synchronized(clockLock){logicalClock=Math.max(logicalClock+1,ConnectionsManager.getInstance(account).getCurrentTime()*1000000L);payload.put("clock",""+logicalClock);prefs.edit().putLong("lamport",logicalClock).apply();}
@@ -203,6 +210,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
         AndroidUtilities.runOnUIThread(() -> {
             if (alive()) SendMessagesHelper.getInstance(account).sendMessage(SendMessagesHelper.SendMessageParams.of(text,dialog,replyTo,null,null,false,null,null,null,true,0,0,null,false));
         });
+        return op;
     }
     public static String newId() { return UUID.randomUUID().toString(); }
     public void bookmark(MessageObject object) {
@@ -248,16 +256,17 @@ public final class FamilyDataController implements NotificationCenter.Notificati
     }
     public boolean scanning(long dialog) { return scans.containsKey(dialog); }
     public int scanned(long dialog) { Scan s=scans.get(dialog);return s==null?prefs.getInt("scanned_"+dialog,0):s.count; }
-    public boolean complete(long dialog) { return prefs.getBoolean("complete_"+dialog,false); }
+    public boolean complete(long dialog) { return !scanning(dialog) && prefs.getBoolean("complete_"+dialog,false) && !prefs.getBoolean("recent_gap_"+dialog,false) && prefs.getString("sync_error_"+dialog,"").isEmpty(); }
     public void sync(long dialog, boolean all) {
         if (!alive() || scanning(dialog) || dialog==0 || DialogObject.isEncryptedDialog(dialog)) return;
-        load(dialog); Scan scan=new Scan();scan.all=all;
+        load(dialog); Scan scan=new Scan();scan.all=all;scan.knownHead=prefs.getInt("synced_head_"+dialog,0);
         // Resume older-history indexing; refresh latest messages separately on every hub opening.
         scan.offset=all?prefs.getInt("offset_"+dialog,0):0;
         scan.count=all?prefs.getInt("scanned_"+dialog,0):0;
         scans.put(dialog,scan); next(dialog,scan);
     }
     public void cancelSync(long dialog) {
+        prefs.edit().putBoolean("auto_history_"+dialog,false).apply();
         Scan s=scans.remove(dialog);if(s!=null){s.cancelled=true;ConnectionsManager.getInstance(account).cancelRequest(s.request,true);}notifyChanged(dialog);
     }
     private void next(long dialog, Scan scan) {
@@ -271,15 +280,24 @@ public final class FamilyDataController implements NotificationCenter.Notificati
             TLRPC.messages_Messages result=(TLRPC.messages_Messages)response;
             MessagesController.getInstance(account).putUsers(result.users,false);MessagesController.getInstance(account).putChats(result.chats,false);
             int oldOffset=scan.offset;
-            for(TLRPC.Message m:result.messages){m.dialog_id=dialog;ingest(m);if(m.id>0&&(scan.offset==0||m.id<scan.offset))scan.offset=m.id;}
+            for(TLRPC.Message m:result.messages){m.dialog_id=dialog;ingest(m);scan.newHead=Math.max(scan.newHead,m.id);if(m.id>0&&(scan.offset==0||m.id<scan.offset))scan.offset=m.id;}
             scan.count+=result.messages.size();
+            boolean newerGap=!scan.all && scan.knownHead>0 && !result.messages.isEmpty() && scan.offset>scan.knownHead && scan.offset!=oldOffset;
+            if(!scan.all)prefs.edit().putBoolean("recent_gap_"+dialog,newerGap).remove("sync_error_"+dialog).apply();
             if(scan.all){
                 SharedPreferences.Editor edit=prefs.edit().putInt("offset_"+dialog,scan.offset).putInt("scanned_"+dialog,scan.count).remove("sync_error_"+dialog);
                 if(result.messages.isEmpty()||scan.offset==oldOffset)edit.putBoolean("complete_"+dialog,true);edit.apply();
             }
             queue.postRunnable(()->{if(alive()){rebuild(dialog);notifyChanged(dialog);}});
-            if(scan.all&&!result.messages.isEmpty()&&scan.offset!=oldOffset)AndroidUtilities.runOnUIThread(()->next(dialog,scan),350);
-            else{scans.remove(dialog);notifyChanged(dialog);}
+            if((scan.all&&!result.messages.isEmpty()&&scan.offset!=oldOffset)||newerGap)AndroidUtilities.runOnUIThread(()->next(dialog,scan),350);
+            else{
+                scans.remove(dialog);
+                if(!scan.all)prefs.edit().putInt("synced_head_"+dialog,Math.max(scan.knownHead,scan.newHead)).putBoolean("recent_gap_"+dialog,false).apply();
+                notifyChanged(dialog);
+                // First use rebuilds shared state even when a card's creation is much older than its latest change.
+                if(!scan.all && prefs.getBoolean("auto_history_"+dialog,true) && !prefs.getBoolean("complete_"+dialog,false))
+                    AndroidUtilities.runOnUIThread(()->{if(alive()&&prefs.getBoolean("auto_history_"+dialog,true))sync(dialog,true);},100);
+            }
         }));
     }
     public void statistics(long dialog, int year, java.util.function.Consumer<String> callback) {
@@ -352,12 +370,13 @@ public final class FamilyDataController implements NotificationCenter.Notificati
             NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.messageReceivedByServer);
             NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.privacyRulesUpdated);
             NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.messagesDeleted);
+            NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.removeAllMessagesFromDialog);
         });listeners.clear();
         queue.postRunnable(()->{db.close();if(erase){ApplicationLoader.applicationContext.deleteDatabase(db.getDatabaseName());prefs.edit().clear().apply();
             java.io.File folder=new java.io.File(ApplicationLoader.applicationContext.getFilesDir(),"familygram_photos_"+self);
             java.io.File[] files=folder.listFiles();if(files!=null)for(java.io.File file:files)file.delete();folder.delete();
             AndroidUtilities.runOnUIThread(()->FamilyPairWidget.updateAll(ApplicationLoader.applicationContext));
-        }});
+        }queue.recycle();});
     }
     private static final class DB extends SQLiteOpenHelper {
         DB(Context c,long uid){super(c,"familygram_hub_"+uid+".db",null,1);}

@@ -24,7 +24,7 @@ public final class FamilyActions {
         if(list!=null)for(MessageObject m:list)if(m.getId()>0&&!m.isOut()&&m.messageOwner.action==null&&(chosen==null||m.getId()>chosen.getId()))chosen=m;
         if(chosen!=null){randomReaction(chosen,f);return;}
         Toast.makeText(f.getParentActivity(),FamilyText.get("SelectMessageReaction"),Toast.LENGTH_LONG).show();
-        Bundle b=new Bundle();b.putLong("user_id",dialog);if(dialog>0)f.presentFragment(new ChatActivity(b));
+        Bundle b=new Bundle();b.putLong("user_id",dialog);if(dialog>0){ChatActivity chat=new ChatActivity(b);chat.setCurrentAccount(account);f.presentFragment(chat);}
     }
     public static void randomReaction(MessageObject message,BaseFragment fragment){
         if(message.getId()<=0||message.getDialogId()!=FamilyDataController.getInstance(message.currentAccount).partner())return;

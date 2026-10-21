@@ -55,8 +55,8 @@ EventTitle	Event	Событие
 EventTitleHint	Birthday, trip or meeting	День рождения, поездка или встреча
 When	Date and time	Дата и время
 WhenHint	Tap to choose	Нажмите, чтобы выбрать
-Annual	Repeat every year: 1 = yes, 0 = no	Повторять ежегодно: 1 — да, 0 — нет
-AnnualHint	1 for a birthday; 0 for a one-time event	1 для дня рождения, 0 для разового события
+Annual	Repeat every year	Повторять ежегодно
+AnnualHint	Repeat birthdays and anniversaries every year	Повторять дни рождения и годовщины ежегодно
 DateFormat	Use YYYY-MM-DD HH:mm	Используйте ГГГГ-ММ-ДД ЧЧ:мм
 Yearly	Every year	Ежегодно
 CancelEvent	Cancel event	Отменить событие
@@ -191,3 +191,13 @@ ReactionsUnavailable	These reactions are not available from Telegram right now	�
 OpenCard	Open FamilyGram card	Открыть карточку FamilyGram
 BookmarkShortcut	★ Ours	★ Наше
 QuickPairReaction	❤ / 💋	❤ / 💋
+AddBillItem	Add an item to the bill	Добавить покупку в счёт
+BillBuilder	Add each purchase, its amount and the people sharing it. Check the totals, then send the bill.	Добавьте покупки, суммы и участников каждой покупки. Проверьте доли и отправьте готовый счёт.
+ItemName	Purchase	Покупка
+ItemNameHint	For example: pizza	Например: пицца
+Participants	Who shares this purchase	Кто участвует в этой покупке
+ParticipantsHint	Names separated by commas, for example Anna, Sasha	Имена через запятую, например Аня, Саша
+RemoveItem	Remove this item	Убрать эту покупку
+SendBill	Send the bill	Отправить счёт
+BillDraft	Bill draft	Черновик счёта
+Add	Add	Добавить

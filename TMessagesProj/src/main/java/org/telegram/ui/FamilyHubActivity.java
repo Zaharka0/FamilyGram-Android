@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
 import org.telegram.messenger.*;
+import org.telegram.messenger.MediaController;
 import org.telegram.messenger.family.*;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.*;
@@ -33,6 +34,8 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     private ScrollView scroll;
     private EditText search;
     private boolean refreshed;
+    private ArrayList<MessageObject> voiceQueue;
+    private final ArrayList<String> billDraft = new ArrayList<>();
     private int visibleLimit=80;
     private static final int PICK_WIDGET_PHOTO=7401, PICK_SHORTCUT_PHOTO=7402;
     public FamilyHubActivity(Bundle args) {
@@ -45,7 +48,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     private String t(String key){return FamilyText.get(key);}
     private int dp(float n){return AndroidUtilities.dp(n);}
     @Override public boolean onFragmentCreate(){
-        data=FamilyDataController.getInstance(currentAccount);if(dialog==0)dialog=data.partner();data.addListener(this);data.load(dialog);return super.onFragmentCreate();
+        data=FamilyDataController.getInstance(currentAccount);if(dialog==0)dialog=data.partner();data.addListener(this);data.load(dialog);loadBillDraft();return super.onFragmentCreate();
     }
     @Override public void onFragmentDestroy(){data.removeListener(this);super.onFragmentDestroy();}
     @Override public View createView(Context context){
@@ -59,7 +62,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     }
     @Override public void onResume(){super.onResume();render();if(!refreshed&&dialog!=0){refreshed=true;data.sync(dialog,false);}}
     @Override public boolean onBackPressed(boolean invoked){if(!page.equals("home")){open("home");return false;}return true;}
-    @Override public void changed(long changed){if(changed==0||changed==dialog)render();}
+    @Override public void changed(long changed){if(changed==0||changed==dialog){loadBillDraft();render();}}
     private void open(String name){page=name;visibleLimit=80;query="";if(search!=null)search.setText("");render();if(scroll!=null)scroll.smoothScrollTo(0,0);}
     private void render(){
         if(body==null||getParentActivity()==null)return;int y=scroll.getScrollY();body.removeAllViews();
@@ -116,20 +119,25 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         }
         if(ids.isEmpty()){toast(t("NoChats"));return;}
         showDialog(new AlertDialog.Builder(getParentActivity()).setTitle(partner?t("Partner"):t("ChooseChat")).setItems(names.toArray(new String[0]),(d,which)->{
-            dialog=ids.get(which);if(partner)data.setPartner(dialog);refreshed=false;data.load(dialog);data.sync(dialog,false);render();
+            dialog=ids.get(which);voiceQueue=null;loadBillDraft();if(partner)data.setPartner(dialog);refreshed=false;data.load(dialog);data.sync(dialog,false);render();
         }).setNegativeButton(t("Cancel"),null).create());
     }
-    private void form(String title,String[] keys,String[] defaults,Consumer<String[]> submit){
+    private void form(String title,String[] keys,String[] defaults,Consumer<String[]> submit){form(title,keys,defaults,submit,t("Save"));}
+    private void form(String title,String[] keys,String[] defaults,Consumer<String[]> submit,String positiveLabel){
         LinearLayout content=new LinearLayout(getParentActivity());content.setOrientation(LinearLayout.VERTICAL);content.setPadding(dp(20),dp(4),dp(20),dp(4));
         EditText[] fields=new EditText[keys.length];
         for(int i=0;i<keys.length;i++){
+            if(keys[i].equals("Annual")){
+                EditText hidden=new EditText(getParentActivity());fields[i]=hidden;hidden.setText(defaults!=null&&i<defaults.length?defaults[i]:"0");
+                CheckBox check=new CheckBox(getParentActivity());check.setText(t("Annual"));check.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));check.setChecked(hidden.getText().toString().equals("1"));check.setOnCheckedChangeListener((v,on)->hidden.setText(on?"1":"0"));content.addView(check,new LinearLayout.LayoutParams(-1,dp(56)));continue;
+            }
             text(content,t(keys[i]),false);EditText field=new EditText(getParentActivity());fields[i]=field;field.setTextSize(16);field.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));field.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));field.setHint(t(keys[i]+"Hint"));field.setText(defaults!=null&&i<defaults.length?defaults[i]:"");field.setMaxLines(keys[i].equals("Items")?8:4);
             if(keys[i].equals("Amount")||keys[i].equals("Target"))field.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
             if(keys[i].equals("When")){field.setFocusable(false);field.setOnClickListener(v->dateTime(field));}
             content.addView(field,new LinearLayout.LayoutParams(-1,-2));
         }
         ScrollView wrap=new ScrollView(getParentActivity());wrap.addView(content);
-        AlertDialog dlg=new AlertDialog.Builder(getParentActivity()).setTitle(title).setView(wrap).setNegativeButton(t("Cancel"),null).setPositiveButton(t("Save"),null).create();showDialog(dlg);
+        AlertDialog dlg=new AlertDialog.Builder(getParentActivity()).setTitle(title).setView(wrap).setNegativeButton(t("Cancel"),null).setPositiveButton(positiveLabel,null).create();showDialog(dlg);
         dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{try{String[] values=new String[fields.length];for(int i=0;i<fields.length;i++)values[i]=fields[i].getText().toString().trim();submit.accept(values);dlg.dismiss();}catch(Exception e){toast(t("Invalid")+"\n"+e.getMessage());}});
     }
     private void dateTime(EditText field){
@@ -151,7 +159,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     public void eventFromMessage(MessageObject source){
         String initial=source==null?"":source.messageText==null?"":source.messageText.toString();if(initial.length()>200)initial=initial.substring(0,200);
         form(t("AddEvent"),new String[]{"EventTitle","When","Annual"},new String[]{initial,new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US).format(new Date()),"0"},v->{
-            required(v[0],200);SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US);format.setLenient(false);ParsePosition p=new ParsePosition(0);Date date=format.parse(v[1],p);if(date==null||p.getIndex()!=v[1].length()||date.getTime()<=0)throw new IllegalArgumentException(t("DateFormat"));
+            required(v[0],200);SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US);format.setLenient(false);ParsePosition p=new ParsePosition(0);Date date=format.parse(v[1],p);if(date==null||p.getIndex()!=v[1].length()||date.getTime() < -5364662400000L||date.getTime()>32503680000000L)throw new IllegalArgumentException(t("DateFormat"));
             if(!v[2].equals("0")&&!v[2].equals("1"))throw new IllegalArgumentException(t("AnnualHint"));
             Map<String,String> f=FamilyCore.fields("title",v[0],"at",""+date.getTime(),"annual",v[2]);if(source!=null){f.put("ref",FamilyDataController.reference(source.messageOwner,source.isOut()?data.self:dialog));f.put("message",""+source.getId());}
             data.send(dialog,"event",FamilyDataController.newId(),"📅 "+v[0]+"\n"+v[1],f,source);
@@ -166,13 +174,13 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     }
     private void album(){
         long peer=data.partner();if(peer==0){row(t("Partner"),t("ChoosePartnerInfo"),()->chooseChat(true));return;}
-        row(t("OpenAlbum"),name(peer)+" · "+t("AlbumDateInfo"),()->{Bundle b=new Bundle();b.putLong("dialog_id",peer);b.putInt("start_from",0);presentFragment(new MediaActivity(b,null));});
+        row(t("OpenAlbum"),name(peer)+" · "+t("AlbumDateInfo"),()->{Bundle b=new Bundle();b.putLong("dialog_id",peer);b.putInt("start_from",0);MediaActivity media=new MediaActivity(b,null);media.setCurrentAccount(currentAccount);presentFragment(media);});
     }
     private void ours(){
         info(t("OursHelp"));int count=0;for(FamilyCore.Card c:cards("bookmark")){if(!matches(c.op().get("text")))continue;if(count++>=visibleLimit)break;LinearLayout box=card();text(box,"★ "+c.op().get("text"),true);text(box,name(c.origin.actor),false);button(box,t("OpenMessage"),()->openReference(c.op().get("ref")));if(c.origin.actor==data.self)button(box,t("RemoveBookmark"),()->send("bookmark_remove",c.op().entity,"★ × "+c.op().get("text")));}more(count);
     }
     private void openReference(String reference){data.resolve(dialog,reference,id->{if(id<=0){toast(t("LoadHistoryFirst"));return;}openChat(dialog,id);});}
-    private void openChat(long peer,int mid){Bundle b=new Bundle();if(peer>0)b.putLong("user_id",peer);else b.putLong("chat_id",-peer);if(mid>0)b.putInt("message_id",mid);presentFragment(new ChatActivity(b));}
+    private void openChat(long peer,int mid){Bundle b=new Bundle();if(peer>0)b.putLong("user_id",peer);else b.putLong("chat_id",-peer);if(mid>0)b.putInt("message_id",mid);ChatActivity chat=new ChatActivity(b);chat.setCurrentAccount(currentAccount);presentFragment(chat);}
     private boolean pair(){if(dialog<=0||dialog!=data.partner()){row(t("Partner"),t("PairOnly"),()->chooseChat(true));return false;}return true;}
     private void hugs(){
         if(!pair())return;row(t("SendHug"),t("hugInfo"),()->{send("hug",FamilyDataController.newId(),"🤗 "+t("SendingHug"));FamilyEffects.show(this,null);});
@@ -199,10 +207,14 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     private void voice(){
         toggle(t("SkipSilence"),t("SkipSilenceInfo"),FamilyVoice.skipSilence(currentAccount),()->{FamilyVoice.setSkipSilence(currentAccount,!FamilyVoice.skipSilence(currentAccount));render();});
         info(t("VoiceHelp"));row(t("LoadVoice"),t("VoiceQueueInfo"),()->data.media(dialog,3,list->{
-            if(body==null||!page.equals("voice"))return;ArrayList<MessageObject> unread=new ArrayList<>();for(MessageObject m:list)if(!m.isOut()&&m.isContentUnread()&&!FamilyVoice.heard(m))unread.add(m);
-            if(unread.isEmpty()){toast(t("NoVoice"));return;}LinearLayout box=card();text(box,t("Queue")+": "+unread.size(),true);button(box,t("PlayQueue"),()->{MessageObject first=unread.get(0);MediaController player=MediaController.getInstance();if(player.playMessage(first))player.setVoiceMessagesPlaylist(unread,true);});
-            for(int i=0;i<Math.min(100,unread.size());i++){MessageObject m=unread.get(i);button(box,DateFormat.getDateTimeInstance().format(new Date(m.messageOwner.date*1000L))+" · "+(int)m.getDuration()+" s",()->{if(MediaController.getInstance().playMessage(m))MediaController.getInstance().setVoiceMessagesPlaylist(new ArrayList<>(unread.subList(unread.indexOf(m),unread.size())),true);});}
+            voiceQueue=new ArrayList<>();for(MessageObject m:list)if(!m.isOut()&&m.isContentUnread()&&!FamilyVoice.heard(m))voiceQueue.add(m);
+            if(voiceQueue.isEmpty())toast(t("NoVoice"));render();
         }));
+        if(voiceQueue!=null&&!voiceQueue.isEmpty()){
+            ArrayList<MessageObject> unread=new ArrayList<>(voiceQueue);LinearLayout box=card();text(box,t("Queue")+": "+unread.size(),true);
+            button(box,t("PlayQueue"),()->{MessageObject first=unread.get(0);MediaController player=MediaController.getInstance();if(player.playMessage(first))player.setVoiceMessagesPlaylist(unread,true);});
+            for(int i=0;i<Math.min(100,unread.size());i++){MessageObject m=unread.get(i);button(box,DateFormat.getDateTimeInstance().format(new Date(m.messageOwner.date*1000L))+" · "+(int)m.getDuration()+" s",()->{if(MediaController.getInstance().playMessage(m))MediaController.getInstance().setVoiceMessagesPlaylist(new ArrayList<>(unread.subList(unread.indexOf(m),unread.size())),true);});}
+        }
     }
     private void games(){
         if(dialog<=0){info(t("PairGame"));return;}
@@ -218,12 +230,23 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
             }
         }more(count);
     }
+    private void loadBillDraft(){billDraft.clear();String stored=data.prefs.getString("bill_draft_"+dialog,"");if(!stored.isEmpty())billDraft.addAll(Arrays.asList(stored.split("\n")));}
+    private void saveBillDraft(){data.prefs.edit().putString("bill_draft_"+dialog,android.text.TextUtils.join("\n",billDraft)).apply();}
     private void bills(){
-        row(t("SplitBill"),t("ItemsHint"),()->form(t("SplitBill"),new String[]{"Items","Currency"},new String[]{"","RUB"},v->{
-            Map<String,Long> shares=FamilyCore.splitBill(v[0]);if(!v[1].matches("[A-Za-z]{3}"))throw new IllegalArgumentException(t("CurrencyHint"));StringBuilder human=new StringBuilder("🧾 "+t("SplitBill")+"\n");for(Map.Entry<String,Long> e:shares.entrySet())human.append(e.getKey()).append(": ").append(FamilyCore.money(e.getValue())).append(' ').append(v[1].toUpperCase(Locale.ROOT)).append('\n');
-            send("bill",FamilyDataController.newId(),human.toString(),"items",v[0],"currency",v[1].toUpperCase(Locale.ROOT));
-        }));
-        for(FamilyCore.Card c:cards("bill")){LinearLayout box=card();text(box,t("SplitBill"),true);text(box,c.op().get("items"),false);for(Map.Entry<String,Long> e:FamilyCore.splitBill(c.op().get("items")).entrySet())text(box,e.getKey()+": "+FamilyCore.money(e.getValue())+" "+c.op().get("currency"),true);}
+        row(t("AddBillItem"),t("BillBuilder"),()->form(t("AddBillItem"),new String[]{"ItemName","Amount","Participants"},null,v->{
+            required(v[0],100);required(v[2],500);if(v[0].contains(";")||v[0].contains("\n")||v[2].contains(";")||v[2].contains("\n"))throw new IllegalArgumentException(t("ParticipantsHint"));
+            String line=v[0]+";"+FamilyCore.money(FamilyCore.cents(v[1]))+";"+v[2];ArrayList<String> next=new ArrayList<>(billDraft);next.add(line);FamilyCore.splitBill(android.text.TextUtils.join("\n",next));billDraft.add(line);saveBillDraft();render();
+        },t("Add")));
+        if(!billDraft.isEmpty()){
+            LinearLayout draft=card();text(draft,t("BillDraft"),true);
+            for(int i=0;i<billDraft.size();i++){final int index=i;String[] item=billDraft.get(i).split(";",-1);text(draft,item[0]+" · "+item[1]+" · "+item[2],false);button(draft,t("RemoveItem"),()->{billDraft.remove(index);saveBillDraft();render();});}
+            String encoded=android.text.TextUtils.join("\n",billDraft);for(Map.Entry<String,Long> share:FamilyCore.splitBill(encoded).entrySet())text(draft,share.getKey()+": "+FamilyCore.money(share.getValue()),true);
+            button(draft,t("SendBill"),()->form(t("SendBill"),new String[]{"Currency"},new String[]{"RUB"},v->{
+                if(!v[0].matches("[A-Za-z]{3}"))throw new IllegalArgumentException(t("CurrencyHint"));String currency=v[0].toUpperCase(Locale.ROOT);Map<String,Long> shares=FamilyCore.splitBill(encoded);StringBuilder human=new StringBuilder("🧾 "+t("SplitBill")+"\n");for(Map.Entry<String,Long> e:shares.entrySet())human.append(e.getKey()).append(": ").append(FamilyCore.money(e.getValue())).append(' ').append(currency).append('\n');
+                send("bill",FamilyDataController.newId(),human.toString(),"items",encoded,"currency",currency);billDraft.clear();saveBillDraft();render();
+            },t("SendBill")));
+        }
+        for(FamilyCore.Card c:cards("bill")){LinearLayout box=card();text(box,t("SplitBill"),true);for(String line:c.op().get("items").split("\n")){if(line.trim().isEmpty())continue;String[] item=line.split(";",-1);text(box,item[0]+" · "+item[1]+" "+c.op().get("currency")+" · "+item[2],false);}for(Map.Entry<String,Long> e:FamilyCore.splitBill(c.op().get("items")).entrySet())text(box,e.getKey()+": "+FamilyCore.money(e.getValue())+" "+c.op().get("currency"),true);}
     }
     private void statistics(){
         syncRows();row(t("AllStats"),t("StatsCoverage"),()->showStats(0));int year=Calendar.getInstance().get(Calendar.YEAR);row(t("YearCard")+" "+year,t("YearCardInfo"),()->showStats(year));row(t("YearCard")+" "+(year-1),t("YearCardInfo"),()->showStats(year-1));

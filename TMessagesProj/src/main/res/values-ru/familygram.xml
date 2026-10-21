@@ -57,8 +57,8 @@
     <string name="FGEventTitleHint" formatted="false">День рождения, поездка или встреча</string>
     <string name="FGWhen" formatted="false">Дата и время</string>
     <string name="FGWhenHint" formatted="false">Нажмите, чтобы выбрать</string>
-    <string name="FGAnnual" formatted="false">Повторять ежегодно: 1 — да, 0 — нет</string>
-    <string name="FGAnnualHint" formatted="false">1 для дня рождения, 0 для разового события</string>
+    <string name="FGAnnual" formatted="false">Повторять ежегодно</string>
+    <string name="FGAnnualHint" formatted="false">Повторять дни рождения и годовщины ежегодно</string>
     <string name="FGDateFormat" formatted="false">Используйте ГГГГ-ММ-ДД ЧЧ:мм</string>
     <string name="FGYearly" formatted="false">Ежегодно</string>
     <string name="FGCancelEvent" formatted="false">Отменить событие</string>
@@ -193,4 +193,14 @@
     <string name="FGOpenCard" formatted="false">Открыть карточку FamilyGram</string>
     <string name="FGBookmarkShortcut" formatted="false">★ Наше</string>
     <string name="FGQuickPairReaction" formatted="false">❤ / 💋</string>
+    <string name="FGAddBillItem" formatted="false">Добавить покупку в счёт</string>
+    <string name="FGBillBuilder" formatted="false">Добавьте покупки, суммы и участников каждой покупки. Проверьте доли и отправьте готовый счёт.</string>
+    <string name="FGItemName" formatted="false">Покупка</string>
+    <string name="FGItemNameHint" formatted="false">Например: пицца</string>
+    <string name="FGParticipants" formatted="false">Кто участвует в этой покупке</string>
+    <string name="FGParticipantsHint" formatted="false">Имена через запятую, например Аня, Саша</string>
+    <string name="FGRemoveItem" formatted="false">Убрать эту покупку</string>
+    <string name="FGSendBill" formatted="false">Отправить счёт</string>
+    <string name="FGBillDraft" formatted="false">Черновик счёта</string>
+    <string name="FGAdd" formatted="false">Добавить</string>
 </resources>
