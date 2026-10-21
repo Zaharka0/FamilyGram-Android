@@ -799,19 +799,19 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     c.setTimeInMillis(since);
                 }
                 final int row = position;
-                android.app.DatePickerDialog dlg = new android.app.DatePickerDialog(getParentActivity(), (view1, y, m, d) -> {
+                android.app.DatePickerDialog dlg = new android.app.DatePickerDialog(getParentActivity(), (view1, yr, mo, dy) -> {
                     java.util.Calendar sel = java.util.Calendar.getInstance();
-                    sel.set(y, m, d, 12, 0, 0);
+                    sel.set(yr, mo, dy, 12, 0, 0);
                     FamilyController.setTogetherSince(sel.getTimeInMillis());
-                    if (listAdapter != null) {
-                        listAdapter.notifyItemChanged(row);
+                    if (adapter != null) {
+                        adapter.notifyItemChanged(row);
                     }
                 }, c.get(java.util.Calendar.YEAR), c.get(java.util.Calendar.MONTH), c.get(java.util.Calendar.DAY_OF_MONTH));
                 dlg.getDatePicker().setMaxDate(System.currentTimeMillis());
                 dlg.setButton(android.content.DialogInterface.BUTTON_NEUTRAL, getString(R.string.FamilyDateClear), (d2, w) -> {
                     FamilyController.setTogetherSince(0);
-                    if (listAdapter != null) {
-                        listAdapter.notifyItemChanged(row);
+                    if (adapter != null) {
+                        adapter.notifyItemChanged(row);
                     }
                 });
                 dlg.show();
