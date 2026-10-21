@@ -1,0 +1,46 @@
+name: Ghost mode checks
+
+on:
+  pull_request:
+    paths:
+      - 'TMessagesProj/src/main/**'
+      - 'familygram/**'
+      - '.github/workflows/ghost-mode.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    name: Ghost settings and request policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: python3 familygram/test_ghost_mode.py
+
+  android-java:
+    name: Android Java compilation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Java dependencies
+        run: git submodule update --init --depth=1 TMessagesProj/lib/jlatexmath TMessagesProj_Modules/media
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Android build tools
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+      - name: Compile Android library without API credentials
+        run: ./gradlew --no-daemon --max-workers=2 '-Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g' :TMessagesProj:compileDebugJavaWithJavac

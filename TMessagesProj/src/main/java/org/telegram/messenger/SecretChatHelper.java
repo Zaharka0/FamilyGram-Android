@@ -163,7 +163,14 @@ public class SecretChatHelper extends BaseController {
     }
 
     public void sendMessagesReadMessage(TLRPC.EncryptedChat encryptedChat, ArrayList<Long> random_ids, TLRPC.Message resendMessage) {
+        sendMessagesReadMessage(encryptedChat, random_ids, resendMessage, false);
+    }
+
+    public void sendMessagesReadMessage(TLRPC.EncryptedChat encryptedChat, ArrayList<Long> random_ids, TLRPC.Message resendMessage, boolean startsTimer) {
         if (!(encryptedChat instanceof TLRPC.TL_encryptedChat)) {
+            return;
+        }
+        if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_READ) && !startsTimer && encryptedChat.ttl == 0) {
             return;
         }
         TLRPC.TL_decryptedMessageService reqSend = new TLRPC.TL_decryptedMessageService();

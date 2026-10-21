@@ -57,6 +57,9 @@ public class TLObject {
 
     public int networkType;
 
+    // Local-only exemption for receipts that start disappearing-media timers.
+    public boolean familygramAllowReadReceipt;
+
     public boolean disableFree = false;
     private static final ThreadLocal<NativeByteBuffer> sizeCalculator = new ThreadLocal<NativeByteBuffer>() {
         @Override

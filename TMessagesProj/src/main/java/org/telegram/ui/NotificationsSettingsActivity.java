@@ -38,6 +38,8 @@ import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.FamilyController;
+import org.telegram.messenger.GhostModeController;
+import org.telegram.messenger.GhostModeSettings;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaDataController;
@@ -105,6 +107,14 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
     private int familyModeRow;
     private int keepDeletedRow;
     private int familyInfoRow;
+    private int ghostSectionRow;
+    private int ghostEnabledRow;
+    private int ghostReadRow;
+    private int ghostStoriesRow;
+    private int ghostOnlineRow;
+    private int ghostTypingRow;
+    private int ghostOfflineRow;
+    private int ghostInfoRow;
 
     private int notificationsServiceRow;
     private int notificationsServiceConnectionRow;
@@ -185,6 +195,15 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         familyModeRow = rowCount++;
         keepDeletedRow = rowCount++;
         familyInfoRow = rowCount++;
+
+        ghostSectionRow = rowCount++;
+        ghostEnabledRow = rowCount++;
+        ghostReadRow = rowCount++;
+        ghostStoriesRow = rowCount++;
+        ghostOnlineRow = rowCount++;
+        ghostTypingRow = rowCount++;
+        ghostOfflineRow = rowCount++;
+        ghostInfoRow = rowCount++;
 
         notificationsSectionRow = rowCount++;
         privateRow = rowCount++;
@@ -746,6 +765,10 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                 } else {
                     ConnectionsManager.getInstance(currentAccount).setPushConnectionEnabled(false);
                 }
+            } else if (ghostOption(position) != 0) {
+                int option = ghostOption(position);
+                enabled = GhostModeController.get(currentAccount).selected(option);
+                GhostModeController.set(currentAccount, option, !enabled);
             } else if (position == familyModeRow) {
                 enabled = FamilyController.isOnlyFamilyMode();
                 FamilyController.setOnlyFamilyMode(!enabled);
@@ -944,6 +967,25 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         }
     }
 
+    private int ghostOption(int position) {
+        if (position == ghostEnabledRow) return GhostModeSettings.ENABLED;
+        if (position == ghostReadRow) return GhostModeSettings.HIDE_READ;
+        if (position == ghostStoriesRow) return GhostModeSettings.HIDE_STORIES;
+        if (position == ghostOnlineRow) return GhostModeSettings.HIDE_ONLINE;
+        if (position == ghostTypingRow) return GhostModeSettings.HIDE_TYPING;
+        if (position == ghostOfflineRow) return GhostModeSettings.RESTORE_OFFLINE;
+        return 0;
+    }
+
+    private int ghostTitle(int position) {
+        if (position == ghostEnabledRow) return R.string.FamilyGhostEnabled;
+        if (position == ghostReadRow) return R.string.FamilyGhostRead;
+        if (position == ghostStoriesRow) return R.string.FamilyGhostStories;
+        if (position == ghostOnlineRow) return R.string.FamilyGhostOnline;
+        if (position == ghostTypingRow) return R.string.FamilyGhostTyping;
+        return R.string.FamilyGhostOffline;
+    }
+
     private class ListAdapter extends RecyclerListView.SelectionAdapter {
 
         private Context mContext;
@@ -960,7 +1002,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     position == badgeNumberSection || position == otherSection2Row || position == resetSection2Row ||
                     position == callsSection2Row || position == callsSectionRow || position == badgeNumberSection2Row ||
                     position == accountsSectionRow || position == accountsInfoRow || position == resetNotificationsSectionRow ||
-                    position == familySectionRow || position == familyInfoRow ||
+                    position == familySectionRow || position == familyInfoRow || position == ghostSectionRow || position == ghostInfoRow ||
                     position == eventsSection2Row);
         }
 
@@ -1022,6 +1064,8 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                         headerCell.setText(getString("ShowNotificationsFor", R.string.ShowNotificationsFor));
                     } else if (position == familySectionRow) {
                         headerCell.setText(getString(R.string.FamilySection));
+                    } else if (position == ghostSectionRow) {
+                        headerCell.setText(getString(R.string.FamilyGhostTitle));
                     }
                     break;
                 }
@@ -1062,6 +1106,8 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                         checkCell.setTextAndCheck(getString(R.string.FamilyOnlyMode), FamilyController.isOnlyFamilyMode(), true);
                     } else if (position == keepDeletedRow) {
                         checkCell.setTextAndCheck(getString(R.string.FamilyKeepDeleted), FamilyController.isKeepDeleted(), false);
+                    } else if (ghostOption(position) != 0) {
+                        checkCell.setTextAndCheck(getString(ghostTitle(position)), GhostModeController.get(currentAccount).selected(ghostOption(position)), position != ghostOfflineRow);
                     }
                     break;
                 }
@@ -1218,6 +1264,8 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                         textCell.setText(getString("ShowNotificationsForInfo", R.string.ShowNotificationsForInfo));
                     } else if (position == familyInfoRow) {
                         textCell.setText(getString(R.string.FamilyOnlyModeInfo));
+                    } else if (position == ghostInfoRow) {
+                        textCell.setText(getString(R.string.FamilyGhostInfo));
                     }
                     break;
                 }
@@ -1228,13 +1276,13 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
         public int getItemViewType(int position) {
             if (position == eventsSectionRow || position == otherSectionRow || position == resetSectionRow ||
                     position == callsSectionRow || position == badgeNumberSection || position == inappSectionRow ||
-                    position == notificationsSectionRow || position == accountsSectionRow || position == familySectionRow) {
+                    position == notificationsSectionRow || position == accountsSectionRow || position == familySectionRow || position == ghostSectionRow) {
                 return 0;
             } else if (position == inappSoundRow || position == inappVibrateRow || position == notificationsServiceConnectionRow ||
                     position == inappPreviewRow || position == contactJoinedRow || position == pinnedMessageRow ||
                     position == notificationsServiceRow || position == badgeNumberMutedRow || position == badgeNumberMessagesRow ||
                     position == badgeNumberShowRow || position == inappPriorityRow || position == inchatSoundRow ||
-                    position == androidAutoAlertRow || position == accountsAllRow || position == familyModeRow || position == keepDeletedRow) {
+                    position == androidAutoAlertRow || position == accountsAllRow || position == familyModeRow || position == keepDeletedRow || ghostOption(position) != 0) {
                 return 1;
             } else if (position == resetNotificationsRow) {
                 return 2;
@@ -1244,7 +1292,7 @@ public class NotificationsSettingsActivity extends BaseFragment implements Notif
                     position == resetSection2Row || position == callsSection2Row || position == badgeNumberSection2Row ||
                     position == resetNotificationsSectionRow) {
                 return 4;
-            } else if (position == accountsInfoRow || position == familyInfoRow) {
+            } else if (position == accountsInfoRow || position == familyInfoRow || position == ghostInfoRow) {
                 return 6;
             } else {
                 return 5;
