@@ -11555,4 +11555,12 @@
     <string name="FamilyOnlyModeInfo">Only family notifications: only chats added to family make sounds and notifications, everything else stays silent (login codes from FamilyGram still arrive). Keep deleted: messages deleted by the other person stay in your chat and are marked as deleted.</string>
     <string name="FamilyKeepDeleted">Keep messages deleted by others</string>
     <string name="FamilyDeletedMark">deleted</string>
+    <string name="FamilyGhostTitle">Ghost mode</string>
+    <string name="FamilyGhostEnabled">Enable ghost mode</string>
+    <string name="FamilyGhostRead">Hide message read receipts</string>
+    <string name="FamilyGhostStories">Hide story views</string>
+    <string name="FamilyGhostOnline">Hide online status</string>
+    <string name="FamilyGhostTyping">Hide typing and recording</string>
+    <string name="FamilyGhostOffline">Return offline automatically</string>
+    <string name="FamilyGhostInfo">Applies to this account on this device while ghost mode is enabled. Messages and stories are marked as read locally. Sending messages, reactions, calls, transcription and other clients may reveal activity. Disappearing-media and secret-chat self-destruct receipts remain enabled so their timers work. Automatic return offline also requires hiding online status and can conflict with other open clients. Reading after disabling this mode can mark earlier messages as read too.</string>
 </resources>

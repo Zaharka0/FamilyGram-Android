@@ -35,6 +35,8 @@ import org.telegram.messenger.EmuDetector;
 import org.telegram.messenger.FileLoadOperation;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.GhostModeController;
+import org.telegram.messenger.GhostModeRequests;
 import org.telegram.messenger.FileUploadOperation;
 import org.telegram.messenger.KeepAliveJob;
 import org.telegram.messenger.LocaleController;
@@ -396,6 +398,20 @@ public class ConnectionsManager extends BaseController {
     }
 
     private void sendRequestInternal(TLObject object, RequestDelegate onComplete, RequestDelegateTimestamp onCompleteTimestamp, QuickAckDelegate onQuickAck, WriteToSocketDelegate onWriteToSocket, int flags, int datacenterId, int connectionType, boolean immediate, int requestToken) {
+        if (GhostModeRequests.shouldSuppress(GhostModeController.get(currentAccount), object)) {
+            TLRPC.TL_error error = new TLRPC.TL_error();
+            error.code = -1;
+            error.text = "FAMILYGRAM_GHOST_MODE";
+            object.freeResources();
+            Utilities.stageQueue.postRunnable(() -> {
+                if (onComplete != null) {
+                    onComplete.run(null, error);
+                } else if (onCompleteTimestamp != null) {
+                    onCompleteTimestamp.run(null, error, 0);
+                }
+            });
+            return;
+        }
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("send request " + object + " with token = " + requestToken);
         }

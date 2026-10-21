@@ -10508,6 +10508,39 @@ public class MessagesController extends BaseController implements NotificationCe
         });
     }
 
+    private long lastGhostOfflineTime;
+
+    public void onGhostModeSettingsChanged(boolean presenceChanged) {
+        Utilities.stageQueue.postRunnable(() -> {
+            if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_READ)) {
+                for (int i = readTasks.size() - 1; i >= 0; i--) {
+                    ReadTask task = readTasks.get(i);
+                    if (!ghostReadStartsSecretTimer(task.dialogId)) {
+                        readTasks.remove(i);
+                        readTasksMap.remove(task.dialogId);
+                    }
+                }
+                for (int i = repliesReadTasks.size() - 1; i >= 0; i--) {
+                    ReadTask task = repliesReadTasks.get(i);
+                    if (!ghostReadStartsSecretTimer(task.dialogId)) {
+                        repliesReadTasks.remove(i);
+                        threadsReadTasksMap.remove(task.dialogId + "_" + task.replyId);
+                    }
+                }
+            }
+            if (presenceChanged) {
+                if (statusRequest != 0) {
+                    getConnectionsManager().cancelRequest(statusRequest, true);
+                    statusRequest = 0;
+                }
+                statusSettingState = 0;
+                lastStatusUpdateTime = 0;
+                lastGhostOfflineTime = 0;
+                offlineSent = false;
+            }
+        });
+    }
+
     public void updateTimerProc() {
         long currentTime = System.currentTimeMillis();
 
@@ -10515,7 +10548,7 @@ public class MessagesController extends BaseController implements NotificationCe
         checkReadTasks();
 
         if (getUserConfig().isClientActivated()) {
-            if (!ignoreSetOnline && getConnectionsManager().getPauseTime() == 0 && ApplicationLoader.isScreenOn && !ApplicationLoader.mainInterfacePausedStageQueue) {
+            if (!ignoreSetOnline && !GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_ONLINE) && getConnectionsManager().getPauseTime() == 0 && ApplicationLoader.isScreenOn && !ApplicationLoader.mainInterfacePausedStageQueue) {
                 if (ApplicationLoader.mainInterfacePausedStageQueueTime != 0 && Math.abs(ApplicationLoader.mainInterfacePausedStageQueueTime - System.currentTimeMillis()) > 1000) {
                     if (statusSettingState != 1 && (lastStatusUpdateTime == 0 || Math.abs(System.currentTimeMillis() - lastStatusUpdateTime) >= 55000 || offlineSent)) {
                         statusSettingState = 1;
@@ -10540,17 +10573,22 @@ public class MessagesController extends BaseController implements NotificationCe
                         });
                     }
                 }
-            } else if (statusSettingState != 2 && !offlineSent && Math.abs(System.currentTimeMillis() - getConnectionsManager().getPauseTime()) >= 2000) {
+            } else if (statusSettingState != 2 && !offlineSent && Math.abs(System.currentTimeMillis() - getConnectionsManager().getPauseTime()) >= 2000
+                    && (!GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_ONLINE) || SystemClock.elapsedRealtime() - lastGhostOfflineTime >= 5000)) {
                 statusSettingState = 2;
                 if (statusRequest != 0) {
                     getConnectionsManager().cancelRequest(statusRequest, true);
                 }
                 TL_account.updateStatus req = new TL_account.updateStatus();
                 req.offline = true;
+                lastGhostOfflineTime = SystemClock.elapsedRealtime();
                 statusRequest = getConnectionsManager().sendRequest(req, (response, error) -> {
                     if (error == null) {
                         offlineSent = true;
                     } else {
+                        if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_ONLINE)) {
+                            statusSettingState = 0;
+                        }
                         if (lastStatusUpdateTime != 0) {
                             lastStatusUpdateTime += 5000;
                         }
@@ -11374,6 +11412,9 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public boolean sendTyping(long dialogId, long threadMsgId, int action, String emojicon, int classGuid) {
+        if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_TYPING)) {
+            return false;
+        }
         if (action < 0 || action >= sendingTypings.length || dialogId == 0) {
             return false;
         }
@@ -14396,8 +14437,13 @@ public class MessagesController extends BaseController implements NotificationCe
         long dialogId = messageObject.getDialogId();
         getMessagesStorage().markMessagesContentAsRead(dialogId, arrayList, 0, 0);
         getNotificationCenter().postNotificationName(NotificationCenter.messagesReadContent, dialogId, arrayList);
+        boolean startsTimer = messageObject.messageOwner.ttl > 0
+                || (messageObject.messageOwner.media != null && messageObject.messageOwner.media.ttl_seconds > 0);
+        if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_READ) && !startsTimer) {
+            return;
+        }
         if (messageObject.getId() < 0) {
-            markMessageAsRead(messageObject.getDialogId(), messageObject.messageOwner.random_id, Integer.MIN_VALUE);
+            markMessageAsRead(messageObject.getDialogId(), messageObject.messageOwner.random_id, Integer.MIN_VALUE, startsTimer);
         } else {
             if (messageObject.messageOwner.peer_id.channel_id != 0) {
                 TLRPC.TL_channels_readMessageContents req = new TLRPC.TL_channels_readMessageContents();
@@ -14406,12 +14452,14 @@ public class MessagesController extends BaseController implements NotificationCe
                     return;
                 }
                 req.id.add(messageObject.getId());
+                req.familygramAllowReadReceipt = startsTimer;
                 getConnectionsManager().sendRequest(req, (response, error) -> {
 
                 });
             } else {
                 TLRPC.TL_messages_readMessageContents req = new TLRPC.TL_messages_readMessageContents();
                 req.id.add(messageObject.getId());
+                req.familygramAllowReadReceipt = startsTimer;
                 getConnectionsManager().sendRequest(req, (response, error) -> {
                     if (error == null) {
                         TLRPC.TL_messages_affectedMessages res = (TLRPC.TL_messages_affectedMessages) response;
@@ -14424,6 +14472,9 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void markMentionMessageAsRead(int mid, long channelId, long did) {
         getMessagesStorage().markMentionMessageAsRead(-channelId, mid, did);
+        if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_READ)) {
+            return;
+        }
         if (channelId != 0) {
             TLRPC.TL_channels_readMessageContents req = new TLRPC.TL_channels_readMessageContents();
             req.channel = getInputChannel(channelId);
@@ -14507,6 +14558,7 @@ public class MessagesController extends BaseController implements NotificationCe
             TLRPC.TL_channels_readMessageContents req = new TLRPC.TL_channels_readMessageContents();
             req.channel = inputChannel;
             req.id.add(mid);
+            req.familygramAllowReadReceipt = true;
             getConnectionsManager().sendRequest(req, (response, error) -> {
                 if (newTaskId != 0) {
                     getMessagesStorage().removePendingTask(newTaskId);
@@ -14515,6 +14567,7 @@ public class MessagesController extends BaseController implements NotificationCe
         } else {
             TLRPC.TL_messages_readMessageContents req = new TLRPC.TL_messages_readMessageContents();
             req.id.add(mid);
+            req.familygramAllowReadReceipt = true;
             getConnectionsManager().sendRequest(req, (response, error) -> {
                 if (error == null) {
                     TLRPC.TL_messages_affectedMessages res = (TLRPC.TL_messages_affectedMessages) response;
@@ -14528,6 +14581,10 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void markMessageAsRead(long dialogId, long randomId, int ttl) {
+        markMessageAsRead(dialogId, randomId, ttl, ttl > 0);
+    }
+
+    private void markMessageAsRead(long dialogId, long randomId, int ttl, boolean startsTimer) {
         if (randomId == 0 || dialogId == 0 || ttl <= 0 && ttl != Integer.MIN_VALUE) {
             return;
         }
@@ -14540,7 +14597,7 @@ public class MessagesController extends BaseController implements NotificationCe
         }
         ArrayList<Long> randomIds = new ArrayList<>();
         randomIds.add(randomId);
-        getSecretChatHelper().sendMessagesReadMessage(chat, randomIds, null);
+        getSecretChatHelper().sendMessagesReadMessage(chat, randomIds, null, startsTimer);
         if (ttl > 0) {
             int time = getConnectionsManager().getCurrentTime();
             getMessagesStorage().createTaskForSecretChat(chat.id, time, time, 0, randomIds);
@@ -14548,6 +14605,10 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     private void completeReadTask(ReadTask task) {
+        boolean startsTimer = ghostReadStartsSecretTimer(task.dialogId);
+        if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_READ) && !startsTimer) {
+            return;
+        }
         if (task.replyId != 0 && task.monoForumPeerId == 0) {
             TLRPC.TL_messages_readDiscussion req = new TLRPC.TL_messages_readDiscussion();
             req.msg_id = (int) task.replyId;
@@ -14593,6 +14654,7 @@ public class MessagesController extends BaseController implements NotificationCe
                 req.peer.chat_id = chat.id;
                 req.peer.access_hash = chat.access_hash;
                 req.max_date = task.maxDate;
+                req.familygramAllowReadReceipt = startsTimer;
                 getConnectionsManager().sendRequest(req, (response, error) -> {
 
                 });
@@ -14654,6 +14716,9 @@ public class MessagesController extends BaseController implements NotificationCe
             return;
         }
         getMessagesStorage().resetMentionsCount(dialogId, topicId, 0);
+        if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_READ)) {
+            return;
+        }
         TLRPC.TL_messages_readMentions req = new TLRPC.TL_messages_readMentions();
         req.peer = getInputPeer(dialogId);
         if (topicId != 0) {
@@ -14663,7 +14728,17 @@ public class MessagesController extends BaseController implements NotificationCe
         getConnectionsManager().sendRequest(req, null);
     }
 
+    private boolean ghostReadStartsSecretTimer(long dialogId) {
+        if (!DialogObject.isEncryptedDialog(dialogId)) {
+            return false;
+        }
+        TLRPC.EncryptedChat chat = getEncryptedChat(DialogObject.getEncryptedChatId(dialogId));
+        return chat != null && chat.ttl > 0;
+    }
+
     public void markDialogAsRead(long dialogId, int maxPositiveId, int maxNegativeId, int maxDate, boolean popup, long threadId, int countDiff, boolean readNow, int scheduledCount) {
+        final boolean suppressReceipt = GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_READ)
+                && !ghostReadStartsSecretTimer(dialogId);
         boolean createReadTask;
 
         if (threadId != 0) {
@@ -14786,8 +14861,11 @@ public class MessagesController extends BaseController implements NotificationCe
             monoForumPeerId = 0;
         }
 
-        if (createReadTask) {
+        if (createReadTask && !suppressReceipt) {
             Utilities.stageQueue.postRunnable(() -> {
+                if (GhostModeController.get(currentAccount).active(GhostModeSettings.HIDE_READ) && !ghostReadStartsSecretTimer(dialogId)) {
+                    return;
+                }
                 ReadTask currentReadTask;
                 if (threadId != 0) {
                     currentReadTask = threadsReadTasksMap.get(dialogId + "_" + threadId);
@@ -19974,6 +20052,14 @@ public class MessagesController extends BaseController implements NotificationCe
                         dbUsersStatus.add(toDbUser);
                         if (update.user_id == getUserConfig().getClientUserId()) {
                             getNotificationsController().setLastOnlineFromOtherDevice(update.status.expires);
+                            if (update.status instanceof TLRPC.TL_userStatusOnline && GhostModeController.get(currentAccount).restoreOffline()) {
+                                Utilities.stageQueue.postRunnable(() -> {
+                                    if (GhostModeController.get(currentAccount).restoreOffline()) {
+                                        offlineSent = false;
+                                        statusSettingState = 0;
+                                    }
+                                });
+                            }
                         }
                     } else if (baseUpdate instanceof TL_update.TL_updateMonoForumNoPaidException) {
                         TL_update.TL_updateMonoForumNoPaidException update = (TL_update.TL_updateMonoForumNoPaidException) baseUpdate;
