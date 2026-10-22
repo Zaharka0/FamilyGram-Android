@@ -67,7 +67,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.didUpdateConnectionState);
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.messagesDeleted);
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.removeAllMessagesFromDialog);
-                if(FamilyController.wantsFamilyOnlyLastSeen())FamilyController.syncLastSeen();
+                FamilyController.syncLastSeen();
             }
         });
         // Migrate the old device-wide partner only into the currently selected account.
@@ -202,7 +202,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
                 }
             }catch(Exception error){FileLog.e(error);}});
         }
-        if(id==NotificationCenter.didUpdateConnectionState && FamilyController.wantsFamilyOnlyLastSeen())FamilyController.syncLastSeen();
+        if(id==NotificationCenter.didUpdateConnectionState)FamilyController.syncLastSeen();
         if(id==NotificationCenter.privacyRulesUpdated && FamilyController.wantsFamilyOnlyLastSeen() && FamilyController.shouldHideOnline(account)) FamilyController.syncLastSeen();
         if (id == NotificationCenter.messageReceivedByServer && args.length > 6 && !Boolean.TRUE.equals(args[6]) && args[2] instanceof TLRPC.Message) ingest((TLRPC.Message) args[2], true);
     }
