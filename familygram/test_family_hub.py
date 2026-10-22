@@ -36,6 +36,7 @@ with tempfile.TemporaryDirectory(prefix='familygram-tests-') as output:
         direct.update(re.findall(r'\bt\("([A-Za-z]+)"\)',text))
         direct.update(re.findall(r'FamilyText.get\("([A-Za-z]+)"\)',text))
         direct.update(re.findall(r'R.string.FG([A-Za-z]+)',text))
+        direct.update(re.findall(r'new FamilyButton\([^,]+,"([A-Za-z]+)"',text))
     missing={'FG'+x for x in direct}-set(keys)
     assert not missing,f'Missing strings: {missing}'
     print(f'FamilyGram resources: {len(keys)} English/Russian strings, XML and direct references passed')

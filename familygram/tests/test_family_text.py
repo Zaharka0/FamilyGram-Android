@@ -48,6 +48,7 @@ public class LocaleController {
  public static String getString(int id){return "LOC_ERR:null";}
 }'''
     }
+    sources['org/telegram/messenger/BotInlineKeyboard.java'] = 'package org.telegram.messenger;\npublic class BotInlineKeyboard {\n public static class ButtonCustom {\n  public final int id, text, icon;\n  public ButtonCustom(int id,int text,int icon){this.id=id;this.text=text;this.icon=icon;}\n  public String getText(){return LocaleController.getString(text);}\n  public int getIconRes(){return icon;}\n }\n}'
     checks=[]
     for lang in ['ru','en','fr','ru']:
         checks.append('LocaleController.language=java.util.Locale.forLanguageTag('+literal(lang)+');')
@@ -56,13 +57,13 @@ public class LocaleController {
     sources['FamilyTextTest.java']='''import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.family.FamilyText;
 public class FamilyTextTest {
- static void check(String key,String expected){String actual=FamilyText.get(key);if(!actual.equals(expected))throw new AssertionError(key+": "+actual);}
- public static void main(String[] args){'''+'\n'.join(checks)+f'\nSystem.out.println("FamilyText: {4*len(keys)+2} resource checks passed");'+'}}'
+ static void check(String key,String expected){String actual=FamilyText.get(key); org.telegram.messenger.family.FamilyButton button=new org.telegram.messenger.family.FamilyButton(7401,key,42); if(button.id!=7401 || button.getIconRes()!=42 || !button.getText().equals(expected))throw new AssertionError("Button: "+key+": "+button.getText()); if(!actual.equals(expected))throw new AssertionError(key+": "+actual);}
+ public static void main(String[] args){'''+'\n'.join(checks)+f'\nSystem.out.println("FamilyText: {4*len(keys)+2} resource and button checks passed");'+'}}'
     with tempfile.TemporaryDirectory(prefix='familygram-text-') as temp:
         paths=[]
         for path,content in sources.items():
             p=Path(temp)/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(content);paths.append(str(p))
         java=os.environ.get('JAVA','java')
-        subprocess.run([java,'com.sun.tools.javac.Main','-d',temp,*paths,str(ROOT/'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyText.java')],check=True)
+        subprocess.run([java,'com.sun.tools.javac.Main','-d',temp,*paths,str(ROOT/'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyText.java'),str(ROOT/'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyButton.java')],check=True)
         subprocess.run([java,'-cp',temp,'FamilyTextTest'],check=True)
 if __name__=='__main__':main()

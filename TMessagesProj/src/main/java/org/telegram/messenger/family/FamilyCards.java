@@ -25,10 +25,10 @@ public final class FamilyCards {
         FamilyCore.Op op=message.messageOwner.fwd_from==null?FamilyCore.fromMessage(message.messageOwner.message):null;
         if(op==null){
             if(message.getDialogId()!=FamilyDataController.getInstance(message.currentAccount).partner()||message.messageOwner.action!=null&&!(message.messageOwner.action instanceof org.telegram.tgnet.TLRPC.TL_messageActionEmpty))return null;
-            return source(new BotInlineKeyboard.Button[]{new BotInlineKeyboard.ButtonCustom(FamilyActions.OURS,R.string.FGBookmarkShortcut,R.drawable.msg_fave),new BotInlineKeyboard.ButtonCustom(FamilyActions.REACT,R.string.FGQuickPairReaction,0)});
+            return source(new BotInlineKeyboard.Button[]{new FamilyButton(FamilyActions.OURS,"BookmarkShortcut",R.drawable.msg_fave),new FamilyButton(FamilyActions.REACT,"QuickPairReaction",0)});
         }
-        final int label=op.kind.equals("task")||op.kind.equals("task_set")?R.string.FGToggleTask:op.kind.equals("hug")?R.string.FGHugBack:R.string.FGOpenCard;
-        return source(new BotInlineKeyboard.Button[]{new BotInlineKeyboard.ButtonCustom(FamilyActions.INLINE,label,R.drawable.msg_fave)});
+        final String label=op.kind.equals("task")||op.kind.equals("task_set")?"ToggleTask":op.kind.equals("hug")?"HugBack":"OpenCard";
+        return source(new BotInlineKeyboard.Button[]{new FamilyButton(FamilyActions.INLINE,label,R.drawable.msg_fave)});
     }
     private static BotInlineKeyboard.Source source(BotInlineKeyboard.Button[] buttons){return new BotInlineKeyboard.Source(){public int getRowsCount(){return 1;}public int getColumnsCount(int row){return buttons.length;}public boolean hasSeparator(int row){return false;}public BotInlineKeyboard.Button getButton(int row,int column){return buttons[column];}};}
 }
