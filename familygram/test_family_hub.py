@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """No Android runtime or API credentials: protocol/state tests, syntax and resources."""
 from pathlib import Path
-import os,re,subprocess,tempfile,xml.etree.ElementTree as ET
+import os,re,subprocess,sys,tempfile,xml.etree.ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1]
 os.chdir(ROOT)
 java=os.environ.get('JAVA','java')
@@ -39,3 +39,5 @@ with tempfile.TemporaryDirectory(prefix='familygram-tests-') as output:
     missing={'FG'+x for x in direct}-set(keys)
     assert not missing,f'Missing strings: {missing}'
     print(f'FamilyGram resources: {len(keys)} English/Russian strings, XML and direct references passed')
+
+subprocess.run([sys.executable, 'familygram/tests/test_family_text.py'], check=True)
