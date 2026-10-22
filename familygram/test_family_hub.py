@@ -41,3 +41,10 @@ with tempfile.TemporaryDirectory(prefix='familygram-tests-') as output:
     print(f'FamilyGram resources: {len(keys)} English/Russian strings, XML and direct references passed')
 
 subprocess.run([sys.executable, 'familygram/tests/test_family_text.py'], check=True)
+
+# FamilyText reads bundled Android resources; APK locale filtering must retain Russian.
+for module in ['TMessagesProj_App', 'TMessagesProj_AppHuawei', 'TMessagesProj_AppHockeyApp', 'TMessagesProj_AppStandalone', 'TMessagesProj_AppTests']:
+    gradle = (ROOT / module / 'build.gradle').read_text()
+    locale_filter = re.search(r'localeFilters\s*\+=\s*\[([^]]+)\]', gradle)
+    assert locale_filter and 'ru' in re.findall(r'[\"\']([^\"\']+)[\"\']', locale_filter.group(1)), f'{module}: Russian strings excluded from APK'
+print('APK locale filters: Russian retained in all five app modules')

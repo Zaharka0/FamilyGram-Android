@@ -52,7 +52,7 @@ android {
 
     androidResources {
         noCompress += "pack"
-        localeFilters += ["zz"]
+        localeFilters += ["zz", "ru"]
     }
 
     signingConfigs {
