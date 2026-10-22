@@ -37,13 +37,13 @@
     <string name="FGNoChats" formatted="false">Сначала откройте переписку, затем вернитесь сюда</string>
     <string name="FGCancel" formatted="false">Отмена</string>
     <string name="FGClose" formatted="false">Закрыть</string>
-    <string name="FGSave" formatted="false">Сохранить и отправить</string>
+    <string name="FGSave" formatted="false">Сохранить</string>
     <string name="FGYou" formatted="false">Вы</string>
     <string name="FGInvalid" formatted="false">Проверьте введённые данные</string>
     <string name="FGRequired" formatted="false">Введите текст в пределах ограничения</string>
     <string name="FGTooLong" formatted="false">Слишком длинный текст</string>
     <string name="FGAddTask" formatted="false">Добавить пункт</string>
-    <string name="FGAddTaskInfo" formatted="false">Каждый пункт отправляется в этот чат, отметка видна обоим</string>
+    <string name="FGAddTaskInfo" formatted="false">Ведите общий список здесь. Отметки синхронизируются на обоих телефонах без лишних сообщений в ленте чата.</string>
     <string name="FGTaskTitle" formatted="false">Пункт</string>
     <string name="FGTaskTitleHint" formatted="false">Например: молоко или заказать билеты</string>
     <string name="FGListName" formatted="false">Название списка</string>
@@ -76,7 +76,7 @@
     <string name="FGSendingHug" formatted="false">Обнимаю тебя</string>
     <string name="FGHugSent" formatted="false">Объятия для вас двоих</string>
     <string name="FGHugReceived" formatted="false">Вас обнимают</string>
-    <string name="FGHugBack" formatted="false">Обнять в ответ</string>
+    <string name="FGHugBack" formatted="false">🤗 Обнять в ответ</string>
     <string name="FGQuestionHelp" formatted="false">Ответы откроются после ответа обоих. Сохраните этот телефон до открытия вашего ответа. Новый вопрос появляется в полночь UTC.</string>
     <string name="FGNoAnswers" formatted="false">Пока никто не ответил</string>
     <string name="FGWaitingAnswer" formatted="false">Ожидаем ответы обоих</string>
@@ -98,7 +98,7 @@
     <string name="FGNoteHint" formatted="false">Необязательно, до 300 символов</string>
     <string name="FGContribute" formatted="false">Добавить взнос</string>
     <string name="FGManualMoney" formatted="false">Это ручной учёт взносов. Каждая подтверждённая запись прибавляется к общей сумме.</string>
-    <string name="FGWatchHelp" formatted="false">Каждый присоединяется на своём телефоне. Пауза и перемотка передаются через чат; задержки сети влияют на синхронизацию.</string>
+    <string name="FGWatchHelp" formatted="false">Оба участника подключаются сами. Воспроизведение, пауза и перемотка общие. Нажмите «Выйти из просмотра», чтобы отключиться; выход с экрана также отключает вас. Задержки сети могут влиять на синхронизацию.</string>
     <string name="FGChooseVideo" formatted="false">Выбрать видео из этого чата</string>
     <string name="FGNoMedia" formatted="false">Подходящее видео не найдено в загруженной истории. Загрузите раннюю историю или выберите более новое видео.</string>
     <string name="FGWatchSession" formatted="false">Сеанс просмотра</string>
@@ -186,8 +186,8 @@
     <string name="FGPhotoError" formatted="false">Не удалось открыть это фото</string>
     <string name="FGConfirmShortcut" formatted="false">Подтвердите добавление фото-ярлыка в лаунчере</string>
     <string name="FGShortcutUnsupported" formatted="false">Этот лаунчер не поддерживает добавление фото-ярлыков</string>
-    <string name="FGQuickReaction" formatted="false">Случайное сердечко или поцелуй</string>
-    <string name="FGQuickReactionInfo" formatted="false">Реакция на последнее сообщение половинки; также доступна в меню сообщения</string>
+    <string name="FGQuickReaction" formatted="false">Случайная реакция</string>
+    <string name="FGQuickReactionInfo" formatted="false">Дважды нажмите на сообщение половинки: красное сердце, огненное сердце или поцелуй.</string>
     <string name="FGSelectMessageReaction" formatted="false">Выберите сообщение половинки и нажмите случайную реакцию в его меню</string>
     <string name="FGReactionsUnavailable" formatted="false">Эти реакции сейчас недоступны со стороны Telegram</string>
     <string name="FGOpenCard" formatted="false">Открыть карточку FamilyGram</string>
@@ -203,4 +203,20 @@
     <string name="FGSendBill" formatted="false">Отправить счёт</string>
     <string name="FGBillDraft" formatted="false">Черновик счёта</string>
     <string name="FGAdd" formatted="false">Добавить</string>
+    <string name="FGWorkspaceIntro" formatted="false">Ваше общее пространство: планы, воспоминания и время вместе. Выберите нужный раздел ниже.</string>
+    <string name="FGBothClientsTitle" formatted="false">FamilyGram на обоих телефонах</string>
+    <string name="FGBothClientsInfo" formatted="false">Общие списки, календарь, «Наше», объятия, вопросы дня, цели, игры и совместный просмотр требуют FamilyGram на обоих телефонах. Управляйте ими здесь; в ленте чата остаются только объятия. Служебные обновления передаются через Telegram и могут отображаться в других клиентах. Установите одинаковую версию FamilyGram на оба телефона.</string>
+    <string name="FGPersonalSection" formatted="false">Ваша пара</string>
+    <string name="FGTogetherSection" formatted="false">Планы и воспоминания</string>
+    <string name="FGMediaSection" formatted="false">Время вместе</string>
+    <string name="FGMoneySection" formatted="false">Деньги и итоги</string>
+    <string name="FGPrivacySection" formatted="false">Приватность и уведомления</string>
+    <string name="FGAppearanceSection" formatted="false">Оформление и рабочий стол</string>
+    <string name="FGLeaveWatch" formatted="false">Выйти из просмотра</string>
+    <string name="FGWatchLeft" formatted="false">Вы вышли из просмотра. Можно подключиться снова.</string>
+    <string name="FGWatchParticipants" formatted="false">Участники просмотра</string>
+    <string name="FGParticipantJoined" formatted="false">Подключён</string>
+    <string name="FGParticipantLeft" formatted="false">Вышел</string>
+    <string name="FGParticipantWaiting" formatted="false">Ещё не подключился</string>
+    <string name="FGParticipantDisconnected" formatted="false">Нет связи — ожидаем</string>
 </resources>

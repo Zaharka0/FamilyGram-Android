@@ -8,9 +8,11 @@ java=os.environ.get('JAVA','java')
 with tempfile.TemporaryDirectory(prefix='familygram-tests-') as output:
     subprocess.run([java,'com.sun.tools.javac.Main','-d',output,
         'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyCore.java',
+        'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyTapGuard.java',
+        'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyPrivacyPolicy.java',
         'familygram/tests/FamilyCoreTest.java','familygram/tests/CheckJavaSyntax.java'],check=True)
     subprocess.run([java,'-cp',output,'FamilyCoreTest'],check=True)
-    modified=['MediaController','MessageObject','MessagesController','UserConfig','FamilyController']
+    modified=['NotificationsController','MediaController','MessageObject','MessagesController','UserConfig','FamilyController']
     files=[f'TMessagesProj/src/main/java/org/telegram/messenger/{name}.java' for name in modified]
     files += [str(p) for p in Path('TMessagesProj/src/main/java/org/telegram/messenger/family').glob('*.java')]
     files += [f'TMessagesProj/src/main/java/org/telegram/ui/{name}.java' for name in ['ChatActivity','LaunchActivity','SettingsActivity','FamilyHubActivity','FamilyWatchActivity','Components/VideoPlayer']]

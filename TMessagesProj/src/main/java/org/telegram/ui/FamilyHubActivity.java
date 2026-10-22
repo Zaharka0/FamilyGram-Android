@@ -34,6 +34,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     private ScrollView scroll;
     private EditText search;
     private boolean refreshed;
+    private final FamilyTapGuard taps=new FamilyTapGuard();
     private ArrayList<MessageObject> voiceQueue;
     private final ArrayList<String> billDraft = new ArrayList<>();
     private int visibleLimit=80;
@@ -73,12 +74,18 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         if(page.equals("widget")){widget();restoreScroll(y);return;}
         if(page.equals("home")){
             if(query.isEmpty()){
+                info(t("WorkspaceIntro"));
+                row(t("BothClientsTitle"),t("BothClientsInfo"),()->showDialog(new AlertDialog.Builder(getParentActivity()).setTitle(t("BothClientsTitle")).setMessage(t("BothClientsInfo")).setNegativeButton(t("Close"),null).create()));
+                heading("PersonalSection");
                 row(t("settings"),t("SettingsInfo"),()->open("settings"));
                 row(t("icons"),t("IconsInfo"),()->open("icons"));row(t("widget"),t("WidgetInfo"),()->open("widget"));
             }
             if(dialog==0){row(t("ChooseChat"),t("ChooseChatInfo"),()->chooseChat(false));if(!query.isEmpty())settings();return;}
             String[] sections={"tasks","calendar","album","ours","hug","question","goals","watch","voice","games","bill","stats"};
-            for(String section:sections)row(t(section),t(section+"Info"),()->open(section));
+            for(String section:sections){
+                if(section.equals("tasks"))heading("TogetherSection");if(section.equals("watch"))heading("MediaSection");if(section.equals("bill"))heading("MoneySection");
+                row(t(section),t(section+"Info"),()->open(section));
+            }
             if(dialog==data.partner())row(t("QuickReaction"),t("QuickReactionInfo"),()->FamilyActions.reactToLatest(currentAccount,dialog,this));
             if(!query.isEmpty())settings();
             syncRows();restoreScroll(y);return;
@@ -102,12 +109,24 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         if(title)v.setTypeface(Typeface.DEFAULT,Typeface.BOLD);v.setPadding(0,dp(4),0,dp(4));parent.addView(v,new LinearLayout.LayoutParams(-1,-2));return v;
     }
     private void button(LinearLayout parent,String label,Runnable action){
-        TextView b=new TextView(getParentActivity());b.setText(label);b.setTextSize(15);b.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));b.setGravity(Gravity.CENTER_VERTICAL);b.setPadding(0,dp(12),0,dp(12));b.setMinHeight(dp(48));b.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));b.setFocusable(true);b.setOnClickListener(v->run(action));parent.addView(b,new LinearLayout.LayoutParams(-1,-2));
+        TextView b=new TextView(getParentActivity());b.setText(label);b.setTextSize(15);b.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));b.setGravity(Gravity.CENTER_VERTICAL);b.setPadding(0,dp(12),0,dp(12));b.setMinHeight(dp(48));b.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));b.setFocusable(true);b.setOnClickListener(v->tap(label,action));parent.addView(b,new LinearLayout.LayoutParams(-1,-2));
     }
     private void row(String title,String description,Runnable action){
-        if(!matches(title+" "+description))return;LinearLayout c=card();text(c,title,true);if(!description.isEmpty())text(c,description,false);if(action!=null){c.setBackground(Theme.createRoundRectDrawable(dp(14),Theme.getColor(Theme.key_windowBackgroundWhite)));c.setOnClickListener(v->run(action));c.setFocusable(true);c.setContentDescription(title+". "+description);c.setMinimumHeight(dp(64));}
+        if(!matches(title+" "+description))return;LinearLayout c=card();
+        LinearLayout top=new LinearLayout(getParentActivity());top.setGravity(Gravity.CENTER_VERTICAL);c.addView(top,new LinearLayout.LayoutParams(-1,-2));
+        String icon=symbol(title);if(!icon.isEmpty()){TextView badge=new TextView(getParentActivity());badge.setText(icon);badge.setTextSize(23);badge.setGravity(Gravity.CENTER);GradientDrawable bg=new GradientDrawable();bg.setColor(Theme.getColor(Theme.key_windowBackgroundGray));bg.setCornerRadius(dp(12));badge.setBackground(bg);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(44),dp(44));lp.rightMargin=dp(12);top.addView(badge,lp);}
+        LinearLayout labels=new LinearLayout(getParentActivity());labels.setOrientation(LinearLayout.VERTICAL);top.addView(labels,new LinearLayout.LayoutParams(0,-2,1));text(labels,title,true);if(!description.isEmpty())text(labels,description,false);
+        if(action!=null){TextView arrow=new TextView(getParentActivity());arrow.setText("›");arrow.setTextSize(26);arrow.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));arrow.setPadding(dp(10),0,0,0);top.addView(arrow,new LinearLayout.LayoutParams(-2,-2));c.setOnClickListener(v->tap(title,action));c.setFocusable(true);c.setContentDescription(title+". "+description);c.setMinimumHeight(dp(64));}
     }
     private void info(String message){if(matches(message))text(card(),message,false);}
+    private void tap(String key,Runnable action){if(taps.accept(dialog+":"+page+":"+key,android.os.SystemClock.elapsedRealtime(),800))run(action);}
+    private void heading(String key){if(query.isEmpty()){TextView label=text(body,t(key),true);label.setTextSize(14);label.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));label.setPadding(dp(8),dp(18),dp(8),dp(8));}}
+    private String symbol(String title){
+        String[] keys={"tasks","calendar","album","ours","hug","question","goals","watch","voice","games","bill","stats","settings","icons","widget","Partner","TogetherSince","QuickReaction","Updates","NewTTT","NewFour","SendHug","SplitBill"};
+        String[] icons={"☑","📅","🖼","★","🤗","💬","🎯","🎬","🎧","🎮","🧾","📊","⚙","🎨","🏡","❤","🗓","❤‍🔥","↻","🎮","🎮","🤗","🧾"};
+        for(int i=0;i<keys.length;i++)if(title.equals(t(keys[i])))return icons[i];
+        return "";
+    }
     private void run(Runnable action){try{action.run();}catch(Exception e){toast(t("Invalid")+"\n"+e.getMessage());FileLog.e(e);}}
     private void toast(String value){if(getParentActivity()!=null)Toast.makeText(getParentActivity(),value,Toast.LENGTH_LONG).show();}
     private String name(long id){
@@ -141,7 +160,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         }
         ScrollView wrap=new ScrollView(getParentActivity());wrap.addView(content);
         AlertDialog dlg=new AlertDialog.Builder(getParentActivity()).setTitle(title).setView(wrap).setNegativeButton(t("Cancel"),null).setPositiveButton(positiveLabel,null).create();showDialog(dlg);
-        dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{try{String[] values=new String[fields.length];for(int i=0;i<fields.length;i++)values[i]=fields[i].getText().toString().trim();submit.accept(values);dlg.dismiss();}catch(Exception e){toast(t("Invalid")+"\n"+e.getMessage());}});
+        dlg.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{if(!v.isEnabled())return;v.setEnabled(false);try{String[] values=new String[fields.length];for(int i=0;i<fields.length;i++)values[i]=fields[i].getText().toString().trim();submit.accept(values);dlg.dismiss();}catch(Exception e){v.setEnabled(true);toast(t("Invalid")+"\n"+e.getMessage());}});
     }
     private void dateTime(EditText field){
         Calendar c=Calendar.getInstance();new DatePickerDialog(getParentActivity(),(picker,y,m,d)->new TimePickerDialog(getParentActivity(),(clock,h,min)->{c.set(y,m,d,h,min,0);c.set(Calendar.MILLISECOND,0);field.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm",Locale.US).format(c.getTime()));},c.get(Calendar.HOUR_OF_DAY),c.get(Calendar.MINUTE),true).show(),c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH)).show();
@@ -229,7 +248,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
             if(g.second==0&&g.first!=data.self)button(box,t("JoinGame"),()->send("join",c.op().entity,"🎮 "+t("JoinGame")));
             for(int y=0;y<g.height;y++){
                 LinearLayout line=new LinearLayout(getParentActivity());line.setOrientation(LinearLayout.HORIZONTAL);box.addView(line,new LinearLayout.LayoutParams(-1,-2));
-                for(int x=0;x<g.width;x++){int cell=y*g.width+x, move=g.target==4?x:cell;TextView b=new TextView(getParentActivity());b.setGravity(Gravity.CENTER);b.setText(g.cells[cell]=='.'?"·":g.cells[cell]=='X'?"✕":"○");b.setTextSize(g.target==4?22:30);b.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));b.setContentDescription((y+1)+", "+(x+1)+": "+g.cells[cell]);b.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));line.addView(b,new LinearLayout.LayoutParams(0,dp(g.target==4?44:64),1));b.setEnabled(g.turn()==data.self&&g.winner==0);b.setOnClickListener(v->run(()->send("move",c.op().entity,"🎮 "+t("GameMove")+" "+(move+1),"cell",""+move)));}
+                for(int x=0;x<g.width;x++){int cell=y*g.width+x, move=g.target==4?x:cell;TextView b=new TextView(getParentActivity());b.setGravity(Gravity.CENTER);b.setText(g.cells[cell]=='.'?"·":g.cells[cell]=='X'?"✕":"○");b.setTextSize(g.target==4?22:30);b.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));b.setContentDescription((y+1)+", "+(x+1)+": "+g.cells[cell]);b.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));line.addView(b,new LinearLayout.LayoutParams(0,dp(g.target==4?44:64),1));b.setEnabled(g.turn()==data.self&&g.winner==0);b.setOnClickListener(v->tap("move:"+c.op().entity,()->{b.setEnabled(false);send("move",c.op().entity,"🎮 "+t("GameMove")+" "+(move+1),"cell",""+move);}));}
             }
         }more(count);
     }
@@ -264,22 +283,30 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         else{row(t("Refresh"),t("RefreshInfo"),()->data.sync(dialog,false));row(t("LoadAllHistory"),status,()->data.sync(dialog,true));}
     }
     private void more(int count){if(count>visibleLimit)row(t("More"),"",()->{visibleLimit+=80;render();});}
-    private void toggle(String title,String description,boolean checked,Runnable action){row((checked?"✓ ":"○ ")+title,description,action);}
+    private void toggle(String title,String description,boolean checked,Runnable action){
+        if(!matches(title+" "+description))return;LinearLayout c=card();LinearLayout line=new LinearLayout(getParentActivity());line.setGravity(Gravity.CENTER_VERTICAL);c.addView(line,new LinearLayout.LayoutParams(-1,-2));
+        LinearLayout labels=new LinearLayout(getParentActivity());labels.setOrientation(LinearLayout.VERTICAL);line.addView(labels,new LinearLayout.LayoutParams(0,-2,1));text(labels,title,true);text(labels,description,false);
+        Switch control=new Switch(getParentActivity());control.setChecked(checked);control.setContentDescription(title);line.addView(control,new LinearLayout.LayoutParams(-2,dp(48)));control.setOnClickListener(v->tap(title,action));c.setOnClickListener(v->tap(title,action));
+    }
     private void settings(){
+        heading("PersonalSection");
         row(t("Partner"),data.partner()==0?t("ChoosePartnerInfo"):name(data.partner()),()->chooseChat(true));
         row(t("TogetherSince"),data.since()==0?t("NotSet"):DateFormat.getDateInstance().format(new Date(data.since())),()->{
             Calendar c=Calendar.getInstance();if(data.since()>0)c.setTimeInMillis(data.since());DatePickerDialog picker=new DatePickerDialog(getParentActivity(),(v,y,m,d)->{Calendar date=Calendar.getInstance();date.set(y,m,d,12,0,0);date.set(Calendar.MILLISECOND,0);data.setSince(date.getTimeInMillis());render();},c.get(Calendar.YEAR),c.get(Calendar.MONTH),c.get(Calendar.DAY_OF_MONTH));picker.getDatePicker().setMaxDate(System.currentTimeMillis());picker.setButton(android.content.DialogInterface.BUTTON_NEUTRAL,t("Reset"),(d,w)->{data.setSince(0);render();});picker.show();
         });
+        heading("PrivacySection");
         toggle(t("PrivateScreen"),t("PrivateScreenInfo"),FamilyPrivacyScreen.enabled(),()->FamilyPrivacyScreen.toggle(getParentActivity()));
         toggle(t("SkipSilence"),t("SkipSilenceInfo"),FamilyVoice.skipSilence(currentAccount),()->{FamilyVoice.setSkipSilence(currentAccount,!FamilyVoice.skipSilence(currentAccount));render();});
+        heading("AppearanceSection");
         row(t("icons"),t("IconsInfo"),()->open("icons"));row(t("widget"),t("WidgetInfo"),()->open("widget"));
-        info(t("LegacySettings"));
+        heading("PrivacySection");info(t("LegacySettings"));
         toggle(t("FamilyOnly"),t("FamilyOnlyInfo"),FamilyController.isOnlyFamilyMode(),()->{FamilyController.setOnlyFamilyMode(!FamilyController.isOnlyFamilyMode());render();});
         toggle(t("KeepDeleted"),t("KeepDeletedInfo"),FamilyController.isKeepDeleted(),()->{FamilyController.setKeepDeleted(!FamilyController.isKeepDeleted());render();});
         toggle(t("GhostRead"),t("GhostReadInfo"),FamilyController.isGhostNoRead(),()->{FamilyController.setGhostNoRead(!FamilyController.isGhostNoRead());render();});
         toggle(t("GhostTyping"),t("GhostTypingInfo"),FamilyController.isGhostNoTyping(),()->{FamilyController.setGhostNoTyping(!FamilyController.isGhostNoTyping());render();});
         toggle(t("GhostOnline"),t("GhostOnlineInfo"),FamilyController.isGhostNoOnline(),()->{FamilyController.setGhostNoOnline(!FamilyController.isGhostNoOnline());if(FamilyController.shouldHideOnline())FamilyController.sendOfflineNow();FamilyController.syncLastSeen();render();});
         toggle(t("GhostFamily"),t("GhostFamilyInfo"),FamilyController.isGhostFamilyExempt(),()->{FamilyController.setGhostFamilyExempt(!FamilyController.isGhostFamilyExempt());if(FamilyController.shouldHideOnline(currentAccount))FamilyController.sendOfflineNow();FamilyController.syncLastSeen();render();});
+        heading("Updates");
         row(t("Updates"),t("UpdatesInfo"),()->FamilyUpdates.check(this,false));
         toggle(t("UpdateChecks"),t("UpdateChecksInfo"),data.prefs.getBoolean("updates",false),()->{data.prefs.edit().putBoolean("updates",!data.prefs.getBoolean("updates",false)).apply();render();});
     }

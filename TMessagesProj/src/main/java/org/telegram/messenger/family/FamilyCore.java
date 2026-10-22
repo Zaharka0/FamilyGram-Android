@@ -14,8 +14,10 @@ public final class FamilyCore {
     public static final Set<String> KINDS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
         "task", "task_set", "event", "event_cancel", "bookmark", "bookmark_remove", "hug",
         "question_commit", "question_reveal", "goal", "contribution", "video", "game", "join", "move",
-        "bill", "reaction")));
+        "bill", "reaction", "video_presence")));
     private FamilyCore() {}
+    public static boolean hiddenInChat(Op op) { return op != null && !op.kind.equals("hug"); }
+    public static final String[] PAIR_REACTIONS = {"❤", "❤‍🔥", "💋"};
 
     public static final class Op {
         public final String kind, entity;
@@ -168,6 +170,7 @@ public final class FamilyCore {
         public long saved;
         public final Map<Long, String> commitments = new TreeMap<>(), answers = new TreeMap<>();
         public Game game;
+        public final Map<Long,Entry> participants = new TreeMap<>();
         Card(Entry origin) { this.origin = this.latest = origin; }
         public Op op() { return origin.op; }
     }
@@ -185,6 +188,7 @@ public final class FamilyCore {
             return result;
         });
         Set<String> identities=new HashSet<>();
+        ArrayList<Entry> presenceEvents=new ArrayList<>();
         for (Entry e : replay) {
             if(!e.op.get("nonce").isEmpty()&&!identities.add(e.actor+":"+e.op.get("nonce")))continue;
             Op op = e.op; Card card = cards.get(op.entity);
@@ -227,6 +231,9 @@ public final class FamilyCore {
                         if (op.number("message") <= 0 || op.number("position") < 0 || op.number("position") > 86400000L) break;
                         if (card == null) { card = new Card(e); cards.put(op.entity, card); }
                         if (card.op().kind.equals("video")) card.latest = e; break;
+                    case "video_presence":
+                        if(op.get("joined").equals("1")||op.get("joined").equals("0"))presenceEvents.add(e);
+                        break;
                     case "join":
                         if (card != null && card.game != null && card.game.join(e.actor)) card.latest = e; break;
                     case "move":
@@ -234,6 +241,11 @@ public final class FamilyCore {
                     default: break;
                 }
             } catch (IllegalArgumentException | ArithmeticException ignored) { /* Invalid remote operation cannot corrupt the timeline. */ }
+        }
+        for(Entry e:presenceEvents){
+            if(!e.op.kind.equals("video_presence")||!(e.op.get("joined").equals("1")||e.op.get("joined").equals("0")))continue;
+            if(e.actor!=self&&e.actor!=peer)continue;
+            Card c=cards.get(e.op.entity);if(c!=null&&c.op().kind.equals("video"))c.participants.put(e.actor,e);
         }
         return cards;
     }

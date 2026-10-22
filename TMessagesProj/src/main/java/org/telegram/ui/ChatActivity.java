@@ -1938,6 +1938,10 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public boolean hasDoubleTap(View view, int position) {
             if (isQuickRepliesOrWelcomeMessagesMode()) return false;
+            if (org.telegram.messenger.family.FamilyActions.hasPairReactions(currentAccount,dialog_id) && view instanceof ChatMessageCell) {
+                MessageObject pairMessage=((ChatMessageCell)view).getPrimaryMessageObject();
+                return pairMessage!=null&&pairMessage.getId()>0&&!pairMessage.isSending()&&!pairMessage.isEditing()&&pairMessage.canSetReaction()&&!actionBar.isActionModeShowed()&&!isSecretChat()&&!isInScheduleMode()&&!pairMessage.isSponsored();
+            }
             String reactionStringSetting = getMediaDataController().getDoubleTapReaction();
             TLRPC.TL_availableReaction reaction = getMediaDataController().getReactionsMap().get(reactionStringSetting);
             if (reaction == null && (reactionStringSetting == null || !reactionStringSetting.startsWith("animated_"))) {
@@ -1984,6 +1988,10 @@ public class ChatActivity extends BaseFragment implements
                 return;
             }
 
+            if (org.telegram.messenger.family.FamilyActions.hasPairReactions(currentAccount,dialog_id)) {
+                org.telegram.messenger.family.FamilyActions.randomReaction(messageObject,ChatActivity.this);
+                return;
+            }
             ReactionsEffectOverlay.removeCurrent(false);
             String reactionString = getMediaDataController().getDoubleTapReaction();
             if (reactionString.startsWith("animated_")) {
@@ -21216,7 +21224,7 @@ public class ChatActivity extends BaseFragment implements
             }
 
             TLRPC.MessageAction action = obj.messageOwner.action;
-            if (obj.type < 0 || loadIndex == 1 && action instanceof TLRPC.TL_messageActionChatMigrateTo) {
+            if (org.telegram.messenger.family.FamilyCards.hidden(obj) || obj.type < 0 || loadIndex == 1 && action instanceof TLRPC.TL_messageActionChatMigrateTo) {
                 continue;
             }
 
@@ -25740,7 +25748,7 @@ public class ChatActivity extends BaseFragment implements
                     scrollToLastMessage(true, false);
                     return;
                 }
-                if (obj.type < 0 || messagesDict[0].indexOfKey(messageId) >= 0) {
+                if (org.telegram.messenger.family.FamilyCards.hidden(obj) || obj.type < 0 || messagesDict[0].indexOfKey(messageId) >= 0) {
                     continue;
                 }
                 if (currentChat != null && currentChat.creator && (!ChatObject.isChannel(currentChat) || currentChat.megagroup) && (action instanceof TLRPC.TL_messageActionChatCreate || action instanceof TLRPC.TL_messageActionChatEditPhoto && messages.size() < 2)) {
@@ -25876,7 +25884,7 @@ public class ChatActivity extends BaseFragment implements
                 if (avatarContainer != null && currentEncryptedChat != null && action instanceof TLRPC.TL_messageEncryptedAction && action.encryptedAction instanceof TLRPC.TL_decryptedMessageActionSetMessageTTL) {
                     avatarContainer.setTime(action.encryptedAction.ttl_seconds, true);
                 }
-                if (obj.type < 0 || messagesDict[0].indexOfKey(messageId) >= 0) {
+                if (org.telegram.messenger.family.FamilyCards.hidden(obj) || obj.type < 0 || messagesDict[0].indexOfKey(messageId) >= 0) {
                     continue;
                 }
                 if (currentChat != null && currentChat.creator && (!ChatObject.isChannel(currentChat) || currentChat.megagroup) && (action instanceof TLRPC.TL_messageActionChatCreate || action instanceof TLRPC.TL_messageActionChatEditPhoto && messages.size() < 2)) {

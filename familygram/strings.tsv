@@ -35,13 +35,13 @@ ChooseChatInfo	Select a conversation for shared FamilyGram cards	Выберит�
 NoChats	Open a conversation first, then return here	Сначала откройте переписку, затем вернитесь сюда
 Cancel	Cancel	Отмена
 Close	Close	Закрыть
-Save	Save and send	Сохранить и отправить
+Save	Save	Сохранить
 You	You	Вы
 Invalid	Check the entered values	Проверьте введённые данные
 Required	Enter text within the character limit	Введите текст в пределах ограничения
 TooLong	Text is too long	Слишком длинный текст
 AddTask	Add an item	Добавить пункт
-AddTaskInfo	Each item is sent to this chat; its state is shared	Каждый пункт отправляется в этот чат, отметка видна обоим
+AddTaskInfo	Manage the shared list here. Checkmarks synchronize on both phones without extra chat messages.	Ведите общий список здесь. Отметки синхронизируются на обоих телефонах без лишних сообщений в ленте чата.
 TaskTitle	Item	Пункт
 TaskTitleHint	For example: milk or book tickets	Например: молоко или заказать билеты
 ListName	List name	Название списка
@@ -74,7 +74,7 @@ SendHug	Hug my partner	Обнять половинку
 SendingHug	Sending you a hug	Обнимаю тебя
 HugSent	A hug for you two	Объятия для вас двоих
 HugReceived	You received a hug	Вас обнимают
-HugBack	Hug back	Обнять в ответ
+HugBack	🤗 Hug back	🤗 Обнять в ответ
 QuestionHelp	Both answers open after both people have answered. Keep this device until your answer opens. The daily question changes at midnight UTC.	Ответы откроются после ответа обоих. Сохраните этот телефон до открытия вашего ответа. Новый вопрос появляется в полночь UTC.
 NoAnswers	Neither of you has answered yet	Пока никто не ответил
 WaitingAnswer	Waiting for both answers	Ожидаем ответы обоих
@@ -96,7 +96,7 @@ Note	Comment	Комментарий
 NoteHint	Optional, up to 300 characters	Необязательно, до 300 символов
 Contribute	Record a contribution	Добавить взнос
 ManualMoney	Contributions are a manual record. Each confirmed entry adds to the shared total.	Это ручной учёт взносов. Каждая подтверждённая запись прибавляется к общей сумме.
-WatchHelp	Both people explicitly join on their phones. Pause and seek changes travel through your chat; network delays can affect synchronization.	Каждый присоединяется на своём телефоне. Пауза и перемотка передаются через чат; задержки сети влияют на синхронизацию.
+WatchHelp	Both people join explicitly. Play, pause and seek are shared. Use Leave session to disconnect; leaving this screen also disconnects you. Network delays can affect synchronization.	Оба участника подключаются сами. Воспроизведение, пауза и перемотка общие. Нажмите «Выйти из просмотра», чтобы отключиться; выход с экрана также отключает вас. Задержки сети могут влиять на синхронизацию.
 ChooseVideo	Choose a video from this chat	Выбрать видео из этого чата
 NoMedia	No suitable downloaded history found. Load earlier history, or choose a newer video.	Подходящее видео не найдено в загруженной истории. Загрузите раннюю историю или выберите более новое видео.
 WatchSession	Video session	Сеанс просмотра
@@ -184,8 +184,8 @@ PhotoSaved	Photo saved	Фото сохранено
 PhotoError	Unable to open this photo	Не удалось открыть это фото
 ConfirmShortcut	Confirm adding the photo shortcut in your launcher	Подтвердите добавление фото-ярлыка в лаунчере
 ShortcutUnsupported	This launcher does not support adding photo shortcuts	Этот лаунчер не поддерживает добавление фото-ярлыков
-QuickReaction	Random heart or kiss	Случайное сердечко или поцелуй
-QuickReactionInfo	React to your partner’s latest message, or use the message menu	Реакция на последнее сообщение половинки; также доступна в меню сообщения
+QuickReaction	Random reaction	Случайная реакция
+QuickReactionInfo	Double-tap a message in your partner chat: red heart, heart on fire or kiss.	Дважды нажмите на сообщение половинки: красное сердце, огненное сердце или поцелуй.
 SelectMessageReaction	Choose your partner’s message and tap the random reaction in its menu	Выберите сообщение половинки и нажмите случайную реакцию в его меню
 ReactionsUnavailable	These reactions are not available from Telegram right now	Эти реакции сейчас недоступны со стороны Telegram
 OpenCard	Open FamilyGram card	Открыть карточку FamilyGram
@@ -201,3 +201,19 @@ RemoveItem	Remove this item	Убрать эту покупку
 SendBill	Send the bill	Отправить счёт
 BillDraft	Bill draft	Черновик счёта
 Add	Add	Добавить
+WorkspaceIntro	Your shared space. Open a section to manage plans, memories and time together.	Ваше общее пространство: планы, воспоминания и время вместе. Выберите нужный раздел ниже.
+BothClientsTitle	FamilyGram on both phones	FamilyGram на обоих телефонах
+BothClientsInfo	Shared tasks, calendar, Ours, hugs, daily questions, goals, games and video sessions require FamilyGram on both phones. Manage them here; only hugs remain visible in the chat. Service updates still travel through Telegram and may be visible in other clients. Install the same FamilyGram version on both phones.	Общие списки, календарь, «Наше», объятия, вопросы дня, цели, игры и совместный просмотр требуют FamilyGram на обоих телефонах. Управляйте ими здесь; в ленте чата остаются только объятия. Служебные обновления передаются через Telegram и могут отображаться в других клиентах. Установите одинаковую версию FamilyGram на оба телефона.
+PersonalSection	Your couple	Ваша пара
+TogetherSection	Plans and memories	Планы и воспоминания
+MediaSection	Time together	Время вместе
+MoneySection	Money and summaries	Деньги и итоги
+PrivacySection	Privacy and notifications	Приватность и уведомления
+AppearanceSection	Appearance and home screen	Оформление и рабочий стол
+LeaveWatch	Leave session	Выйти из просмотра
+WatchLeft	You left the session. You can join again.	Вы вышли из просмотра. Можно подключиться снова.
+WatchParticipants	Session participants	Участники просмотра
+ParticipantJoined	Connected	Подключён
+ParticipantLeft	Left	Вышел
+ParticipantWaiting	Has not joined yet	Ещё не подключился
+ParticipantDisconnected	No connection — waiting	Нет связи — ожидаем

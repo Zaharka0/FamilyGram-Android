@@ -1,4 +1,6 @@
 import org.telegram.messenger.family.FamilyCore;
+import org.telegram.messenger.family.FamilyTapGuard;
+import org.telegram.messenger.family.FamilyPrivacyPolicy;
 import java.util.*;
 
 public class FamilyCoreTest {
@@ -49,6 +51,35 @@ public class FamilyCoreTest {
         check(FamilyCore.reduce(dates,10,20).containsKey("birthday"));
         dates.add(e(2,10,op("event","invalid","title","Bad date","at","not-a-date")));check(!FamilyCore.reduce(dates,10,20).containsKey("invalid"));
         for(int i=0;i<5000;i++){StringBuilder f=new StringBuilder();for(int j=0;j<random.nextInt(50);j++)f.append((char)random.nextInt(150));FamilyCore.unpack(f.toString());checks++;}
+        Set<Long> desired=new HashSet<>(Arrays.asList(10L,20L));
+        check(!FamilyPrivacyPolicy.canWrite(false,desired,desired));
+        check(!FamilyPrivacyPolicy.canWrite(true,desired,new HashSet<>(Arrays.asList(10L))));
+        check(FamilyPrivacyPolicy.canWrite(true,desired,desired));
+        check(FamilyPrivacyPolicy.matches(desired,desired,true,false));
+        check(!FamilyPrivacyPolicy.matches(desired,desired,false,false));
+        check(!FamilyPrivacyPolicy.matches(desired,desired,true,true));
+        check(!FamilyPrivacyPolicy.matches(desired,Collections.singleton(10L),true,false));
+        FamilyTapGuard guard=new FamilyTapGuard();
+        check(guard.accept("hug:10",100,1500));check(!guard.accept("hug:10",101,1500));
+        check(guard.accept("hug:20",101,1500));check(!guard.accept("hug:10",1599,1500));check(guard.accept("hug:10",1600,1500));
+        check(guard.accept("hug:10",50,1500));
+        for(int i=0;i<1000;i++)check(guard.accept("bounded:"+i,2000,1000));
+        check(!FamilyCore.hiddenInChat(null));
+        for(String kind:FamilyCore.KINDS)check(FamilyCore.hiddenInChat(op(kind,"x"))!=kind.equals("hug"));
+        ArrayList<FamilyCore.Entry> watch=new ArrayList<>();
+        watch.add(e(2,10,op("video_presence","v","joined","1")));
+        watch.add(e(1,10,op("video","v","message","50","position","0","playing","0")));
+        watch.add(e(3,20,op("video_presence","v","joined","1")));
+        watch.add(e(4,10,op("video","v","message","50","position","1000","playing","1")));
+        watch.add(e(5,20,op("video_presence","v","joined","0")));
+        watch.add(e(6,30,op("video_presence","v","joined","1")));
+        FamilyCore.Card video=FamilyCore.reduce(watch,10,20).get("v");
+        check(video.latest.op.get("playing").equals("1"));check(video.participants.size()==2);
+        check(video.participants.get(10L).op.get("joined").equals("1"));check(video.participants.get(20L).op.get("joined").equals("0"));
+        Collections.reverse(watch);check(FamilyCore.reduce(watch,10,20).get("v").participants.get(20L).op.get("joined").equals("0"));
+        ArrayList<FamilyCore.Entry> watchRemap=new ArrayList<>();for(FamilyCore.Entry item:watch)watchRemap.add(new FamilyCore.Entry(100000-item.id,1,item.actor,item.op));
+        check(FamilyCore.reduce(watchRemap,10,20).get("v").participants.get(20L).op.get("joined").equals("0"));
+        check(Arrays.equals(FamilyCore.PAIR_REACTIONS,new String[]{"❤","❤‍🔥","💋"}));
         System.out.println("FamilyGram core: "+checks+" checks passed");
     }
 }

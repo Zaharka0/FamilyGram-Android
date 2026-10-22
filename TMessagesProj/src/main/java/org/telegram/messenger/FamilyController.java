@@ -318,6 +318,16 @@ public class FamilyController {
      * complete previous rules, including user and group exceptions, back afterwards.
      */
     private static boolean syncingLastSeen;
+    private static boolean familyRulesMatch(ArrayList<TLRPC.PrivacyRule> rules,java.util.Set<Long> desired){
+        if(rules==null)return false;
+        java.util.Set<Long> allowed=new java.util.HashSet<>();boolean nobody=false;
+        for(TLRPC.PrivacyRule rule:rules){
+            if(rule instanceof TLRPC.TL_privacyValueAllowUsers)allowed.addAll(((TLRPC.TL_privacyValueAllowUsers)rule).users);
+            else if(rule instanceof TLRPC.TL_privacyValueDisallowAll)nobody=true;
+            else return false;
+        }
+        return org.telegram.messenger.family.FamilyPrivacyPolicy.matches(desired,allowed,nobody,false);
+    }
     private static final java.util.HashMap<Integer, Long> lastSeenRequests = new java.util.HashMap<>();
     public static void syncLastSeen() {
         if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) { AndroidUtilities.runOnUIThread(FamilyController::syncLastSeen); return; }
@@ -337,6 +347,8 @@ public class FamilyController {
                 continue;
             }
             final int account = a;
+            // Connectivity changes never restore backups or publish a partial exception list.
+            if(ConnectionsManager.getInstance(account).getConnectionState()!=ConnectionsManager.ConnectionStateConnected)continue;
             final long privacyUid=UserConfig.getInstance(account).getClientUserId();
             if (java.util.Objects.equals(lastSeenRequests.get(account),privacyUid)) continue;
             final String backupKey = "lastseen_backup_" + account;
@@ -348,6 +360,24 @@ public class FamilyController {
             TL_account.setPrivacy req = new TL_account.setPrivacy();
             req.key = new TLRPC.TL_inputPrivacyKeyStatusTimestamp();
             if (familyOnly) {
+                java.util.Set<Long> desired=new java.util.HashSet<>();
+                for(Long id:snapshot)if(id!=null&&id>0)desired.add(id);
+                ArrayList<TLRPC.PrivacyRule> current=contacts.getPrivacyRules(ContactsController.PRIVACY_RULES_TYPE_LASTSEEN);
+                if(current==null){contacts.loadPrivacySettings();continue;}
+                // Existing server rules remain valid across going offline and process restarts.
+                if(familyRulesMatch(current,desired)){
+                    activeFamilyPrivacy.add(privacyUid);
+                    p.edit().putBoolean(activeKey,true).apply();
+                    continue;
+                }
+                java.util.Set<Long> resolved=new java.util.HashSet<>();
+                for(Long id:desired){
+                    TLRPC.User user=messages.getUser(id);
+                    TLRPC.InputUser input=user==null?null:messages.getInputUser(user);
+                    if(input!=null&&!(input instanceof TLRPC.TL_inputUserEmpty))resolved.add(id);
+                }
+                // Wait for Telegram to load users. Omitting one would remove that exception on the server.
+                if(!org.telegram.messenger.family.FamilyPrivacyPolicy.canWrite(ConnectionsManager.getInstance(account).getConnectionState()==ConnectionsManager.ConnectionStateConnected,desired,resolved)){activeFamilyPrivacy.remove(privacyUid);contacts.loadPrivacySettings();continue;}
                 if (!p.contains(fullKey) && !p.contains(backupKey)) {
                     ArrayList<TLRPC.PrivacyRule> rules = contacts.getPrivacyRules(ContactsController.PRIVACY_RULES_TYPE_LASTSEEN);
                     if (rules == null) { contacts.loadPrivacySettings(); continue; }

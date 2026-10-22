@@ -37,13 +37,13 @@
     <string name="FGNoChats" formatted="false">Open a conversation first, then return here</string>
     <string name="FGCancel" formatted="false">Cancel</string>
     <string name="FGClose" formatted="false">Close</string>
-    <string name="FGSave" formatted="false">Save and send</string>
+    <string name="FGSave" formatted="false">Save</string>
     <string name="FGYou" formatted="false">You</string>
     <string name="FGInvalid" formatted="false">Check the entered values</string>
     <string name="FGRequired" formatted="false">Enter text within the character limit</string>
     <string name="FGTooLong" formatted="false">Text is too long</string>
     <string name="FGAddTask" formatted="false">Add an item</string>
-    <string name="FGAddTaskInfo" formatted="false">Each item is sent to this chat; its state is shared</string>
+    <string name="FGAddTaskInfo" formatted="false">Manage the shared list here. Checkmarks synchronize on both phones without extra chat messages.</string>
     <string name="FGTaskTitle" formatted="false">Item</string>
     <string name="FGTaskTitleHint" formatted="false">For example: milk or book tickets</string>
     <string name="FGListName" formatted="false">List name</string>
@@ -76,7 +76,7 @@
     <string name="FGSendingHug" formatted="false">Sending you a hug</string>
     <string name="FGHugSent" formatted="false">A hug for you two</string>
     <string name="FGHugReceived" formatted="false">You received a hug</string>
-    <string name="FGHugBack" formatted="false">Hug back</string>
+    <string name="FGHugBack" formatted="false">🤗 Hug back</string>
     <string name="FGQuestionHelp" formatted="false">Both answers open after both people have answered. Keep this device until your answer opens. The daily question changes at midnight UTC.</string>
     <string name="FGNoAnswers" formatted="false">Neither of you has answered yet</string>
     <string name="FGWaitingAnswer" formatted="false">Waiting for both answers</string>
@@ -98,7 +98,7 @@
     <string name="FGNoteHint" formatted="false">Optional, up to 300 characters</string>
     <string name="FGContribute" formatted="false">Record a contribution</string>
     <string name="FGManualMoney" formatted="false">Contributions are a manual record. Each confirmed entry adds to the shared total.</string>
-    <string name="FGWatchHelp" formatted="false">Both people explicitly join on their phones. Pause and seek changes travel through your chat; network delays can affect synchronization.</string>
+    <string name="FGWatchHelp" formatted="false">Both people join explicitly. Play, pause and seek are shared. Use Leave session to disconnect; leaving this screen also disconnects you. Network delays can affect synchronization.</string>
     <string name="FGChooseVideo" formatted="false">Choose a video from this chat</string>
     <string name="FGNoMedia" formatted="false">No suitable downloaded history found. Load earlier history, or choose a newer video.</string>
     <string name="FGWatchSession" formatted="false">Video session</string>
@@ -186,8 +186,8 @@
     <string name="FGPhotoError" formatted="false">Unable to open this photo</string>
     <string name="FGConfirmShortcut" formatted="false">Confirm adding the photo shortcut in your launcher</string>
     <string name="FGShortcutUnsupported" formatted="false">This launcher does not support adding photo shortcuts</string>
-    <string name="FGQuickReaction" formatted="false">Random heart or kiss</string>
-    <string name="FGQuickReactionInfo" formatted="false">React to your partner’s latest message, or use the message menu</string>
+    <string name="FGQuickReaction" formatted="false">Random reaction</string>
+    <string name="FGQuickReactionInfo" formatted="false">Double-tap a message in your partner chat: red heart, heart on fire or kiss.</string>
     <string name="FGSelectMessageReaction" formatted="false">Choose your partner’s message and tap the random reaction in its menu</string>
     <string name="FGReactionsUnavailable" formatted="false">These reactions are not available from Telegram right now</string>
     <string name="FGOpenCard" formatted="false">Open FamilyGram card</string>
@@ -203,4 +203,20 @@
     <string name="FGSendBill" formatted="false">Send the bill</string>
     <string name="FGBillDraft" formatted="false">Bill draft</string>
     <string name="FGAdd" formatted="false">Add</string>
+    <string name="FGWorkspaceIntro" formatted="false">Your shared space. Open a section to manage plans, memories and time together.</string>
+    <string name="FGBothClientsTitle" formatted="false">FamilyGram on both phones</string>
+    <string name="FGBothClientsInfo" formatted="false">Shared tasks, calendar, Ours, hugs, daily questions, goals, games and video sessions require FamilyGram on both phones. Manage them here; only hugs remain visible in the chat. Service updates still travel through Telegram and may be visible in other clients. Install the same FamilyGram version on both phones.</string>
+    <string name="FGPersonalSection" formatted="false">Your couple</string>
+    <string name="FGTogetherSection" formatted="false">Plans and memories</string>
+    <string name="FGMediaSection" formatted="false">Time together</string>
+    <string name="FGMoneySection" formatted="false">Money and summaries</string>
+    <string name="FGPrivacySection" formatted="false">Privacy and notifications</string>
+    <string name="FGAppearanceSection" formatted="false">Appearance and home screen</string>
+    <string name="FGLeaveWatch" formatted="false">Leave session</string>
+    <string name="FGWatchLeft" formatted="false">You left the session. You can join again.</string>
+    <string name="FGWatchParticipants" formatted="false">Session participants</string>
+    <string name="FGParticipantJoined" formatted="false">Connected</string>
+    <string name="FGParticipantLeft" formatted="false">Left</string>
+    <string name="FGParticipantWaiting" formatted="false">Has not joined yet</string>
+    <string name="FGParticipantDisconnected" formatted="false">No connection — waiting</string>
 </resources>

@@ -10,6 +10,10 @@ import java.util.*;
 public final class FamilyActions {
     public static final int INLINE=7401, HUB=7402, OURS=7403, EVENT=7404, REACT=7405, WATCH=7406, PRIVATE=7407;
     private FamilyActions(){}
+    private static final FamilyTapGuard reactionTaps=new FamilyTapGuard();
+    public static boolean hasPairReactions(int account,long dialog) {
+        return dialog>0&&dialog==FamilyDataController.getInstance(account).partner();
+    }
     public static void inline(BaseFragment fragment,MessageObject message){
         FamilyCore.Op op=FamilyCore.fromMessage(message.messageOwner.message);if(op==null)return;
         FamilyDataController data=FamilyDataController.getInstance(message.currentAccount);long dialog=message.getDialogId();
@@ -28,8 +32,9 @@ public final class FamilyActions {
     }
     public static void randomReaction(MessageObject message,BaseFragment fragment){
         if(message.getId()<=0||message.getDialogId()!=FamilyDataController.getInstance(message.currentAccount).partner())return;
+        if(!message.canSetReaction()||!reactionTaps.accept(message.currentAccount+":"+message.getDialogId()+":"+message.getId(),android.os.SystemClock.elapsedRealtime(),800))return;
         ArrayList<String> available=new ArrayList<>();Map<String,TLRPC.TL_availableReaction> reactions=MediaDataController.getInstance(message.currentAccount).getReactionsMap();
-        for(String emoji:new String[]{"❤","❤️","💋","😘"}){TLRPC.TL_availableReaction r=reactions.get(emoji);if(r!=null&&!r.inactive&&!r.premium&&!available.contains(r.reaction))available.add(r.reaction);}
+        for(String emoji:FamilyCore.PAIR_REACTIONS){TLRPC.TL_availableReaction r=reactions.get(emoji);if(r!=null&&!r.inactive&&!r.premium&&!available.contains(r.reaction))available.add(r.reaction);}
         if(available.isEmpty()){Toast.makeText(fragment.getParentActivity(),FamilyText.get("ReactionsUnavailable"),Toast.LENGTH_LONG).show();return;}
         String emoji=available.get(new java.security.SecureRandom().nextInt(available.size()));ReactionsLayoutInBubble.VisibleReaction reaction=ReactionsLayoutInBubble.VisibleReaction.fromEmojicon(emoji);
         ArrayList<ReactionsLayoutInBubble.VisibleReaction> selected=new ArrayList<>(message.getChoosenReactions());selected.clear();selected.add(reaction);

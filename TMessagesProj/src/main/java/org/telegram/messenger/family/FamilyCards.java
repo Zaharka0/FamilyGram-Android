@@ -20,15 +20,15 @@ public final class FamilyCards {
             else message.messageText=question+"\n"+FamilyText.get("WaitingAnswer");
         }else if(kind.equals("game")&&card.game!=null){FamilyCore.Game g=card.game;StringBuilder text=new StringBuilder("🎮 "+FamilyText.get(g.target==3?"NewTTT":"NewFour")+"\n");for(int y=0;y<g.height;y++){for(int x=0;x<g.width;x++){char c=g.cells[y*g.width+x];text.append(c=='.'?"·":c=='X'?"✕":"○").append(' ');}text.append('\n');}message.messageText=text.toString();}
     }
+    public static boolean hidden(MessageObject message) {
+        if(message==null||message.messageOwner==null||message.messageOwner.fwd_from!=null||DialogObject.isEncryptedDialog(message.getDialogId()))return false;
+        return FamilyCore.hiddenInChat(FamilyCore.fromMessage(message.messageOwner.message));
+    }
     public static BotInlineKeyboard.Source buttons(MessageObject message){
-        if(message.messageOwner==null||message.getId()<=0||message.messageOwner.ttl_period!=0||message.messageOwner.noforwards||message.messageOwner.media!=null&&message.messageOwner.media.ttl_seconds!=0||DialogObject.isEncryptedDialog(message.getDialogId()))return null;
-        FamilyCore.Op op=message.messageOwner.fwd_from==null?FamilyCore.fromMessage(message.messageOwner.message):null;
-        if(op==null){
-            if(message.getDialogId()!=FamilyDataController.getInstance(message.currentAccount).partner()||message.messageOwner.action!=null&&!(message.messageOwner.action instanceof org.telegram.tgnet.TLRPC.TL_messageActionEmpty))return null;
-            return source(new BotInlineKeyboard.Button[]{new FamilyButton(FamilyActions.OURS,"BookmarkShortcut",R.drawable.msg_fave),new FamilyButton(FamilyActions.REACT,"QuickPairReaction",0)});
-        }
-        final String label=op.kind.equals("task")||op.kind.equals("task_set")?"ToggleTask":op.kind.equals("hug")?"HugBack":"OpenCard";
-        return source(new BotInlineKeyboard.Button[]{new FamilyButton(FamilyActions.INLINE,label,R.drawable.msg_fave)});
+        if(message.messageOwner==null||message.messageOwner.fwd_from!=null||message.getId()<=0||message.messageOwner.ttl_period!=0||message.messageOwner.noforwards||DialogObject.isEncryptedDialog(message.getDialogId()))return null;
+        FamilyCore.Op op=FamilyCore.fromMessage(message.messageOwner.message);
+        if(op==null||!op.kind.equals("hug"))return null;
+        return source(new BotInlineKeyboard.Button[]{new FamilyButton(FamilyActions.INLINE,"HugBack",0)});
     }
     private static BotInlineKeyboard.Source source(BotInlineKeyboard.Button[] buttons){return new BotInlineKeyboard.Source(){public int getRowsCount(){return 1;}public int getColumnsCount(int row){return buttons.length;}public boolean hasSeparator(int row){return false;}public BotInlineKeyboard.Button getButton(int row,int column){return buttons[column];}};}
 }

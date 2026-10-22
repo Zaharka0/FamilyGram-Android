@@ -1073,11 +1073,18 @@ public class NotificationsController extends BaseController implements Notificat
         });
     }
 
-    public void processNewMessages(ArrayList<MessageObject> messageObjects, boolean isLast, boolean isFcm, CountDownLatch countDownLatch) {
+    public void processNewMessages(ArrayList<MessageObject> incomingMessageObjects, boolean isLast, boolean isFcm, CountDownLatch countDownLatch) {
+        final ArrayList<MessageObject> messageObjects = incomingMessageObjects == null ? new ArrayList<>() : new ArrayList<>(incomingMessageObjects);
+
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("NotificationsController: processNewMessages msgs.size()=" + (messageObjects == null ? "null" : messageObjects.size()) + " isLast=" + isLast + " isFcm=" + isFcm + ")");
         }
 
+        if (messageObjects != null) {
+            for (int i = messageObjects.size()-1; i >= 0; i--) {
+                if (org.telegram.messenger.family.FamilyCards.hidden(messageObjects.get(i))) messageObjects.remove(i);
+            }
+        }
         if (messageObjects != null) {
             for (int i = 0; i < messageObjects.size(); ++i) {
                 final MessageObject messageObject = messageObjects.get(i);
@@ -1600,6 +1607,7 @@ public class NotificationsController extends BaseController implements Notificat
                         continue;
                     }
                     MessageObject messageObject = new MessageObject(currentAccount, message, false, false);
+                    if (org.telegram.messenger.family.FamilyCards.hidden(messageObject)) continue;
                     if (isPersonalMessage(messageObject)) {
                         personalCount++;
                     }
@@ -1670,6 +1678,7 @@ public class NotificationsController extends BaseController implements Notificat
             if (push != null) {
                 for (int a = 0; a < push.size(); a++) {
                     MessageObject messageObject = push.get(a);
+                    if (org.telegram.messenger.family.FamilyCards.hidden(messageObject)) continue;
                     int mid = messageObject.getId();
                     if (pushMessagesDict.indexOfKey(mid) >= 0) {
                         continue;

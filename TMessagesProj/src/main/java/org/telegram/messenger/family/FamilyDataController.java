@@ -51,6 +51,8 @@ public final class FamilyDataController implements NotificationCenter.Notificati
     private volatile boolean disposed;
     private final Object clockLock = new Object();
     private long logicalClock;
+    private final FamilyTapGuard sendTaps=new FamilyTapGuard();
+    private final Map<String,FamilyCore.Op> recentSends=new LinkedHashMap<>();
     private static final class Scan { int request, offset, count, knownHead, newHead; boolean all, cancelled; }
     private FamilyDataController(int account, long self) {
         this.account = account; this.self = self;
@@ -62,6 +64,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
             if (!disposed) {
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.messageReceivedByServer);
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.privacyRulesUpdated);
+                NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.didUpdateConnectionState);
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.messagesDeleted);
                 NotificationCenter.getInstance(account).addObserver(this, NotificationCenter.removeAllMessagesFromDialog);
                 if(FamilyController.wantsFamilyOnlyLastSeen())FamilyController.syncLastSeen();
@@ -199,18 +202,24 @@ public final class FamilyDataController implements NotificationCenter.Notificati
                 }
             }catch(Exception error){FileLog.e(error);}});
         }
+        if(id==NotificationCenter.didUpdateConnectionState && FamilyController.wantsFamilyOnlyLastSeen())FamilyController.syncLastSeen();
         if(id==NotificationCenter.privacyRulesUpdated && FamilyController.wantsFamilyOnlyLastSeen() && FamilyController.shouldHideOnline(account)) FamilyController.syncLastSeen();
         if (id == NotificationCenter.messageReceivedByServer && args.length > 6 && !Boolean.TRUE.equals(args[6]) && args[2] instanceof TLRPC.Message) ingest((TLRPC.Message) args[2], true);
     }
     public FamilyCore.Op send(long dialog, String kind, String entity, String human, Map<String,String> data) {
         return send(dialog,kind,entity,human,data,null);
     }
-    public FamilyCore.Op send(long dialog, String kind, String entity, String human, Map<String,String> data, MessageObject replyTo) {
+    public synchronized FamilyCore.Op send(long dialog, String kind, String entity, String human, Map<String,String> data, MessageObject replyTo) {
         if (!alive() || dialog == 0 || DialogObject.isEncryptedDialog(dialog) || dialog == self) throw new IllegalArgumentException("Choose a normal conversation");
+        String identity=dialog+":"+kind+":"+(Arrays.asList("hug","task","event","goal","game","bill").contains(kind)?"":entity)+":"+new TreeMap<>(data).toString()+":"+human;
+        synchronized(recentSends){
+            if(!sendTaps.accept(identity,android.os.SystemClock.elapsedRealtime(),1500))return recentSends.get(identity);
+        }
         Map<String,String> payload=new HashMap<>(data);
         synchronized(clockLock){logicalClock=Math.max(logicalClock+1,ConnectionsManager.getInstance(account).getCurrentTime()*1000000L);payload.put("clock",""+logicalClock);prefs.edit().putLong("lamport",logicalClock).apply();}
         payload.put("nonce",newId());
         FamilyCore.Op op = new FamilyCore.Op(kind, entity, payload);
+        synchronized(recentSends){recentSends.put(identity,op);if(recentSends.size()>256)recentSends.remove(recentSends.keySet().iterator().next());}
         String text = FamilyCore.message(human, op);
         AndroidUtilities.runOnUIThread(() -> {
             if (alive()) SendMessagesHelper.getInstance(account).sendMessage(SendMessagesHelper.SendMessageParams.of(text,dialog,replyTo,null,null,false,null,null,null,true,0,0,null,false));
@@ -374,6 +383,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
         AndroidUtilities.runOnUIThread(()->{
             NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.messageReceivedByServer);
             NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.privacyRulesUpdated);
+            NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.didUpdateConnectionState);
             NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.messagesDeleted);
             NotificationCenter.getInstance(account).removeObserver(this,NotificationCenter.removeAllMessagesFromDialog);
         });listeners.clear();
