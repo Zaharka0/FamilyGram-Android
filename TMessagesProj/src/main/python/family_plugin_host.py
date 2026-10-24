@@ -125,3 +125,9 @@ def receive(uid, plugin_id, account, message):
     instance = _instances[_key(uid, plugin_id)][0]
     _context.bridge=instance._bridge
     for callback in list(instance._receive_hooks): callback(account, message)
+
+@limited
+def ui(uid, plugin_id, callback):
+    instance = _instances[_key(uid, plugin_id)][0]
+    _context.bridge = instance._bridge
+    return callback()

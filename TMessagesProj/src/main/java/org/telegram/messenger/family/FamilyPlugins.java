@@ -95,6 +95,7 @@ public final class FamilyPlugins {
         private void check(){if(!owner.alive())throw new IllegalStateException("Account changed");}
         public String getSetting(String key){check();return owner.prefs.getString("setting_"+id+":"+key,null);}
         public void setSetting(String key,String json){check();if(key.length()>100||json.length()>16384)throw new IllegalArgumentException("Setting too long");owner.prefs.edit().putString("setting_"+id+":"+key,json).apply();}
+        public void runOnUI(PyObject callback){check();owner.queue.postRunnable(()->AndroidUtilities.runOnUIThread(()->{if(!owner.alive()||!owner.enabled()||!owner.prefs.getBoolean("enabled_"+id,false))return;try{owner.host().callAttr("ui",owner.uid,id,callback);}catch(Exception e){owner.queue.postRunnable(()->owner.fail(id,e));}}));}
         public int getAccount(){check();return owner.account;}
         public long getPartner(){check();return FamilyDataController.getInstance(owner.account).partner();}
         public void log(String message){check();FileLog.d("FamilyPlugin "+id+": "+message);}

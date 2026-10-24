@@ -43,6 +43,11 @@ class PluginsTest(unittest.TestCase):
         with self.assertRaises(RuntimeError):host.load(10,self.source+'\nraise RuntimeError("test")',self.bridge)
         self.assertNotIn((10,'heart_signature'),host._instances)
         self.assertNotIn('_family_plugin_10_heart_signature',sys.modules)
+    def test_ui_callback_uses_plugin_context(self):
+        host.load(10,self.source,self.bridge)
+        other=Bridge(30);host.load(11,self.source,other)
+        self.assertIs(host.ui(10,'heart_signature',lambda:host.current_bridge()),self.bridge)
+        self.assertIs(host.ui(11,'heart_signature',lambda:host.current_bridge()),other)
     def test_cancel_hook(self):
         source="""from base_plugin import BasePlugin,HookResult,HookStrategy
 __id__='cancel_test'
