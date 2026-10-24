@@ -263,4 +263,5 @@
     <string name="FGPluginTimeout" formatted="false">A plugin timed out. The engine was turned off; your message was passed to Telegram.</string>
     <string name="FGPluginRecovered" formatted="false">Disabled the plugin active during the previous interruption</string>
     <string name="FGInstallExamplePlugin" formatted="false">Install example: heart signature</string>
+    <string name="FGAuthorIconOnly" formatted="false">The author icon is available in this build. Photo icons require a build with your personal photo pack.</string>
 </resources>

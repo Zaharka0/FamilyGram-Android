@@ -361,7 +361,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         toggle(t("UpdateChecks"),t("UpdateChecksInfo"),data.prefs.getBoolean("updates",false),()->{data.prefs.edit().putBoolean("updates",!data.prefs.getBoolean("updates",false)).apply();render();});
     }
     private void icons(){
-        info(t("BuiltInPhotoIcons"));
+        info(t(getParentActivity().getResources().getBoolean(R.bool.family_photo_pack_present)?"BuiltInPhotoIcons":"AuthorIconOnly"));
         LinearLayout line=null;int column=0;
         for(LauncherIconController.LauncherIcon icon:LauncherIconController.availableIcons()){
             if(column==0){line=new LinearLayout(getParentActivity());line.setOrientation(LinearLayout.HORIZONTAL);body.addView(line,new LinearLayout.LayoutParams(-1,-2));line.setWeightSum(2);}

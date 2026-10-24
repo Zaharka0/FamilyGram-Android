@@ -261,3 +261,4 @@ Enable	Enable	Включить
 PluginTimeout	A plugin timed out. The engine was turned off; your message was passed to Telegram.	Плагин не ответил вовремя. Движок выключен; сообщение передано Telegram.
 PluginRecovered	Disabled the plugin active during the previous interruption	Отключён плагин, работавший при предыдущем сбое
 InstallExamplePlugin	Install example: heart signature	Установить пример: подпись с сердцем
+AuthorIconOnly	The author icon is available in this build. Photo icons require a build with your personal photo pack.	В этой сборке доступна авторская иконка. Фотоиконки доступны в сборке с вашим личным набором фотографий.

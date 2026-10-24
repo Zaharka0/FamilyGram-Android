@@ -263,4 +263,5 @@
     <string name="FGPluginTimeout" formatted="false">Плагин не ответил вовремя. Движок выключен; сообщение передано Telegram.</string>
     <string name="FGPluginRecovered" formatted="false">Отключён плагин, работавший при предыдущем сбое</string>
     <string name="FGInstallExamplePlugin" formatted="false">Установить пример: подпись с сердцем</string>
+    <string name="FGAuthorIconOnly" formatted="false">В этой сборке доступна авторская иконка. Фотоиконки доступны в сборке с вашим личным набором фотографий.</string>
 </resources>
