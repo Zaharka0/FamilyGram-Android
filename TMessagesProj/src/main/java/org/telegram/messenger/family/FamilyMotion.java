@@ -14,7 +14,7 @@ public final class FamilyMotion {
     public static void setEnabled(boolean on){ApplicationLoader.applicationContext.getSharedPreferences("familygram_motion",Context.MODE_PRIVATE).edit().putBoolean("enabled",on).apply();}
     public static boolean allowed(){try{return enabled()&&Settings.Global.getFloat(ApplicationLoader.applicationContext.getContentResolver(),Settings.Global.ANIMATOR_DURATION_SCALE,1)>0;}catch(Exception e){return enabled();}}
     public static void enter(View view,int index){if(!allowed())return;view.setAlpha(0);view.setTranslationY(AndroidUtilities.dp(12));view.animate().alpha(1).translationY(0).setDuration(240).setStartDelay(Math.min(index*28,180)).setInterpolator(new DecelerateInterpolator()).start();}
-    public static void press(View view){view.setOnTouchListener((v,event)->{if(!allowed())return false;int action=event.getActionMasked();if(action==MotionEvent.ACTION_DOWN)v.animate().scaleX(.97f).scaleY(.97f).setDuration(90).start();else if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL)v.animate().scaleX(1).scaleY(1).setDuration(160).start();return false;});}
+    public static void press(View view){view.setOnTouchListener((v,event)->{if(!allowed())return false;int action=event.getActionMasked();if(action==MotionEvent.ACTION_DOWN)v.animate().setStartDelay(0).scaleX(.97f).scaleY(.97f).setDuration(90).start();else if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL)v.animate().setStartDelay(0).scaleX(1).scaleY(1).setDuration(160).start();return false;});}
     public static void hearts(View view){
         if(!allowed())return;view.post(()->{
             if(!view.isAttachedToWindow()||!allowed())return;

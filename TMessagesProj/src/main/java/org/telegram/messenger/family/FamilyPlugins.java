@@ -21,7 +21,8 @@ import java.util.function.Consumer;
 public final class FamilyPlugins {
     private static final FamilyPlugins[] INSTANCES=new FamilyPlugins[UserConfig.MAX_ACCOUNT_COUNT];
     private static final ThreadLocal<Boolean> BYPASS=new ThreadLocal<>();
-    private static synchronized void startPython(){if(!Python.isStarted())Python.start(new AndroidPlatform(ApplicationLoader.applicationContext));}
+    private static final Object PYTHON_LOCK=new Object();
+    private static void startPython(){synchronized(PYTHON_LOCK){if(!Python.isStarted())Python.start(new AndroidPlatform(ApplicationLoader.applicationContext));}}
     public static synchronized FamilyPlugins get(int account){
         long uid=UserConfig.getInstance(account).getClientUserId();FamilyPlugins p=INSTANCES[account];
         if(p==null||p.uid!=uid){if(p!=null)p.close(false);INSTANCES[account]=p=new FamilyPlugins(account,uid);}return p;
@@ -73,7 +74,7 @@ public final class FamilyPlugins {
         if(!alive()||!enabled())return;String crashed=prefs.getString("running","");if(!crashed.isEmpty()){prefs.edit().putBoolean("enabled_"+crashed,false).putString("error",FamilyText.get("PluginRecovered")+": "+crashed).remove("running").apply();}
         File[] files=root.listFiles((dir,name)->name.endsWith(".py"));if(files!=null)for(File f:files){String id=f.getName().substring(0,f.getName().length()-3);if(prefs.getBoolean("enabled_"+id,false))load(id);}
     });}
-    private void load(String id){if(!alive()||!enabled())return;try{mark(id);host().callAttr("load",uid,read(new FileInputStream(source(id))),new Bridge(this,id));loaded.add(id);}catch(Exception e){fail(id,e);}finally{unmark();}}
+    private void load(String id){if(!alive()||!enabled())return;try{PyObject runtime=host();if(!alive()||!enabled())return;mark(id);runtime.callAttr("load",uid,read(new FileInputStream(source(id))),new Bridge(this,id));if(enabled())loaded.add(id);else runtime.callAttr("unload",uid,id);}catch(Exception e){fail(id,e);}finally{unmark();}}
     private void task(Runnable action,Consumer<String> done){queue.postRunnable(()->{String error=null;try{if(!alive())throw new IllegalStateException("Account changed");action.run();}catch(Exception e){FileLog.e(e);error=String.valueOf(e.getMessage());}final String result=error;AndroidUtilities.runOnUIThread(()->{if(alive())done.accept(result);});});}
     public void engine(boolean on,Consumer<String> done){
         prefs.edit().putBoolean("engine",on).apply();synchronized(this){warming=false;}
