@@ -115,6 +115,7 @@ public class FamilyController {
             boolean changed = value ? family.add(dialogId) : family.remove(dialogId);
             if (changed) {
                 saveIds();
+                storiesChanged();
             }
         }
     }
@@ -271,6 +272,19 @@ public class FamilyController {
 
     public static void setGhostFamilyExempt(boolean value) {
         setFlag(KEY_GHOST_FAMILY, value);
+    }
+
+    public static boolean isGhostStories(){return prefs().getBoolean("ghost_stories",isGhostNoRead());}
+    public static void setGhostStories(boolean value){setFlag("ghost_stories",value);storiesChanged();}
+    public static boolean isFamilyStoriesOnly(){return flag("family_stories_only");}
+    public static void setFamilyStoriesOnly(boolean value){setFlag("family_stories_only",value);storiesChanged();}
+    public static boolean storyExempt(int account,long peer){
+        return org.telegram.messenger.family.FamilyStoryPolicy.exempt(peer,UserConfig.getInstance(account).getClientUserId(),org.telegram.messenger.family.FamilyDataController.getInstance(account).partner(),isFamily(peer));
+    }
+    public static boolean shouldHideStoryView(int account,long peer){return org.telegram.messenger.family.FamilyStoryPolicy.hideView(isGhostStories(),storyExempt(account,peer));}
+    public static boolean shouldShowStories(int account,long peer){return org.telegram.messenger.family.FamilyStoryPolicy.show(isFamilyStoriesOnly(),storyExempt(account,peer));}
+    private static void storiesChanged(){
+        AndroidUtilities.runOnUIThread(()->{for(int a=0;a<UserConfig.MAX_ACCOUNT_COUNT;a++)if(UserConfig.getInstance(a).isClientActivated())NotificationCenter.getInstance(a).postNotificationName(NotificationCenter.storiesUpdated);});
     }
 
     /** Do not tell the other person that we read the chat. */

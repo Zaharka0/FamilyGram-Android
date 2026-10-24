@@ -164,11 +164,11 @@
     <string name="FGGhostFamily" formatted="false">Family exception</string>
     <string name="FGGhostFamilyInfo" formatted="false">Family may see reading, typing and online activity</string>
     <string name="FGUpdates" formatted="false">FamilyGram updates</string>
-    <string name="FGUpdatesInfo" formatted="false">Check published APK releases on your GitHub repository</string>
+    <string name="FGUpdatesInfo" formatted="false">Download public APK releases from your GitHub repository. Build numbers distinguish rebuilds.</string>
     <string name="FGUpdateChecks" formatted="false">Check for updates when opening the app</string>
     <string name="FGUpdateChecksInfo" formatted="false">Once a day; notify about a new stable APK release</string>
-    <string name="FGNoRelease" formatted="false">No stable FamilyGram release has been published yet. APK build artifacts are separate from published releases.</string>
-    <string name="FGNoApk" formatted="false">This release does not contain an APK</string>
+    <string name="FGNoRelease" formatted="false">No public APK release yet. Run Android APK in GitHub Actions with Publish release enabled, then check again. Actions ZIP artifacts cannot be downloaded anonymously by the app.</string>
+    <string name="FGNoApk" formatted="false">The newest compatible release has no APK. Publish an APK in GitHub Releases.</string>
     <string name="FGUpToDate" formatted="false">You are up to date</string>
     <string name="FGUpdateError" formatted="false">Unable to check for updates. Try again later.</string>
     <string name="FGDownloadApk" formatted="false">Download APK</string>
@@ -219,4 +219,23 @@
     <string name="FGParticipantLeft" formatted="false">Left</string>
     <string name="FGParticipantWaiting" formatted="false">Has not joined yet</string>
     <string name="FGParticipantDisconnected" formatted="false">No connection — waiting</string>
+    <string name="FGsections" formatted="false">Customize sections</string>
+    <string name="FGManageSectionsInfo" formatted="false">Hide sections with the switch, pin favorites with the star, and change order with arrows. Favorites always appear first. Choices apply only to this account.</string>
+    <string name="FGWelcomeTitle" formatted="false">Your family space</string>
+    <string name="FGFavorites" formatted="false">Favorites</string>
+    <string name="FGAllSections" formatted="false">All sections</string>
+    <string name="FGNoSections" formatted="false">All sections are hidden</string>
+    <string name="FGShowSection" formatted="false">Show</string>
+    <string name="FGFavoriteSection" formatted="false">Pin as favorite</string>
+    <string name="FGMoveUp" formatted="false">Move up</string>
+    <string name="FGMoveDown" formatted="false">Move down</string>
+    <string name="FGResetSections" formatted="false">Reset section layout</string>
+    <string name="FGBothClientsShort" formatted="false">Which features need FamilyGram on both phones?</string>
+    <string name="FGStoriesSection" formatted="false">Stories</string>
+    <string name="FGGhostStories" formatted="false">Hide story views</string>
+    <string name="FGGhostStoriesInfo" formatted="false">Do not send story view or profile-view receipts. Family and your partner still see your views. Defaults to the ghost read setting until you choose it separately.</string>
+    <string name="FGFamilyStoriesOnly" formatted="false">Show only family stories</string>
+    <string name="FGFamilyStoriesOnlyInfo" formatted="false">Hide other stories from the story feed and prevent opening them. Your own stories remain available. This is separate from hiding view receipts.</string>
+    <string name="FGFamilyVersion" formatted="false">FamilyGram version</string>
+    <string name="FGOpenReleases" formatted="false">Open GitHub Releases</string>
 </resources>

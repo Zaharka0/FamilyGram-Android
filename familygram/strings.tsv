@@ -162,11 +162,11 @@ GhostOnlineInfo	Send offline; the family exception uses Telegram privacy setting
 GhostFamily	Family exception	Исключение для семьи
 GhostFamilyInfo	Family may see reading, typing and online activity	Семья может видеть прочтение, набор текста и онлайн
 Updates	FamilyGram updates	Обновления FamilyGram
-UpdatesInfo	Check published APK releases on your GitHub repository	Проверить опубликованные APK-релизы в вашем репозитории GitHub
+UpdatesInfo	Download public APK releases from your GitHub repository. Build numbers distinguish rebuilds.	Скачивание публичных APK из вашего репозитория GitHub. Номер сборки отличает повторные сборки.
 UpdateChecks	Check for updates when opening the app	Проверять обновления при открытии приложения
 UpdateChecksInfo	Once a day; notify about a new stable APK release	Раз в день; сообщать о новом стабильном APK-релизе
-NoRelease	No stable FamilyGram release has been published yet. APK build artifacts are separate from published releases.	Стабильный релиз FamilyGram ещё не опубликован. Артефакты сборок APK и опубликованные релизы — разные вещи.
-NoApk	This release does not contain an APK	В этом релизе нет APK
+NoRelease	No public APK release yet. Run Android APK in GitHub Actions with Publish release enabled, then check again. Actions ZIP artifacts cannot be downloaded anonymously by the app.	Публичного релиза APK пока нет. Запустите Android APK в GitHub Actions с включённым Publish release, затем проверьте снова. ZIP-артефакты Actions приложение не может скачивать без авторизации.
+NoApk	The newest compatible release has no APK. Publish an APK in GitHub Releases.	В последнем подходящем релизе нет APK. Опубликуйте APK в GitHub Releases.
 UpToDate	You are up to date	Установлена актуальная версия
 UpdateError	Unable to check for updates. Try again later.	Не удалось проверить обновления. Попробуйте позже.
 DownloadApk	Download APK	Скачать APK
@@ -217,3 +217,22 @@ ParticipantJoined	Connected	Подключён
 ParticipantLeft	Left	Вышел
 ParticipantWaiting	Has not joined yet	Ещё не подключился
 ParticipantDisconnected	No connection — waiting	Нет связи — ожидаем
+sections	Customize sections	Управление разделами
+ManageSectionsInfo	Hide sections with the switch, pin favorites with the star, and change order with arrows. Favorites always appear first. Choices apply only to this account.	Скрывайте разделы переключателем, закрепляйте любимые звёздочкой и меняйте порядок стрелками. Любимые всегда выше остальных. Настройки действуют только для этого аккаунта.
+WelcomeTitle	Your family space	Ваше семейное пространство
+Favorites	Favorites	Любимые разделы
+AllSections	All sections	Все разделы
+NoSections	All sections are hidden	Все разделы скрыты
+ShowSection	Show	Показывать
+FavoriteSection	Pin as favorite	Закрепить в любимых
+MoveUp	Move up	Переместить выше
+MoveDown	Move down	Переместить ниже
+ResetSections	Reset section layout	Вернуть исходный порядок разделов
+BothClientsShort	Which features need FamilyGram on both phones?	Какие функции требуют FamilyGram на обоих телефонах?
+StoriesSection	Stories	Истории
+GhostStories	Hide story views	Скрывать просмотр историй
+GhostStoriesInfo	Do not send story view or profile-view receipts. Family and your partner still see your views. Defaults to the ghost read setting until you choose it separately.	Не отправлять отметки просмотра обычных и профильных историй. Семья и половинка видят ваши просмотры. Пока вы не изменили этот переключатель отдельно, он следует настройке скрытия прочтения.
+FamilyStoriesOnly	Show only family stories	Показывать истории только семьи и половинки
+FamilyStoriesOnlyInfo	Hide other stories from the story feed and prevent opening them. Your own stories remain available. This is separate from hiding view receipts.	Скрыть остальные истории из ленты и запретить их открытие. Свои истории остаются доступны. Это отдельная настройка от скрытия отметок просмотра.
+FamilyVersion	FamilyGram version	Версия FamilyGram
+OpenReleases	Open GitHub Releases	Открыть релизы GitHub

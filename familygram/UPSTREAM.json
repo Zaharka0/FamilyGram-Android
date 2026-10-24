@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/DrKLO/Telegram",
+  "commit": "0aae959806c57be8ad457980f2a5c6277ff18635",
+  "version": "13.0.3",
+  "version_code": 7183,
+  "checked_at": "2026-10-24",
+  "note": "The official Android source HEAD is still 13.0.3. Telegram 13.1.0 is distributed as an APK, but its source is not published in the official repository yet."
+}

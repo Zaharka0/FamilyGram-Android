@@ -10,12 +10,17 @@ with tempfile.TemporaryDirectory(prefix='familygram-tests-') as output:
         'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyCore.java',
         'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyTapGuard.java',
         'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyPrivacyPolicy.java',
+        'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilySections.java',
+        'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyStoryPolicy.java',
+        'TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyReleasePolicy.java',
+        'familygram/tests/FamilySettingsTest.java',
         'familygram/tests/FamilyCoreTest.java','familygram/tests/CheckJavaSyntax.java'],check=True)
     subprocess.run([java,'-cp',output,'FamilyCoreTest'],check=True)
+    subprocess.run([java,'-cp',output,'FamilySettingsTest'],check=True)
     modified=['NotificationsController','MediaController','MessageObject','MessagesController','UserConfig','FamilyController']
     files=[f'TMessagesProj/src/main/java/org/telegram/messenger/{name}.java' for name in modified]
     files += [str(p) for p in Path('TMessagesProj/src/main/java/org/telegram/messenger/family').glob('*.java')]
-    files += [f'TMessagesProj/src/main/java/org/telegram/ui/{name}.java' for name in ['ChatActivity','LaunchActivity','SettingsActivity','FamilyHubActivity','FamilyWatchActivity','Components/VideoPlayer']]
+    files += [f'TMessagesProj/src/main/java/org/telegram/ui/{name}.java' for name in ['ChatActivity','LaunchActivity','SettingsActivity','FamilyHubActivity','FamilyWatchActivity','Components/VideoPlayer','Stories/StoriesController','Stories/StoryViewer']]
     subprocess.run([java,'-cp',output,'CheckJavaSyntax',*files],check=True)
     update_source=Path('TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyUpdates.java').read_text()
     assert re.search(r'VERSION="([^"]+)"',update_source).group(1)==Path('familygram/VERSION').read_text().strip(),'Update/release version mismatch'
@@ -51,3 +56,13 @@ for module in ['TMessagesProj_App', 'TMessagesProj_AppHuawei', 'TMessagesProj_Ap
     locale_filter = re.search(r'localeFilters\s*\+=\s*\[([^]]+)\]', gradle)
     assert locale_filter and 'ru' in re.findall(r'[\"\']([^\"\']+)[\"\']', locale_filter.group(1)), f'{module}: Russian strings excluded from APK'
 print('APK locale filters: Russian retained in all five app modules')
+
+story_source=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Stories/StoriesController.java').read_text()
+for start,end,send in [('public boolean markStoryAsRead(TL_stories.PeerStories','public int getMaxStoriesReadId','new TL_stories.TL_stories_readStories'),('protected boolean markAsRead(int storyId)','protected boolean canLoad()','new TL_stories.TL_stories_incrementStoryViews')]:
+    method=story_source.split(start,1)[1].split(end,1)[0]
+    assert method.index('shouldHideStoryView')<method.index(send),'Story receipt bypasses ghost guard'
+workflow=(ROOT/'.github/workflows/android.yml').read_text()
+assert 'default: true\n      abis:' in workflow,'APK release publishing must default on'
+assert 'TAG="familygram-$VERSION-b$APK_CODE"' in workflow,'Updater release/build tag mismatch'
+assert 'APP_VERSION_CODE=$BUILD_CODE' in workflow,'Update rebuild must increment installed APK code'
+print('Story receipt entry points and release workflow wiring passed')

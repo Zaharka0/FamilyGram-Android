@@ -32,6 +32,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
         FamilyDataController c=INSTANCES[account];
         if(c!=null&&c.alive()){
             c.prefs.edit().putLong(partner?"partner":"since",value).apply();
+            if(partner)NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.storiesUpdated);
             c.notifyChanged(0);FamilyPairWidget.updateAll(ApplicationLoader.applicationContext);
         }
     }
@@ -91,6 +92,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
     public long partner() { return prefs.getLong("partner", 0); }
     public void setPartner(long id) {
         prefs.edit().putLong("partner", id).apply();
+        NotificationCenter.getInstance(account).postNotificationName(NotificationCenter.storiesUpdated);
         if (account == UserConfig.selectedAccount) FamilyController.setPartnerId(id);
         FamilyPairWidget.updateAll(ApplicationLoader.applicationContext);
         notifyChanged(0);

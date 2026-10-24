@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
@@ -54,11 +55,14 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     @Override public void onFragmentDestroy(){data.removeListener(this);super.onFragmentDestroy();}
     @Override public View createView(Context context){
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);actionBar.setTitle(t("Title"));
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick(){@Override public void onItemClick(int id){if(id==-1){if(!page.equals("home"))open("home");else finishFragment();}}});
+        actionBar.createMenu().addItem(7410,R.drawable.msg_settings);
+        actionBar.createMenu().addItem(7411,R.drawable.msg_edit);
+        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick(){@Override public void onItemClick(int id){if(id==7410){open("settings");return;}if(id==7411){open("sections");return;}if(id==-1){if(!page.equals("home"))open("home");else finishFragment();}}});
         LinearLayout root=new LinearLayout(context);root.setOrientation(LinearLayout.VERTICAL);root.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
-        search=new EditText(context);search.setSingleLine(true);search.setTextSize(16);search.setHint(t("Search"));search.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));search.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));search.setPadding(dp(20),dp(10),dp(20),dp(10));
+        search=new EditText(context);search.setSingleLine(true);search.setTextSize(16);search.setHint(t("Search"));search.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));search.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));search.setPadding(dp(16),dp(10),dp(16),dp(10));
+        GradientDrawable searchBg=new GradientDrawable();searchBg.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));searchBg.setCornerRadius(dp(16));search.setBackground(searchBg);
         search.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){query=s.toString().trim().toLowerCase(Locale.ROOT);render();}public void afterTextChanged(Editable e){}});
-        root.addView(search,new LinearLayout.LayoutParams(-1,dp(52)));
+        LinearLayout.LayoutParams searchParams=new LinearLayout.LayoutParams(-1,dp(50));searchParams.setMargins(dp(12),dp(10),dp(12),dp(6));root.addView(search,searchParams);
         scroll=new ScrollView(context);scroll.setFillViewport(true);body=new LinearLayout(context);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(12),dp(8),dp(12),dp(24));scroll.addView(body,new ScrollView.LayoutParams(-1,-2));root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));fragmentView=root;render();return root;
     }
     @Override public void onResume(){super.onResume();render();if(!refreshed&&dialog!=0){refreshed=true;data.sync(dialog,false);}}
@@ -68,27 +72,13 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     private void render(){
         if(body==null||getParentActivity()==null)return;int y=scroll.getScrollY();body.removeAllViews();
         actionBar.setTitle(page.equals("home")?t("Title"):t(page));
-        if(dialog!=0)row(name(dialog),t("ChooseChat"),()->chooseChat(false));
+        if(dialog!=0&&!page.equals("home")&&!page.equals("sections"))row(name(dialog),t("ChooseChat"),()->chooseChat(false));
+        if(page.equals("sections")){manageSections();restoreScroll(y);return;}
         if(page.equals("settings")){settings();restoreScroll(y);return;}
         if(page.equals("icons")){icons();restoreScroll(y);return;}
         if(page.equals("widget")){widget();restoreScroll(y);return;}
         if(page.equals("home")){
-            if(query.isEmpty()){
-                info(t("WorkspaceIntro"));
-                row(t("BothClientsTitle"),t("BothClientsInfo"),()->showDialog(new AlertDialog.Builder(getParentActivity()).setTitle(t("BothClientsTitle")).setMessage(t("BothClientsInfo")).setNegativeButton(t("Close"),null).create()));
-                heading("PersonalSection");
-                row(t("settings"),t("SettingsInfo"),()->open("settings"));
-                row(t("icons"),t("IconsInfo"),()->open("icons"));row(t("widget"),t("WidgetInfo"),()->open("widget"));
-            }
-            if(dialog==0){row(t("ChooseChat"),t("ChooseChatInfo"),()->chooseChat(false));if(!query.isEmpty())settings();return;}
-            String[] sections={"tasks","calendar","album","ours","hug","question","goals","watch","voice","games","bill","stats"};
-            for(String section:sections){
-                if(section.equals("tasks"))heading("TogetherSection");if(section.equals("watch"))heading("MediaSection");if(section.equals("bill"))heading("MoneySection");
-                row(t(section),t(section+"Info"),()->open(section));
-            }
-            if(dialog==data.partner())row(t("QuickReaction"),t("QuickReactionInfo"),()->FamilyActions.reactToLatest(currentAccount,dialog,this));
-            if(!query.isEmpty())settings();
-            syncRows();restoreScroll(y);return;
+            dashboard();restoreScroll(y);return;
         }
         if(dialog==0){row(t("ChooseChat"),t("ChooseChatInfo"),()->chooseChat(false));return;}
         if(page.equals("tasks"))tasks();else if(page.equals("calendar"))calendar();else if(page.equals("album"))album();
@@ -97,6 +87,58 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         else if(page.equals("games"))games();else if(page.equals("bill"))bills();else if(page.equals("stats"))statistics();
         restoreScroll(y);
     }
+    private void dashboard(){
+        if(query.isEmpty()){
+            LinearLayout hero=card();TextView title=text(hero,dialog==0?t("WelcomeTitle"):"❤ "+name(dialog),true);title.setTextSize(24);
+            text(hero,dialog==0?t("WorkspaceIntro"):data.daysTogether()>0?data.daysTogether()+" "+t("DaysTogether"):t("WorkspaceIntro"),false);
+            button(hero,t("ChooseChat"),()->chooseChat(false));
+            LinearLayout shortcuts=new LinearLayout(getParentActivity());shortcuts.setOrientation(LinearLayout.HORIZONTAL);body.addView(shortcuts,new LinearLayout.LayoutParams(-1,-2));
+            quick(shortcuts,"⚙",t("settings"),()->open("settings"));quick(shortcuts,"☷",t("sections"),()->open("sections"));quick(shortcuts,"↻",t("Updates"),()->FamilyUpdates.check(this,false));
+        }
+        if(dialog==0){if(!query.isEmpty())settings();return;}
+        List<String> visible=FamilySections.visible(data.prefs.getString("section_order",""),data.prefs.getString("section_hidden",""),data.prefs.getString("section_favorites","hug,tasks,calendar"));
+        Set<String> favorites=FamilySections.selected(data.prefs.getString("section_favorites","hug,tasks,calendar"));
+        LinearLayout line=null;int column=0;boolean hadFavorites=false,hadOther=false;
+        for(String section:visible){
+            if(!matches(t(section)+" "+t(section+"Info")))continue;
+            boolean favorite=favorites.contains(section);
+            if(favorite&&!hadFavorites){heading("Favorites");hadFavorites=true;column=0;}
+            if(!favorite&&!hadOther){heading("AllSections");hadOther=true;column=0;}
+            if(column==0){line=new LinearLayout(getParentActivity());line.setOrientation(LinearLayout.HORIZONTAL);body.addView(line,new LinearLayout.LayoutParams(-1,-2));}
+            tile(line,section,favorite);column=(column+1)%2;
+            if(column==1)line.setWeightSum(2);
+        }
+        if(visible.isEmpty())row(t("NoSections"),t("ManageSectionsInfo"),()->open("sections"));
+        if(dialog==data.partner())row(t("QuickReaction"),t("QuickReactionInfo"),()->FamilyActions.reactToLatest(currentAccount,dialog,this));
+        row(t("BothClientsTitle"),t("BothClientsShort"),()->showDialog(new AlertDialog.Builder(getParentActivity()).setTitle(t("BothClientsTitle")).setMessage(t("BothClientsInfo")).setNegativeButton(t("Close"),null).create()));
+        if(!query.isEmpty())settings();
+    }
+    private void quick(LinearLayout parent,String icon,String label,Runnable action){
+        TextView v=new TextView(getParentActivity());v.setText(icon+"\n"+label);v.setTextSize(13);v.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));v.setGravity(Gravity.CENTER);v.setPadding(dp(4),dp(12),dp(4),dp(12));v.setMinHeight(dp(76));v.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));v.setOnClickListener(view->tap(label,action));parent.addView(v,new LinearLayout.LayoutParams(0,-2,1));
+    }
+    private void tile(LinearLayout parent,String section,boolean favorite){
+        LinearLayout box=new LinearLayout(getParentActivity());box.setOrientation(LinearLayout.VERTICAL);box.setPadding(dp(14),dp(14),dp(14),dp(14));GradientDrawable background=new GradientDrawable();background.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));background.setCornerRadius(dp(18));box.setBackground(background);
+        TextView icon=text(box,symbol(t(section))+(favorite?"  ★":""),false);icon.setTextSize(24);text(box,t(section),true);TextView description=text(box,t(section+"Info"),false);description.setMaxLines(3);description.setEllipsize(TextUtils.TruncateAt.END);box.setMinimumHeight(dp(160));box.setFocusable(true);box.setContentDescription(t(section)+". "+t(section+"Info"));box.setOnClickListener(v->tap(section,()->open(section)));
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(dp(4),dp(4),dp(4),dp(4));parent.addView(box,lp);
+    }
+    private void manageSections(){
+        info(t("ManageSectionsInfo"));
+        List<String> order=FamilySections.order(data.prefs.getString("section_order",""));
+        Set<String> hidden=FamilySections.selected(data.prefs.getString("section_hidden","")),favorites=FamilySections.selected(data.prefs.getString("section_favorites","hug,tasks,calendar"));
+        for(int i=0;i<order.size();i++){
+            final int index=i;String id=order.get(i);if(!matches(t(id)))continue;LinearLayout box=card();text(box,symbol(t(id))+" "+t(id),true);
+            LinearLayout controls=new LinearLayout(getParentActivity());controls.setGravity(Gravity.CENTER_VERTICAL);box.addView(controls,new LinearLayout.LayoutParams(-1,-2));
+            Switch show=new Switch(getParentActivity());show.setText(t("ShowSection"));show.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));show.setChecked(!hidden.contains(id));show.setContentDescription(t("ShowSection")+" "+t(id));controls.addView(show,new LinearLayout.LayoutParams(0,dp(48),1));show.setOnCheckedChangeListener((v,on)->{if(on)hidden.remove(id);else hidden.add(id);saveSectionSet("section_hidden",hidden);});
+            sectionControl(controls,favorites.contains(id)?"★":"☆",t("FavoriteSection")+" "+t(id),true,()->{if(!favorites.add(id))favorites.remove(id);saveSectionSet("section_favorites",favorites);render();});
+            sectionControl(controls,"↑",t("MoveUp")+" "+t(id),i>0,()->{Collections.swap(order,index,index-1);data.prefs.edit().putString("section_order",TextUtils.join(",",order)).apply();render();});
+            sectionControl(controls,"↓",t("MoveDown")+" "+t(id),i<order.size()-1,()->{Collections.swap(order,index,index+1);data.prefs.edit().putString("section_order",TextUtils.join(",",order)).apply();render();});
+        }
+        row(t("ResetSections"),"",()->{data.prefs.edit().remove("section_order").remove("section_hidden").remove("section_favorites").apply();render();});
+    }
+    private void sectionControl(LinearLayout parent,String label,String description,boolean enabled,Runnable action){
+        TextView control=new TextView(getParentActivity());control.setText(label);control.setTextSize(22);control.setGravity(Gravity.CENTER);control.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));control.setContentDescription(description);control.setEnabled(enabled);control.setAlpha(enabled?1f:0.3f);control.setOnClickListener(v->tap(description,action));parent.addView(control,new LinearLayout.LayoutParams(dp(48),dp(48)));
+    }
+    private void saveSectionSet(String key,Set<String> values){data.prefs.edit().putString(key,TextUtils.join(",",values)).apply();}
     private void restoreScroll(int y){scroll.post(()->scroll.scrollTo(0,y));}
     private boolean matches(String text){return query.isEmpty()||text.toLowerCase(Locale.ROOT).contains(query);}
     private LinearLayout card(){
@@ -289,6 +331,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         Switch control=new Switch(getParentActivity());control.setChecked(checked);control.setContentDescription(title);line.addView(control,new LinearLayout.LayoutParams(-2,dp(48)));control.setOnClickListener(v->tap(title,action));c.setOnClickListener(v->tap(title,action));
     }
     private void settings(){
+        row(t("sections"),t("ManageSectionsInfo"),()->open("sections"));
         heading("PersonalSection");
         row(t("Partner"),data.partner()==0?t("ChoosePartnerInfo"):name(data.partner()),()->chooseChat(true));
         row(t("TogetherSince"),data.since()==0?t("NotSet"):DateFormat.getDateInstance().format(new Date(data.since())),()->{
@@ -302,11 +345,15 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         heading("PrivacySection");info(t("LegacySettings"));
         toggle(t("FamilyOnly"),t("FamilyOnlyInfo"),FamilyController.isOnlyFamilyMode(),()->{FamilyController.setOnlyFamilyMode(!FamilyController.isOnlyFamilyMode());render();});
         toggle(t("KeepDeleted"),t("KeepDeletedInfo"),FamilyController.isKeepDeleted(),()->{FamilyController.setKeepDeleted(!FamilyController.isKeepDeleted());render();});
+        heading("StoriesSection");
+        toggle(t("GhostStories"),t("GhostStoriesInfo"),FamilyController.isGhostStories(),()->{FamilyController.setGhostStories(!FamilyController.isGhostStories());render();});
+        toggle(t("FamilyStoriesOnly"),t("FamilyStoriesOnlyInfo"),FamilyController.isFamilyStoriesOnly(),()->{FamilyController.setFamilyStoriesOnly(!FamilyController.isFamilyStoriesOnly());render();});
         toggle(t("GhostRead"),t("GhostReadInfo"),FamilyController.isGhostNoRead(),()->{FamilyController.setGhostNoRead(!FamilyController.isGhostNoRead());render();});
         toggle(t("GhostTyping"),t("GhostTypingInfo"),FamilyController.isGhostNoTyping(),()->{FamilyController.setGhostNoTyping(!FamilyController.isGhostNoTyping());render();});
         toggle(t("GhostOnline"),t("GhostOnlineInfo"),FamilyController.isGhostNoOnline(),()->{FamilyController.setGhostNoOnline(!FamilyController.isGhostNoOnline());if(FamilyController.shouldHideOnline())FamilyController.sendOfflineNow();FamilyController.syncLastSeen();render();});
         toggle(t("GhostFamily"),t("GhostFamilyInfo"),FamilyController.isGhostFamilyExempt(),()->{FamilyController.setGhostFamilyExempt(!FamilyController.isGhostFamilyExempt());if(FamilyController.shouldHideOnline(currentAccount))FamilyController.sendOfflineNow();FamilyController.syncLastSeen();render();});
         heading("Updates");
+        info(t("FamilyVersion")+" "+FamilyUpdates.VERSION+" · Telegram "+BuildVars.BUILD_VERSION_STRING);
         row(t("Updates"),t("UpdatesInfo"),()->FamilyUpdates.check(this,false));
         toggle(t("UpdateChecks"),t("UpdateChecksInfo"),data.prefs.getBoolean("updates",false),()->{data.prefs.edit().putBoolean("updates",!data.prefs.getBoolean("updates",false)).apply();render();});
     }

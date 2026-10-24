@@ -164,11 +164,11 @@
     <string name="FGGhostFamily" formatted="false">Исключение для семьи</string>
     <string name="FGGhostFamilyInfo" formatted="false">Семья может видеть прочтение, набор текста и онлайн</string>
     <string name="FGUpdates" formatted="false">Обновления FamilyGram</string>
-    <string name="FGUpdatesInfo" formatted="false">Проверить опубликованные APK-релизы в вашем репозитории GitHub</string>
+    <string name="FGUpdatesInfo" formatted="false">Скачивание публичных APK из вашего репозитория GitHub. Номер сборки отличает повторные сборки.</string>
     <string name="FGUpdateChecks" formatted="false">Проверять обновления при открытии приложения</string>
     <string name="FGUpdateChecksInfo" formatted="false">Раз в день; сообщать о новом стабильном APK-релизе</string>
-    <string name="FGNoRelease" formatted="false">Стабильный релиз FamilyGram ещё не опубликован. Артефакты сборок APK и опубликованные релизы — разные вещи.</string>
-    <string name="FGNoApk" formatted="false">В этом релизе нет APK</string>
+    <string name="FGNoRelease" formatted="false">Публичного релиза APK пока нет. Запустите Android APK в GitHub Actions с включённым Publish release, затем проверьте снова. ZIP-артефакты Actions приложение не может скачивать без авторизации.</string>
+    <string name="FGNoApk" formatted="false">В последнем подходящем релизе нет APK. Опубликуйте APK в GitHub Releases.</string>
     <string name="FGUpToDate" formatted="false">Установлена актуальная версия</string>
     <string name="FGUpdateError" formatted="false">Не удалось проверить обновления. Попробуйте позже.</string>
     <string name="FGDownloadApk" formatted="false">Скачать APK</string>
@@ -219,4 +219,23 @@
     <string name="FGParticipantLeft" formatted="false">Вышел</string>
     <string name="FGParticipantWaiting" formatted="false">Ещё не подключился</string>
     <string name="FGParticipantDisconnected" formatted="false">Нет связи — ожидаем</string>
+    <string name="FGsections" formatted="false">Управление разделами</string>
+    <string name="FGManageSectionsInfo" formatted="false">Скрывайте разделы переключателем, закрепляйте любимые звёздочкой и меняйте порядок стрелками. Любимые всегда выше остальных. Настройки действуют только для этого аккаунта.</string>
+    <string name="FGWelcomeTitle" formatted="false">Ваше семейное пространство</string>
+    <string name="FGFavorites" formatted="false">Любимые разделы</string>
+    <string name="FGAllSections" formatted="false">Все разделы</string>
+    <string name="FGNoSections" formatted="false">Все разделы скрыты</string>
+    <string name="FGShowSection" formatted="false">Показывать</string>
+    <string name="FGFavoriteSection" formatted="false">Закрепить в любимых</string>
+    <string name="FGMoveUp" formatted="false">Переместить выше</string>
+    <string name="FGMoveDown" formatted="false">Переместить ниже</string>
+    <string name="FGResetSections" formatted="false">Вернуть исходный порядок разделов</string>
+    <string name="FGBothClientsShort" formatted="false">Какие функции требуют FamilyGram на обоих телефонах?</string>
+    <string name="FGStoriesSection" formatted="false">Истории</string>
+    <string name="FGGhostStories" formatted="false">Скрывать просмотр историй</string>
+    <string name="FGGhostStoriesInfo" formatted="false">Не отправлять отметки просмотра обычных и профильных историй. Семья и половинка видят ваши просмотры. Пока вы не изменили этот переключатель отдельно, он следует настройке скрытия прочтения.</string>
+    <string name="FGFamilyStoriesOnly" formatted="false">Показывать истории только семьи и половинки</string>
+    <string name="FGFamilyStoriesOnlyInfo" formatted="false">Скрыть остальные истории из ленты и запретить их открытие. Свои истории остаются доступны. Это отдельная настройка от скрытия отметок просмотра.</string>
+    <string name="FGFamilyVersion" formatted="false">Версия FamilyGram</string>
+    <string name="FGOpenReleases" formatted="false">Открыть релизы GitHub</string>
 </resources>
