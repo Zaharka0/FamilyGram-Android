@@ -19,7 +19,6 @@ Resources are mirrored as family_icon_N.jpg for legacy launchers; Android 8+
 uses the matching adaptive-icon XML. The transparent foreground is a native
 Android shape resource. All six existing alias component names remain stable.
 
-Personal-photo publishing is blocked pending explicit authorization for this public
-GitHub repository. Public resources currently contain the author icon only and
-family_photo_pack_present=false. The private photo overlay archive is delivered
-separately. Do not publish its contents without the requested authorization.
+The five processed photo icons are included in the public repository with the
+user's explicit approval for Zaharka0/FamilyGram-Android. The build flag
+family_photo_pack_present=true enables all five photo choices and the author mark.
