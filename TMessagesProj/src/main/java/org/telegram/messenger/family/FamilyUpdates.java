@@ -10,12 +10,12 @@ import java.nio.charset.StandardCharsets;
 
 /** Only this repository's public, non-prerelease GitHub Releases are update sources. */
 public final class FamilyUpdates {
-    public static final String VERSION="1.1.0";
+    public static final String VERSION="1.2.0";
     private static final String REPO="Zaharka0/FamilyGram-Android";
     private static boolean checking;
     private FamilyUpdates(){}
     public static void onResume(){
-        if(FamilyPrivacyScreen.enabled())return;BaseFragment f=LaunchActivity.getSafeLastFragment();if(f==null)return;FamilyDataController data=FamilyDataController.getInstance(f.getCurrentAccount());
+        if(FamilyPrivacyScreen.enabled())return;BaseFragment f=LaunchActivity.getSafeLastFragment();if(f==null)return;FamilyDataController data=FamilyDataController.getInstance(f.getCurrentAccount());FamilyPlugins.resume(f.getCurrentAccount());
         if(data.prefs.getBoolean("updates",false)&&System.currentTimeMillis()-data.prefs.getLong("update_check",0)>86400000L)check(f,true);
     }
     public static void check(BaseFragment fragment,boolean quiet){

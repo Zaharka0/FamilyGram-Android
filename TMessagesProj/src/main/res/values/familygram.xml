@@ -238,4 +238,29 @@
     <string name="FGFamilyStoriesOnlyInfo" formatted="false">Hide other stories from the story feed and prevent opening them. Your own stories remain available. This is separate from hiding view receipts.</string>
     <string name="FGFamilyVersion" formatted="false">FamilyGram version</string>
     <string name="FGOpenReleases" formatted="false">Open GitHub Releases</string>
+    <string name="FGIcon1" formatted="false">Kiss</string>
+    <string name="FGIcon2" formatted="false">Smile</string>
+    <string name="FGIcon3" formatted="false">Together</string>
+    <string name="FGIcon4" formatted="false">Tenderness</string>
+    <string name="FGIcon5" formatted="false">Funny faces</string>
+    <string name="FGIcon6" formatted="false">FamilyGram heart</string>
+    <string name="FGBuiltInPhotoIcons" formatted="false">Six bundled launcher icons. Tap a preview to change the main application icon; your launcher may need a few seconds to refresh. All choices are available without Premium.</string>
+    <string name="FGAnimations" formatted="false">FamilyGram animations</string>
+    <string name="FGAnimationsInfo" formatted="false">Soft tile transitions, touch feedback and hearts for hugs. Respects the system animation switch.</string>
+    <string name="FGPlugins" formatted="false">Plugins</string>
+    <string name="FGPluginsInfo" formatted="false">Import trusted Python extensions, enable them and adjust settings.</string>
+    <string name="FGPluginCompatibility" formatted="false">FamilyGram SDK 1: Python 3.11, lifecycle, settings, send and receive events. Supports .py and .plugin files. This is not the full exteraGram SDK: Xposed hooks, Elyx archives and pip packages are not supported.</string>
+    <string name="FGPluginTrust" formatted="false">A plugin runs code with access to this app and account data, and may modify sent messages. Enable only code you trust. Installed or replaced plugins start disabled.</string>
+    <string name="FGEnablePluginEngine" formatted="false">Enable Python plugins</string>
+    <string name="FGImportPlugin" formatted="false">Import plugin file</string>
+    <string name="FGNoPlugins" formatted="false">No plugins installed</string>
+    <string name="FGPluginEnabled" formatted="false">Plugin enabled</string>
+    <string name="FGEnablePluginFirst" formatted="false">Enable the plugin first to open its settings.</string>
+    <string name="FGRemovePlugin" formatted="false">Remove plugin</string>
+    <string name="FGRemove" formatted="false">Remove</string>
+    <string name="FGInstall" formatted="false">Install</string>
+    <string name="FGEnable" formatted="false">Enable</string>
+    <string name="FGPluginTimeout" formatted="false">A plugin timed out. The engine was turned off; your message was passed to Telegram.</string>
+    <string name="FGPluginRecovered" formatted="false">Disabled the plugin active during the previous interruption</string>
+    <string name="FGInstallExamplePlugin" formatted="false">Install example: heart signature</string>
 </resources>

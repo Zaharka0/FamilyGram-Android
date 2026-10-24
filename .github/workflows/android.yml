@@ -99,6 +99,9 @@ jobs:
           BUILD_CODE=$((9000 + GITHUB_RUN_NUMBER))
           sed -i "s/^APP_VERSION_CODE=.*/APP_VERSION_CODE=$BUILD_CODE/" gradle.properties
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
       - name: Build APK.
         run: ./gradlew --no-daemon --stacktrace :TMessagesProj_App:assembleAfatRelease
 

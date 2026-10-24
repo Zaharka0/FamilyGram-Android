@@ -17,10 +17,10 @@ with tempfile.TemporaryDirectory(prefix='familygram-tests-') as output:
         'familygram/tests/FamilyCoreTest.java','familygram/tests/CheckJavaSyntax.java'],check=True)
     subprocess.run([java,'-cp',output,'FamilyCoreTest'],check=True)
     subprocess.run([java,'-cp',output,'FamilySettingsTest'],check=True)
-    modified=['NotificationsController','MediaController','MessageObject','MessagesController','UserConfig','FamilyController']
+    modified=['SendMessagesHelper','NotificationsController','MediaController','MessageObject','MessagesController','UserConfig','FamilyController']
     files=[f'TMessagesProj/src/main/java/org/telegram/messenger/{name}.java' for name in modified]
     files += [str(p) for p in Path('TMessagesProj/src/main/java/org/telegram/messenger/family').glob('*.java')]
-    files += [f'TMessagesProj/src/main/java/org/telegram/ui/{name}.java' for name in ['ChatActivity','LaunchActivity','SettingsActivity','FamilyHubActivity','FamilyWatchActivity','Components/VideoPlayer','Stories/StoriesController','Stories/StoryViewer']]
+    files += [f'TMessagesProj/src/main/java/org/telegram/ui/{name}.java' for name in ['ChatActivity','LaunchActivity','SettingsActivity','FamilyHubActivity','FamilyWatchActivity','Components/VideoPlayer','Stories/StoriesController','Stories/StoryViewer','FamilyPluginsActivity','LauncherIconController','Cells/AppIconsSelectorCell']]
     subprocess.run([java,'-cp',output,'CheckJavaSyntax',*files],check=True)
     update_source=Path('TMessagesProj/src/main/java/org/telegram/messenger/family/FamilyUpdates.java').read_text()
     assert re.search(r'VERSION="([^"]+)"',update_source).group(1)==Path('familygram/VERSION').read_text().strip(),'Update/release version mismatch'
@@ -66,3 +66,18 @@ assert 'default: true\n      abis:' in workflow,'APK release publishing must def
 assert 'TAG="familygram-$VERSION-b$APK_CODE"' in workflow,'Updater release/build tag mismatch'
 assert 'APP_VERSION_CODE=$BUILD_CODE' in workflow,'Update rebuild must increment installed APK code'
 print('Story receipt entry points and release workflow wiring passed')
+
+subprocess.run([sys.executable, 'familygram/tests/test_plugins.py'], check=True)
+# Alias names survive updates, while all six icon files and previews are distinct.
+manifest=ET.parse(ROOT/'TMessagesProj/src/main/AndroidManifest.xml').getroot()
+ns='{http://schemas.android.com/apk/res/android}'
+aliases={node.attrib[ns+'name']:node for node in manifest.find('application').findall('activity-alias')}
+for index,key in enumerate(['DefaultIcon','VintageIcon','AquaIcon','PremiumIcon','TurboIcon','NoxIcon'],1):
+    assert aliases['org.telegram.messenger.'+key].attrib[ns+'icon']=='@mipmap/family_icon_'+str(index)
+    ET.parse(ROOT/f'TMessagesProj/src/main/res/mipmap-anydpi-v26/family_icon_{index}.xml')
+    assert (ROOT/f'TMessagesProj/src/main/res/mipmap-nodpi/family_icon_{index}.jpg').is_file()
+import hashlib
+photo_pack=ET.parse(ROOT/'TMessagesProj/src/main/res/values/family_photo_pack.xml').getroot().find('bool').text=='true'
+hashes={hashlib.sha256((ROOT/f'TMessagesProj/src/main/res/mipmap-nodpi/family_icon_{i}.jpg').read_bytes()).hexdigest() for i in range(1,7)}
+assert len(hashes)==(6 if photo_pack else 1), 'Private photo pack or public author-icon resources mismatch'
+print('Six launcher alias slots, private/public icon packaging and plugin lifecycle tests passed')

@@ -18,6 +18,6 @@ public final class FamilyEffects {
         TextView emoji=new TextView(f.getParentActivity());emoji.setText("🤗");emoji.setTextSize(96);emoji.setGravity(Gravity.CENTER);box.addView(emoji,new LinearLayout.LayoutParams(-1,AndroidUtilities.dp(150)));
         AlertDialog.Builder b=new AlertDialog.Builder(f.getParentActivity()).setTitle(FamilyText.get(reply==null?"HugSent":"HugReceived")).setView(box).setNegativeButton(FamilyText.get("Close"),null);
         if(reply!=null)b.setPositiveButton(FamilyText.get("HugBack"),(d,w)->reply.run());f.showDialog(b.create());
-        emoji.setScaleX(0.25f);emoji.setScaleY(0.25f);emoji.setAlpha(0);emoji.animate().scaleX(1).scaleY(1).alpha(1).setDuration(600).setInterpolator(new android.view.animation.OvershootInterpolator()).start();emoji.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+        if(FamilyMotion.allowed()){FamilyMotion.hearts(emoji);emoji.setScaleX(0.25f);emoji.setScaleY(0.25f);emoji.setAlpha(0);emoji.animate().scaleX(1).scaleY(1).alpha(1).setDuration(600).setInterpolator(new android.view.animation.OvershootInterpolator()).start();}emoji.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
     }
 }

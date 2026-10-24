@@ -117,7 +117,7 @@
             android:enabled="true"
             android:name="org.telegram.messenger.DefaultIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:exported="true">
+            android:exported="true" android:icon="@mipmap/family_icon_1" android:roundIcon="@mipmap/family_icon_1">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -131,9 +131,9 @@
             android:enabled="false"
             android:name="org.telegram.messenger.VintageIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_6_launcher"
-            android:roundIcon="@mipmap/icon_6_launcher_round"
-            android:exported="true">
+
+
+            android:exported="true" android:icon="@mipmap/family_icon_2" android:roundIcon="@mipmap/family_icon_2">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -147,9 +147,9 @@
             android:enabled="false"
             android:name="org.telegram.messenger.AquaIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_4_launcher"
-            android:roundIcon="@mipmap/icon_4_launcher_round"
-            android:exported="true">
+
+
+            android:exported="true" android:icon="@mipmap/family_icon_3" android:roundIcon="@mipmap/family_icon_3">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -163,9 +163,9 @@
             android:enabled="false"
             android:name="org.telegram.messenger.PremiumIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_3_launcher"
-            android:roundIcon="@mipmap/icon_3_launcher_round"
-            android:exported="true">
+
+
+            android:exported="true" android:icon="@mipmap/family_icon_4" android:roundIcon="@mipmap/family_icon_4">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -179,9 +179,9 @@
             android:enabled="false"
             android:name="org.telegram.messenger.TurboIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_5_launcher"
-            android:roundIcon="@mipmap/icon_5_launcher_round"
-            android:exported="true">
+
+
+            android:exported="true" android:icon="@mipmap/family_icon_5" android:roundIcon="@mipmap/family_icon_5">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -195,9 +195,9 @@
             android:enabled="false"
             android:name="org.telegram.messenger.NoxIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
-            android:icon="@mipmap/icon_2_launcher"
-            android:roundIcon="@mipmap/icon_2_launcher_round"
-            android:exported="true">
+
+
+            android:exported="true" android:icon="@mipmap/family_icon_6" android:roundIcon="@mipmap/family_icon_6">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

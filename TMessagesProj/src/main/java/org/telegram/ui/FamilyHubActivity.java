@@ -35,6 +35,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     private ScrollView scroll;
     private EditText search;
     private boolean refreshed;
+    private boolean animateNext=true,changingPage,hasResumed;private int motionIndex;
     private final FamilyTapGuard taps=new FamilyTapGuard();
     private ArrayList<MessageObject> voiceQueue;
     private final ArrayList<String> billDraft = new ArrayList<>();
@@ -61,16 +62,16 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         LinearLayout root=new LinearLayout(context);root.setOrientation(LinearLayout.VERTICAL);root.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
         search=new EditText(context);search.setSingleLine(true);search.setTextSize(16);search.setHint(t("Search"));search.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));search.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));search.setPadding(dp(16),dp(10),dp(16),dp(10));
         GradientDrawable searchBg=new GradientDrawable();searchBg.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));searchBg.setCornerRadius(dp(16));search.setBackground(searchBg);
-        search.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){query=s.toString().trim().toLowerCase(Locale.ROOT);render();}public void afterTextChanged(Editable e){}});
+        search.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int c,int a){}public void onTextChanged(CharSequence s,int st,int before,int count){if(changingPage)return;query=s.toString().trim().toLowerCase(Locale.ROOT);render();}public void afterTextChanged(Editable e){}});
         LinearLayout.LayoutParams searchParams=new LinearLayout.LayoutParams(-1,dp(50));searchParams.setMargins(dp(12),dp(10),dp(12),dp(6));root.addView(search,searchParams);
         scroll=new ScrollView(context);scroll.setFillViewport(true);body=new LinearLayout(context);body.setOrientation(LinearLayout.VERTICAL);body.setPadding(dp(12),dp(8),dp(12),dp(24));scroll.addView(body,new ScrollView.LayoutParams(-1,-2));root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));fragmentView=root;render();return root;
     }
-    @Override public void onResume(){super.onResume();render();if(!refreshed&&dialog!=0){refreshed=true;data.sync(dialog,false);}}
+    @Override public void onResume(){super.onResume();if(!hasResumed){animateNext=true;hasResumed=true;}render();if(!refreshed&&dialog!=0){refreshed=true;data.sync(dialog,false);}}
     @Override public boolean onBackPressed(boolean invoked){if(!page.equals("home")){open("home");return false;}return true;}
     @Override public void changed(long changed){if(changed==0||changed==dialog){loadBillDraft();render();}}
-    private void open(String name){page=name;visibleLimit=80;query="";if(search!=null)search.setText("");render();if(scroll!=null)scroll.smoothScrollTo(0,0);}
+    private void open(String name){animateNext=true;page=name;visibleLimit=80;query="";if(search!=null){changingPage=true;search.setText("");changingPage=false;}render();if(scroll!=null)scroll.smoothScrollTo(0,0);}
     private void render(){
-        if(body==null||getParentActivity()==null)return;int y=scroll.getScrollY();body.removeAllViews();
+        if(body==null||getParentActivity()==null)return;int y=scroll.getScrollY();body.removeAllViews();motionIndex=0;
         actionBar.setTitle(page.equals("home")?t("Title"):t(page));
         if(dialog!=0&&!page.equals("home")&&!page.equals("sections"))row(name(dialog),t("ChooseChat"),()->chooseChat(false));
         if(page.equals("sections")){manageSections();restoreScroll(y);return;}
@@ -93,7 +94,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
             text(hero,dialog==0?t("WorkspaceIntro"):data.daysTogether()>0?data.daysTogether()+" "+t("DaysTogether"):t("WorkspaceIntro"),false);
             button(hero,t("ChooseChat"),()->chooseChat(false));
             LinearLayout shortcuts=new LinearLayout(getParentActivity());shortcuts.setOrientation(LinearLayout.HORIZONTAL);body.addView(shortcuts,new LinearLayout.LayoutParams(-1,-2));
-            quick(shortcuts,"⚙",t("settings"),()->open("settings"));quick(shortcuts,"☷",t("sections"),()->open("sections"));quick(shortcuts,"↻",t("Updates"),()->FamilyUpdates.check(this,false));
+            quick(shortcuts,"⚙",t("settings"),()->open("settings"));quick(shortcuts,"☷",t("sections"),()->open("sections"));quick(shortcuts,"↻",t("Updates"),()->FamilyUpdates.check(this,false));quick(shortcuts,"🧩",t("Plugins"),()->presentFragment(new FamilyPluginsActivity(currentAccount)));
         }
         if(dialog==0){if(!query.isEmpty())settings();return;}
         List<String> visible=FamilySections.visible(data.prefs.getString("section_order",""),data.prefs.getString("section_hidden",""),data.prefs.getString("section_favorites","hug,tasks,calendar"));
@@ -119,7 +120,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
     private void tile(LinearLayout parent,String section,boolean favorite){
         LinearLayout box=new LinearLayout(getParentActivity());box.setOrientation(LinearLayout.VERTICAL);box.setPadding(dp(14),dp(14),dp(14),dp(14));GradientDrawable background=new GradientDrawable();background.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));background.setCornerRadius(dp(18));box.setBackground(background);
         TextView icon=text(box,symbol(t(section))+(favorite?"  ★":""),false);icon.setTextSize(24);text(box,t(section),true);TextView description=text(box,t(section+"Info"),false);description.setMaxLines(3);description.setEllipsize(TextUtils.TruncateAt.END);box.setMinimumHeight(dp(160));box.setFocusable(true);box.setContentDescription(t(section)+". "+t(section+"Info"));box.setOnClickListener(v->tap(section,()->open(section)));
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(dp(4),dp(4),dp(4),dp(4));parent.addView(box,lp);
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(dp(4),dp(4),dp(4),dp(4));parent.addView(box,lp);FamilyMotion.press(box);if(animateNext)FamilyMotion.enter(box,motionIndex++);
     }
     private void manageSections(){
         info(t("ManageSectionsInfo"));
@@ -139,7 +140,7 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         TextView control=new TextView(getParentActivity());control.setText(label);control.setTextSize(22);control.setGravity(Gravity.CENTER);control.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));control.setContentDescription(description);control.setEnabled(enabled);control.setAlpha(enabled?1f:0.3f);control.setOnClickListener(v->tap(description,action));parent.addView(control,new LinearLayout.LayoutParams(dp(48),dp(48)));
     }
     private void saveSectionSet(String key,Set<String> values){data.prefs.edit().putString(key,TextUtils.join(",",values)).apply();}
-    private void restoreScroll(int y){scroll.post(()->scroll.scrollTo(0,y));}
+    private void restoreScroll(int y){animateNext=false;scroll.post(()->scroll.scrollTo(0,y));}
     private boolean matches(String text){return query.isEmpty()||text.toLowerCase(Locale.ROOT).contains(query);}
     private LinearLayout card(){
         LinearLayout v=new LinearLayout(getParentActivity());v.setOrientation(LinearLayout.VERTICAL);v.setPadding(dp(16),dp(12),dp(16),dp(12));
@@ -331,6 +332,8 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         Switch control=new Switch(getParentActivity());control.setChecked(checked);control.setContentDescription(title);line.addView(control,new LinearLayout.LayoutParams(-2,dp(48)));control.setOnClickListener(v->tap(title,action));c.setOnClickListener(v->tap(title,action));
     }
     private void settings(){
+        row(t("Plugins"),t("PluginsInfo"),()->presentFragment(new FamilyPluginsActivity(currentAccount)));
+        toggle(t("Animations"),t("AnimationsInfo"),FamilyMotion.enabled(),()->{FamilyMotion.setEnabled(!FamilyMotion.enabled());render();});
         row(t("sections"),t("ManageSectionsInfo"),()->open("sections"));
         heading("PersonalSection");
         row(t("Partner"),data.partner()==0?t("ChoosePartnerInfo"):name(data.partner()),()->chooseChat(true));
@@ -358,8 +361,14 @@ public class FamilyHubActivity extends BaseFragment implements FamilyDataControl
         toggle(t("UpdateChecks"),t("UpdateChecksInfo"),data.prefs.getBoolean("updates",false),()->{data.prefs.edit().putBoolean("updates",!data.prefs.getBoolean("updates",false)).apply();render();});
     }
     private void icons(){
-        info(t("IconPhotoInfo"));row(t("AddPhotoShortcut"),t("ShortcutInfo"),()->pickPhoto(PICK_SHORTCUT_PHOTO));
-        for(LauncherIconController.LauncherIcon icon:LauncherIconController.LauncherIcon.values())row((LauncherIconController.isEnabled(icon)?"✓ ":"")+LocaleController.getString(icon.title),t("BuiltInIcon"),()->{LauncherIconController.setIcon(icon);render();});
+        info(t("BuiltInPhotoIcons"));
+        LinearLayout line=null;int column=0;
+        for(LauncherIconController.LauncherIcon icon:LauncherIconController.availableIcons()){
+            if(column==0){line=new LinearLayout(getParentActivity());line.setOrientation(LinearLayout.HORIZONTAL);body.addView(line,new LinearLayout.LayoutParams(-1,-2));line.setWeightSum(2);}
+            LinearLayout box=new LinearLayout(getParentActivity());box.setOrientation(LinearLayout.VERTICAL);box.setPadding(dp(12),dp(12),dp(12),dp(12));box.setBackground(Theme.createRoundRectDrawable(dp(16),Theme.getColor(Theme.key_windowBackgroundWhite)));
+            ImageView preview=new ImageView(getParentActivity());preview.setImageResource(icon.background);preview.setScaleType(ImageView.ScaleType.CENTER_CROP);box.addView(preview,new LinearLayout.LayoutParams(-1,dp(128)));text(box,(LauncherIconController.isEnabled(icon)?"✓ ":"")+icon.getTitle(),true);box.setContentDescription(icon.getTitle());box.setFocusable(true);box.setOnClickListener(v->tap(icon.key,()->{LauncherIconController.setIcon(icon);render();}));FamilyMotion.press(box);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.setMargins(dp(4),dp(4),dp(4),dp(4));line.addView(box,lp);if(animateNext)FamilyMotion.enter(box,motionIndex++);column=(column+1)%2;
+        }
+        row(t("AddPhotoShortcut"),t("ShortcutInfo"),()->pickPhoto(PICK_SHORTCUT_PHOTO));
     }
     private void widget(){
         if(data.partner()==0){row(t("Partner"),t("ChoosePartnerInfo"),()->chooseChat(true));return;}

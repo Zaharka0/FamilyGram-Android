@@ -136,6 +136,7 @@ public final class FamilyDataController implements NotificationCenter.Notificati
     }
     /** Safe to call from Telegram's incoming-message path; no sending occurs here except mutual question reveal. */
     public void ingest(MessageObject object) {
+        if(object!=null)FamilyPlugins.incoming(account,object);
         if (object != null) ingest(object.messageOwner, true);
     }
     public void ingest(TLRPC.Message message) { ingest(message, false); }

@@ -238,4 +238,29 @@
     <string name="FGFamilyStoriesOnlyInfo" formatted="false">Скрыть остальные истории из ленты и запретить их открытие. Свои истории остаются доступны. Это отдельная настройка от скрытия отметок просмотра.</string>
     <string name="FGFamilyVersion" formatted="false">Версия FamilyGram</string>
     <string name="FGOpenReleases" formatted="false">Открыть релизы GitHub</string>
+    <string name="FGIcon1" formatted="false">Поцелуй</string>
+    <string name="FGIcon2" formatted="false">Улыбка</string>
+    <string name="FGIcon3" formatted="false">Вместе</string>
+    <string name="FGIcon4" formatted="false">Нежность</string>
+    <string name="FGIcon5" formatted="false">Смешной кадр</string>
+    <string name="FGIcon6" formatted="false">Сердце FamilyGram</string>
+    <string name="FGBuiltInPhotoIcons" formatted="false">Шесть встроенных иконок. Нажмите на превью, чтобы изменить основную иконку приложения; лаунчеру может понадобиться несколько секунд. Все варианты доступны без Premium.</string>
+    <string name="FGAnimations" formatted="false">Анимации FamilyGram</string>
+    <string name="FGAnimationsInfo" formatted="false">Плавное появление плиток, отклик на нажатия и сердечки для объятий. Учитывается системное отключение анимаций.</string>
+    <string name="FGPlugins" formatted="false">Плагины</string>
+    <string name="FGPluginsInfo" formatted="false">Импорт Python-плагинов, включение и настройки.</string>
+    <string name="FGPluginCompatibility" formatted="false">FamilyGram SDK 1: Python 3.11, запуск, настройки, события отправки и получения. Форматы .py и .plugin. Это не полный SDK exteraGram: Xposed-перехваты, архивы Elyx и pip-пакеты не поддерживаются.</string>
+    <string name="FGPluginTrust" formatted="false">Плагин запускает код с доступом к приложению и данным аккаунта и может изменять отправляемые сообщения. Включайте только код, которому доверяете. Новый или заменённый плагин устанавливается выключенным.</string>
+    <string name="FGEnablePluginEngine" formatted="false">Включить Python-плагины</string>
+    <string name="FGImportPlugin" formatted="false">Импортировать файл плагина</string>
+    <string name="FGNoPlugins" formatted="false">Плагины ещё не установлены</string>
+    <string name="FGPluginEnabled" formatted="false">Плагин включён</string>
+    <string name="FGEnablePluginFirst" formatted="false">Сначала включите плагин, чтобы открыть его настройки.</string>
+    <string name="FGRemovePlugin" formatted="false">Удалить плагин</string>
+    <string name="FGRemove" formatted="false">Удалить</string>
+    <string name="FGInstall" formatted="false">Установить</string>
+    <string name="FGEnable" formatted="false">Включить</string>
+    <string name="FGPluginTimeout" formatted="false">Плагин не ответил вовремя. Движок выключен; сообщение передано Telegram.</string>
+    <string name="FGPluginRecovered" formatted="false">Отключён плагин, работавший при предыдущем сбое</string>
+    <string name="FGInstallExamplePlugin" formatted="false">Установить пример: подпись с сердцем</string>
 </resources>

@@ -236,3 +236,28 @@ FamilyStoriesOnly	Show only family stories	Показывать истории �
 FamilyStoriesOnlyInfo	Hide other stories from the story feed and prevent opening them. Your own stories remain available. This is separate from hiding view receipts.	Скрыть остальные истории из ленты и запретить их открытие. Свои истории остаются доступны. Это отдельная настройка от скрытия отметок просмотра.
 FamilyVersion	FamilyGram version	Версия FamilyGram
 OpenReleases	Open GitHub Releases	Открыть релизы GitHub
+Icon1	Kiss	Поцелуй
+Icon2	Smile	Улыбка
+Icon3	Together	Вместе
+Icon4	Tenderness	Нежность
+Icon5	Funny faces	Смешной кадр
+Icon6	FamilyGram heart	Сердце FamilyGram
+BuiltInPhotoIcons	Six bundled launcher icons. Tap a preview to change the main application icon; your launcher may need a few seconds to refresh. All choices are available without Premium.	Шесть встроенных иконок. Нажмите на превью, чтобы изменить основную иконку приложения; лаунчеру может понадобиться несколько секунд. Все варианты доступны без Premium.
+Animations	FamilyGram animations	Анимации FamilyGram
+AnimationsInfo	Soft tile transitions, touch feedback and hearts for hugs. Respects the system animation switch.	Плавное появление плиток, отклик на нажатия и сердечки для объятий. Учитывается системное отключение анимаций.
+Plugins	Plugins	Плагины
+PluginsInfo	Import trusted Python extensions, enable them and adjust settings.	Импорт Python-плагинов, включение и настройки.
+PluginCompatibility	FamilyGram SDK 1: Python 3.11, lifecycle, settings, send and receive events. Supports .py and .plugin files. This is not the full exteraGram SDK: Xposed hooks, Elyx archives and pip packages are not supported.	FamilyGram SDK 1: Python 3.11, запуск, настройки, события отправки и получения. Форматы .py и .plugin. Это не полный SDK exteraGram: Xposed-перехваты, архивы Elyx и pip-пакеты не поддерживаются.
+PluginTrust	A plugin runs code with access to this app and account data, and may modify sent messages. Enable only code you trust. Installed or replaced plugins start disabled.	Плагин запускает код с доступом к приложению и данным аккаунта и может изменять отправляемые сообщения. Включайте только код, которому доверяете. Новый или заменённый плагин устанавливается выключенным.
+EnablePluginEngine	Enable Python plugins	Включить Python-плагины
+ImportPlugin	Import plugin file	Импортировать файл плагина
+NoPlugins	No plugins installed	Плагины ещё не установлены
+PluginEnabled	Plugin enabled	Плагин включён
+EnablePluginFirst	Enable the plugin first to open its settings.	Сначала включите плагин, чтобы открыть его настройки.
+RemovePlugin	Remove plugin	Удалить плагин
+Remove	Remove	Удалить
+Install	Install	Установить
+Enable	Enable	Включить
+PluginTimeout	A plugin timed out. The engine was turned off; your message was passed to Telegram.	Плагин не ответил вовремя. Движок выключен; сообщение передано Telegram.
+PluginRecovered	Disabled the plugin active during the previous interruption	Отключён плагин, работавший при предыдущем сбое
+InstallExamplePlugin	Install example: heart signature	Установить пример: подпись с сердцем
