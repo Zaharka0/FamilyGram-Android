@@ -1,6 +1,7 @@
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 apply plugin: 'com.android.library'
+apply plugin: 'com.chaquo.python'
 apply plugin: 'org.telegram.build-plugin'
 apply plugin: 'idea'
 
@@ -135,7 +136,8 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 23
+        ndk { abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64" }
+        minSdkVersion 24
         targetSdkVersion 36
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
@@ -268,3 +270,10 @@ task checkVisibility {
 }
 
 preBuild.dependsOn checkVisibility
+
+// One Python runtime in the shared library, used by every FamilyGram APK variant.
+chaquopy {
+    defaultConfig {
+        version = "3.11"
+    }
+}

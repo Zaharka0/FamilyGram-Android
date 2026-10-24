@@ -1938,6 +1938,10 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public boolean hasDoubleTap(View view, int position) {
             if (isQuickRepliesOrWelcomeMessagesMode()) return false;
+            if (org.telegram.messenger.family.FamilyActions.hasPairReactions(currentAccount,dialog_id) && view instanceof ChatMessageCell) {
+                MessageObject pairMessage=((ChatMessageCell)view).getPrimaryMessageObject();
+                return pairMessage!=null&&pairMessage.getId()>0&&!pairMessage.isSending()&&!pairMessage.isEditing()&&pairMessage.canSetReaction()&&!actionBar.isActionModeShowed()&&!isSecretChat()&&!isInScheduleMode()&&!pairMessage.isSponsored();
+            }
             String reactionStringSetting = getMediaDataController().getDoubleTapReaction();
             TLRPC.TL_availableReaction reaction = getMediaDataController().getReactionsMap().get(reactionStringSetting);
             if (reaction == null && (reactionStringSetting == null || !reactionStringSetting.startsWith("animated_"))) {
@@ -1984,6 +1988,10 @@ public class ChatActivity extends BaseFragment implements
                 return;
             }
 
+            if (org.telegram.messenger.family.FamilyActions.hasPairReactions(currentAccount,dialog_id)) {
+                org.telegram.messenger.family.FamilyActions.randomReaction(messageObject,ChatActivity.this);
+                return;
+            }
             ReactionsEffectOverlay.removeCurrent(false);
             String reactionString = getMediaDataController().getDoubleTapReaction();
             if (reactionString.startsWith("animated_")) {
@@ -2712,8 +2720,18 @@ public class ChatActivity extends BaseFragment implements
 
     private NotificationCenter.ObserversGroup observersGroup;
 
+    private final org.telegram.messenger.family.FamilyDataController.Listener familyHubListener = changedDialog -> {
+        if (changedDialog != dialog_id || fragmentView == null) return;
+        for (MessageObject message : messages) {
+            if (message.messageOwner != null && org.telegram.messenger.family.FamilyCore.fromMessage(message.messageOwner.message) != null) {
+                message.updateMessageText(); message.measureInlineBotButtons(); message.forceUpdate = true;
+            }
+        }
+        updateVisibleRows();
+    };
     @Override
     public boolean onFragmentCreate() {
+        if (getUserConfig().isClientActivated()) org.telegram.messenger.family.FamilyDataController.getInstance(currentAccount).addListener(familyHubListener);
         final long chatId = arguments.getLong("chat_id", 0);
         final long userId = arguments.getLong("user_id", 0);
         final int encId = arguments.getInt("enc_id", 0);
@@ -3401,6 +3419,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        org.telegram.messenger.family.FamilyDataController.removeListener(currentAccount, familyHubListener);
         super.onFragmentDestroy();
         if (messageMetricsView != null) {
             messageMetricsView.finish();
@@ -3952,6 +3971,10 @@ public class ChatActivity extends BaseFragment implements
                     }
                 } else if (id == report) {
                     ReportBottomSheet.openChat(ChatActivity.this);
+                } else if (id == org.telegram.messenger.family.FamilyActions.HUB) {
+                    presentFragment(FamilyHubActivity.create(currentAccount, dialog_id, "home"));
+                } else if (id == org.telegram.messenger.family.FamilyActions.PRIVATE) {
+                    org.telegram.messenger.family.FamilyPrivacyScreen.toggle(getParentActivity());
                 } else if (id == star) {
                     for (int a = 0; a < 2; a++) {
                         for (int b = 0; b < selectedMessagesCanStarIds[a].size(); b++) {
@@ -4344,6 +4367,10 @@ public class ChatActivity extends BaseFragment implements
                 userFull = getMessagesController().getUserFull(currentUser.id);
             }
             headerItem = menu.addItem(chat_menu_options, otherIcon);
+            if (dialog_id != getUserConfig().getClientUserId() && !DialogObject.isEncryptedDialog(dialog_id)) {
+                headerItem.addSubItem(org.telegram.messenger.family.FamilyActions.HUB, R.drawable.msg_fave, "FamilyGram");
+                headerItem.addSubItem(org.telegram.messenger.family.FamilyActions.PRIVATE, R.drawable.msg_fave, org.telegram.messenger.family.FamilyText.get("PrivateScreen"));
+            }
             headerItem.setSubMenuDelegate(new ActionBarMenuItem.ActionBarSubMenuItemDelegate() {
                 @Override
                 public void onShowSubMenu() {
@@ -21197,7 +21224,7 @@ public class ChatActivity extends BaseFragment implements
             }
 
             TLRPC.MessageAction action = obj.messageOwner.action;
-            if (obj.type < 0 || loadIndex == 1 && action instanceof TLRPC.TL_messageActionChatMigrateTo) {
+            if (org.telegram.messenger.family.FamilyCards.hidden(obj) || obj.type < 0 || loadIndex == 1 && action instanceof TLRPC.TL_messageActionChatMigrateTo) {
                 continue;
             }
 
@@ -25721,7 +25748,7 @@ public class ChatActivity extends BaseFragment implements
                     scrollToLastMessage(true, false);
                     return;
                 }
-                if (obj.type < 0 || messagesDict[0].indexOfKey(messageId) >= 0) {
+                if (org.telegram.messenger.family.FamilyCards.hidden(obj) || obj.type < 0 || messagesDict[0].indexOfKey(messageId) >= 0) {
                     continue;
                 }
                 if (currentChat != null && currentChat.creator && (!ChatObject.isChannel(currentChat) || currentChat.megagroup) && (action instanceof TLRPC.TL_messageActionChatCreate || action instanceof TLRPC.TL_messageActionChatEditPhoto && messages.size() < 2)) {
@@ -25857,7 +25884,7 @@ public class ChatActivity extends BaseFragment implements
                 if (avatarContainer != null && currentEncryptedChat != null && action instanceof TLRPC.TL_messageEncryptedAction && action.encryptedAction instanceof TLRPC.TL_decryptedMessageActionSetMessageTTL) {
                     avatarContainer.setTime(action.encryptedAction.ttl_seconds, true);
                 }
-                if (obj.type < 0 || messagesDict[0].indexOfKey(messageId) >= 0) {
+                if (org.telegram.messenger.family.FamilyCards.hidden(obj) || obj.type < 0 || messagesDict[0].indexOfKey(messageId) >= 0) {
                     continue;
                 }
                 if (currentChat != null && currentChat.creator && (!ChatObject.isChannel(currentChat) || currentChat.megagroup) && (action instanceof TLRPC.TL_messageActionChatCreate || action instanceof TLRPC.TL_messageActionChatEditPhoto && messages.size() < 2)) {
@@ -33424,6 +33451,21 @@ public class ChatActivity extends BaseFragment implements
             return;
         }
         boolean preserveDim = false;
+        if (option == org.telegram.messenger.family.FamilyActions.OURS) {
+            try { org.telegram.messenger.family.FamilyDataController.getInstance(currentAccount).bookmark(selectedObject); } catch (Exception e) { android.widget.Toast.makeText(getParentActivity(), e.getMessage(), android.widget.Toast.LENGTH_LONG).show(); }
+            return;
+        } else if (option == org.telegram.messenger.family.FamilyActions.EVENT) {
+            FamilyHubActivity hub = FamilyHubActivity.create(currentAccount, dialog_id, "calendar");
+            final MessageObject source = selectedObject;
+            presentFragment(hub);
+            AndroidUtilities.runOnUIThread(() -> { if (hub.getParentActivity() != null) hub.eventFromMessage(source); }, 350);
+            return;
+        } else if (option == org.telegram.messenger.family.FamilyActions.WATCH) {
+            presentFragment(new FamilyWatchActivity(currentAccount,dialog_id,org.telegram.messenger.family.FamilyDataController.newId(),selectedObject,true));return;
+        } else if (option == org.telegram.messenger.family.FamilyActions.REACT) {
+            org.telegram.messenger.family.FamilyActions.randomReaction(selectedObject, this);
+            return;
+        }
         switch (option) {
             case OPTION_RETRY: {
                 final MessageObject object = selectedObject;
@@ -40135,6 +40177,17 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         public void didPressCustomBotButton(ChatMessageCell cell, BotInlineKeyboard.ButtonCustom button) {
+            if (button.id == org.telegram.messenger.family.FamilyActions.OURS) {
+                try { org.telegram.messenger.family.FamilyDataController.getInstance(currentAccount).bookmark(cell.getMessageObject()); } catch (Exception e) { android.widget.Toast.makeText(getParentActivity(), e.getMessage(), android.widget.Toast.LENGTH_LONG).show(); }
+                return;
+            }
+            if (button.id == org.telegram.messenger.family.FamilyActions.REACT) {
+                org.telegram.messenger.family.FamilyActions.randomReaction(cell.getMessageObject(), ChatActivity.this);return;
+            }
+            if (button.id == org.telegram.messenger.family.FamilyActions.INLINE) {
+                org.telegram.messenger.family.FamilyActions.inline(ChatActivity.this, cell.getMessageObject());
+                return;
+            }
             final MessageObject messageObject = cell.getMessageObject();
             if (messageObject == null) {
                 return;
@@ -46353,6 +46406,14 @@ public class ChatActivity extends BaseFragment implements
                     && !message.isExpiredStory()
                     && message.type != MessageObject.TYPE_STORY_MENTION
                     && message.type != MessageObject.TYPE_GIFT_STARS;
+                if (canForward && selectedObject.getId() > 0 && !DialogObject.isEncryptedDialog(dialog_id) && selectedObject.messageOwner.ttl_period == 0 && (selectedObject.messageOwner.media == null || selectedObject.messageOwner.media.ttl_seconds == 0)) {
+                    items.add(org.telegram.messenger.family.FamilyText.get("AddToOurs")); options.add(org.telegram.messenger.family.FamilyActions.OURS); icons.add(R.drawable.msg_fave);
+                    items.add(org.telegram.messenger.family.FamilyText.get("AddEvent")); options.add(org.telegram.messenger.family.FamilyActions.EVENT); icons.add(R.drawable.msg_fave);
+                    if (dialog_id == org.telegram.messenger.family.FamilyDataController.getInstance(currentAccount).partner()) {
+                        if(selectedObject.isVideo()) { items.add(org.telegram.messenger.family.FamilyText.get("watch"));options.add(org.telegram.messenger.family.FamilyActions.WATCH);icons.add(R.drawable.msg_fave); }
+                        items.add(org.telegram.messenger.family.FamilyText.get("QuickReaction")); options.add(org.telegram.messenger.family.FamilyActions.REACT); icons.add(R.drawable.msg_fave);
+                    }
+                }
                 if (canForward) {
                     items.add(LocaleController.getString(R.string.Forward));
                     options.add(OPTION_FORWARD);

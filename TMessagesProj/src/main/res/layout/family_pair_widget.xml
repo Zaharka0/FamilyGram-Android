@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/family_widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="horizontal" android:gravity="center_vertical" android:padding="16dp" android:background="#202638">
+    <ImageView android:id="@+id/family_widget_photo" android:layout_width="72dp" android:layout_height="72dp" android:scaleType="centerCrop" android:contentDescription="@string/FGWidgetPhotoInfo" />
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="16dp" android:paddingEnd="4dp">
+        <TextView android:id="@+id/family_widget_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" android:maxLines="2" android:ellipsize="end" />
+        <TextView android:id="@+id/family_widget_days" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#D1D6E4" android:textSize="14sp" android:layout_marginTop="6dp" />
+    </LinearLayout>
+</LinearLayout>

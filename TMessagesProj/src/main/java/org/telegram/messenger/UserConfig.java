@@ -459,6 +459,8 @@ public class UserConfig extends BaseController {
     }
 
     public void clearConfig() {
+        org.telegram.messenger.family.FamilyPlugins.logout(currentAccount);
+        org.telegram.messenger.family.FamilyDataController.logout(currentAccount);
         getPreferences().edit().clear().apply();
 
         sharingMyLocationUntil = 0;

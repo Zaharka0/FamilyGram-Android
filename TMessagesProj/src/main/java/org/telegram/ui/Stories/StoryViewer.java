@@ -372,7 +372,18 @@ public class StoryViewer implements NotificationCenter.NotificationCenterDelegat
     public void open(Context context, TL_stories.StoryItem storyItem, ArrayList<Long> peerIds, int position, StoriesController.StoriesList storiesList, TL_stories.PeerStories userStories, PlaceProvider placeProvider, boolean reversed) {
         open(UserConfig.selectedAccount, context, storyItem, peerIds, position, storiesList, userStories, placeProvider, reversed);
     }
-    public void open(int account, Context context, TL_stories.StoryItem storyItem, ArrayList<Long> peerIds, int position, StoriesController.StoriesList storiesList, TL_stories.PeerStories userStories, PlaceProvider placeProvider, boolean reversed) {
+    public void open(int account, Context context, TL_stories.StoryItem storyItem, ArrayList<Long> incomingPeers, int incomingPosition, StoriesController.StoriesList storiesList, TL_stories.PeerStories userStories, PlaceProvider placeProvider, boolean reversed) {
+        long selectedPeer=incomingPeers!=null&&incomingPosition>=0&&incomingPosition<incomingPeers.size()?incomingPeers.get(incomingPosition):storyItem!=null?storyItem.dialogId:0;
+        if(selectedPeer!=0&&!org.telegram.messenger.FamilyController.shouldShowStories(account,selectedPeer)){
+            doOnAnimationReadyRunnables.clear();return;
+        }
+        final ArrayList<Long> peerIds;
+        final int position;
+        if(incomingPeers!=null&&org.telegram.messenger.FamilyController.isFamilyStoriesOnly()){
+            peerIds=new ArrayList<>();
+            for(Long peer:incomingPeers)if(org.telegram.messenger.FamilyController.shouldShowStories(account,peer))peerIds.add(peer);
+            position=peerIds.indexOf(selectedPeer);if(position<0)return;
+        }else{peerIds=incomingPeers;position=incomingPosition;}
         if (!isContextSafe(context)) {
             doOnAnimationReadyRunnables.clear();
             return;

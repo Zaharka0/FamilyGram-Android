@@ -247,6 +247,7 @@ public class StoriesController {
     }
 
     public boolean hasStories(long dialogId) {
+        if(!org.telegram.messenger.FamilyController.shouldShowStories(currentAccount,dialogId))return false;
         if (dialogId == 0) {
             return false;
         }
@@ -280,7 +281,7 @@ public class StoriesController {
     }
 
     public boolean hasStories() {
-        return (dialogListStories != null && dialogListStories.size() > 0) || hasSelfStories();
+        return !getDialogListStories().isEmpty() || hasSelfStories();
     }
 
     public void loadStories() {
@@ -674,9 +675,15 @@ public class StoriesController {
     }
 
     public ArrayList<TL_stories.PeerStories> getDialogListStories() {
-        return dialogListStories;
+        return familyVisibleStories(dialogListStories);
     }
 
+    private ArrayList<TL_stories.PeerStories> familyVisibleStories(ArrayList<TL_stories.PeerStories> source){
+        if(!org.telegram.messenger.FamilyController.isFamilyStoriesOnly())return source;
+        ArrayList<TL_stories.PeerStories> visible=new ArrayList<>();
+        for(TL_stories.PeerStories peer:source)if(org.telegram.messenger.FamilyController.shouldShowStories(currentAccount,DialogObject.getPeerDialogId(peer.peer)))visible.add(peer);
+        return visible;
+    }
     public TL_stories.PeerStories getStories(long peerId) {
         return allStoriesMap.get(peerId);
     }
@@ -1283,6 +1290,7 @@ public class StoriesController {
             return false;
         }
         final long dialogId = DialogObject.getPeerDialogId(userStories.peer);
+        if(org.telegram.messenger.FamilyController.shouldHideStoryView(currentAccount,dialogId))return false;
         if (storyItem.justUploaded) {
             storyItem.justUploaded = false;
         }
@@ -1335,6 +1343,7 @@ public class StoriesController {
     }
 
     public boolean hasUnreadStories(long dialogId) {
+        if(!org.telegram.messenger.FamilyController.shouldShowStories(currentAccount,dialogId))return false;
         TL_stories.PeerStories userStories = allStoriesMap.get(dialogId);
         if (userStories == null) {
             userStories = getStoriesFromFullPeer(dialogId);
@@ -1361,6 +1370,7 @@ public class StoriesController {
     }
 
     public int hasUnreadStoriesLive(long dialogId) {
+        if(!org.telegram.messenger.FamilyController.shouldShowStories(currentAccount,dialogId))return 0;
         TL_stories.PeerStories userStories = allStoriesMap.get(dialogId);
         if (userStories == null) {
             userStories = getStoriesFromFullPeer(dialogId);
@@ -1676,10 +1686,11 @@ public class StoriesController {
     }
 
     public ArrayList<TL_stories.PeerStories> getHiddenList() {
-        return hiddenListStories;
+        return familyVisibleStories(hiddenListStories);
     }
 
     public int getUnreadStoriesCount(long dialogId) {
+        if(!org.telegram.messenger.FamilyController.shouldShowStories(currentAccount,dialogId))return 0;
         TL_stories.PeerStories userStories = allStoriesMap.get(dialogId);
         for (int i = 0; i < userStories.stories.size(); i++) {
             if (userStories.max_read_id < userStories.stories.get(i).id) {
@@ -1747,7 +1758,7 @@ public class StoriesController {
     }
 
     public boolean hasHiddenStories() {
-        return !hiddenListStories.isEmpty();
+        return !getHiddenList().isEmpty();
     }
 
     public void checkExpiredStories() {
@@ -2752,6 +2763,7 @@ public class StoriesController {
 
         @Override
         protected boolean markAsRead(int storyId) {
+            if(org.telegram.messenger.FamilyController.shouldHideStoryView(currentAccount,dialogId))return false;
             return false;
         }
 
@@ -3066,6 +3078,7 @@ public class StoriesController {
 
         @Override
         protected boolean markAsRead(int storyId) {
+            if(org.telegram.messenger.FamilyController.shouldHideStoryView(currentAccount,dialogId))return false;
             return false;
         }
 
@@ -3230,6 +3243,7 @@ public class StoriesController {
 
         @Override
         protected boolean markAsRead(int storyId) {
+            if(org.telegram.messenger.FamilyController.shouldHideStoryView(currentAccount,dialogId))return false;
             return false;
         }
 
@@ -3720,6 +3734,7 @@ public class StoriesController {
         }
 
         protected boolean markAsRead(int storyId) {
+            if(org.telegram.messenger.FamilyController.shouldHideStoryView(currentAccount,dialogId))return false;
             if (seenStories.contains(storyId)) return false;
             seenStories.add(storyId);
             saveCache();

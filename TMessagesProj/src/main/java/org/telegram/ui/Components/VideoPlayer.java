@@ -263,6 +263,7 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
                 builder.setLooper(looper);
             }
             player = builder.build();
+            player.setSkipSilenceEnabled(familySkipSilence);
 
             player.addAnalyticsListener(this);
             player.addListener(this);
@@ -1455,6 +1456,12 @@ public class VideoPlayer implements Player.Listener, VideoListener, AnalyticsLis
             audioUpdateHandler.removeCallbacksAndMessages(null);
             audioVisualizerDelegate.onVisualizerUpdate(false, true, null);
         }
+    }
+
+    private boolean familySkipSilence;
+    public void setSkipSilence(boolean enabled) {
+        familySkipSilence = enabled;
+        if (player != null) player.setSkipSilenceEnabled(enabled);
     }
 
     public void setPlaybackSpeed(float speed) {

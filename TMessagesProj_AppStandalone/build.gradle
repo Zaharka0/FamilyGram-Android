@@ -45,7 +45,7 @@ android {
 
     androidResources {
         noCompress += "pack"
-        localeFilters += ["zz"]
+        localeFilters += ["zz", "ru"]
     }
 
     signingConfigs {
@@ -135,7 +135,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 36
         versionName APP_VERSION_NAME
         ndkVersion "27.2.12479018"

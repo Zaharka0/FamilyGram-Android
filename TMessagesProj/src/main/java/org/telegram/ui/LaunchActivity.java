@@ -6971,6 +6971,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     protected void onResume() {
         super.onResume();
         isResumed = true;
+        org.telegram.messenger.family.FamilyPrivacyScreen.apply(this);
+        AndroidUtilities.runOnUIThread(org.telegram.messenger.family.FamilyUpdates::onResume, 1200);
         pipActivityHandler.onResume();
         if (onResumeStaticCallback != null) {
             onResumeStaticCallback.run();

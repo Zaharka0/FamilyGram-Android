@@ -6,6 +6,10 @@ name: Android APK
 on:
   workflow_dispatch:
     inputs:
+      publish_release:
+        description: "Publish a stable FamilyGram APK release (APK published to GitHub Releases for in-app updates)"
+        type: boolean
+        default: true
       abis:
         description: "CPU architectures to build (arm64-v8a fits almost every modern phone)"
         type: choice
@@ -15,6 +19,9 @@ on:
           - armeabi-v7a
           - "armeabi-v7a, arm64-v8a"
           - "armeabi-v7a, arm64-v8a, x86, x86_64"
+
+permissions:
+  contents: read
 
 jobs:
   apk:
@@ -87,6 +94,14 @@ jobs:
           sed -i "s|abiFilters \"armeabi-v7a\", \"arm64-v8a\", \"x86\", \"x86_64\"|abiFilters ${LIST}|" TMessagesProj_App/build.gradle
           grep -n "abiFilters" TMessagesProj_App/build.gradle
 
+      - name: Set monotonic FamilyGram build code
+        run: |
+          BUILD_CODE=$((9000 + GITHUB_RUN_NUMBER))
+          sed -i "s/^APP_VERSION_CODE=.*/APP_VERSION_CODE=$BUILD_CODE/" gradle.properties
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
       - name: Build APK.
         run: ./gradlew --no-daemon --stacktrace :TMessagesProj_App:assembleAfatRelease
 
@@ -102,3 +117,34 @@ jobs:
           name: FamilyGram-apk
           path: apk/*.apk
           retention-days: 14
+
+  release:
+    if: ${{ inputs.publish_release }}
+    needs: apk
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v7
+        with:
+          name: FamilyGram-apk
+          path: apk
+      - name: Publish stable APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          VERSION=$(cat familygram/VERSION)
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then exit 1; fi
+          # The afat flavor uses base code * 10 + 9. A unique tag lets in-app updates
+          # distinguish rebuilds without pretending to change the Telegram base version.
+          APK_CODE=$(((9000 + GITHUB_RUN_NUMBER) * 10 + 9))
+          TAG="familygram-$VERSION-b$APK_CODE"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" apk/*.apk --clobber
+          else
+            gh release create "$TAG" apk/*.apk --target "$GITHUB_SHA" --title "FamilyGram $VERSION · build $APK_CODE" --notes-file familygram/CHANGELOG.md
+          fi

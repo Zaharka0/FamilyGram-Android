@@ -115,6 +115,7 @@ public class FamilyController {
             boolean changed = value ? family.add(dialogId) : family.remove(dialogId);
             if (changed) {
                 saveIds();
+                storiesChanged();
             }
         }
     }
@@ -273,6 +274,19 @@ public class FamilyController {
         setFlag(KEY_GHOST_FAMILY, value);
     }
 
+    public static boolean isGhostStories(){return prefs().getBoolean("ghost_stories",isGhostNoRead());}
+    public static void setGhostStories(boolean value){setFlag("ghost_stories",value);storiesChanged();}
+    public static boolean isFamilyStoriesOnly(){return flag("family_stories_only");}
+    public static void setFamilyStoriesOnly(boolean value){setFlag("family_stories_only",value);storiesChanged();}
+    public static boolean storyExempt(int account,long peer){
+        return org.telegram.messenger.family.FamilyStoryPolicy.exempt(peer,UserConfig.getInstance(account).getClientUserId(),org.telegram.messenger.family.FamilyDataController.getInstance(account).partner(),isFamily(peer));
+    }
+    public static boolean shouldHideStoryView(int account,long peer){return org.telegram.messenger.family.FamilyStoryPolicy.hideView(isGhostStories(),storyExempt(account,peer));}
+    public static boolean shouldShowStories(int account,long peer){return org.telegram.messenger.family.FamilyStoryPolicy.show(isFamilyStoriesOnly(),storyExempt(account,peer));}
+    private static void storiesChanged(){
+        AndroidUtilities.runOnUIThread(()->{for(int a=0;a<UserConfig.MAX_ACCOUNT_COUNT;a++)if(UserConfig.getInstance(a).isClientActivated())NotificationCenter.getInstance(a).postNotificationName(NotificationCenter.storiesUpdated);});
+    }
+
     /** Do not tell the other person that we read the chat. */
     public static boolean shouldHideRead(long dialogId) {
         return isGhostNoRead() && !(isGhostFamilyExempt() && isFamily(dialogId));
@@ -285,7 +299,13 @@ public class FamilyController {
 
     /** True: always send "offline". With the family exception the online status is shown normally and Last seen privacy limits it to family. */
     public static boolean shouldHideOnline() {
-        return isGhostNoOnline() && !isGhostFamilyExempt();
+        return shouldHideOnline(UserConfig.selectedAccount);
+    }
+
+    private static final java.util.Set<Long> activeFamilyPrivacy = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
+    public static boolean shouldHideOnline(int account) {
+        long uid=UserConfig.getInstance(account).getClientUserId();
+        return isGhostNoOnline() && (!isGhostFamilyExempt() || !activeFamilyPrivacy.contains(uid));
     }
 
     /** True: only family may see when we are online (server side privacy rule). */
@@ -309,9 +329,27 @@ public class FamilyController {
     /**
      * Makes the server side "Last seen" privacy match the ghost settings:
      * "Nobody, except family" while the family exception is on, and puts the
-     * previous basic choice (everybody / contacts / nobody) back afterwards.
+     * complete previous rules, including user and group exceptions, back afterwards.
      */
+    private static boolean syncingLastSeen;
+    private static boolean familyRulesMatch(ArrayList<TLRPC.PrivacyRule> rules,java.util.Set<Long> desired){
+        if(rules==null)return false;
+        java.util.Set<Long> allowed=new java.util.HashSet<>();boolean nobody=false;
+        for(TLRPC.PrivacyRule rule:rules){
+            if(rule instanceof TLRPC.TL_privacyValueAllowUsers)allowed.addAll(((TLRPC.TL_privacyValueAllowUsers)rule).users);
+            else if(rule instanceof TLRPC.TL_privacyValueDisallowAll)nobody=true;
+            else return false;
+        }
+        return org.telegram.messenger.family.FamilyPrivacyPolicy.matches(desired,allowed,nobody,false);
+    }
+    private static final java.util.HashMap<Integer, Long> lastSeenRequests = new java.util.HashMap<>();
     public static void syncLastSeen() {
+        if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) { AndroidUtilities.runOnUIThread(FamilyController::syncLastSeen); return; }
+        if (syncingLastSeen) return;
+        syncingLastSeen=true;
+        try { syncLastSeenInternal(); } finally { syncingLastSeen=false; }
+    }
+    private static void syncLastSeenInternal() {
         final boolean familyOnly = wantsFamilyOnlyLastSeen();
         ensureLoaded();
         final HashSet<Long> snapshot;
@@ -323,33 +361,44 @@ public class FamilyController {
                 continue;
             }
             final int account = a;
+            // Connectivity changes never restore backups or publish a partial exception list.
+            if(ConnectionsManager.getInstance(account).getConnectionState()!=ConnectionsManager.ConnectionStateConnected)continue;
+            final long privacyUid=UserConfig.getInstance(account).getClientUserId();
+            if (java.util.Objects.equals(lastSeenRequests.get(account),privacyUid)) continue;
             final String backupKey = "lastseen_backup_" + account;
+            final String fullKey = "lastseen_rules_v1_" + UserConfig.getInstance(account).getClientUserId();
+            final String activeKey = "family_privacy_active_" + UserConfig.getInstance(account).getClientUserId();
             final SharedPreferences p = prefs();
             final ContactsController contacts = ContactsController.getInstance(account);
             final MessagesController messages = MessagesController.getInstance(account);
             TL_account.setPrivacy req = new TL_account.setPrivacy();
             req.key = new TLRPC.TL_inputPrivacyKeyStatusTimestamp();
             if (familyOnly) {
-                if (!p.contains(backupKey)) {
+                java.util.Set<Long> desired=new java.util.HashSet<>();
+                for(Long id:snapshot)if(id!=null&&id>0)desired.add(id);
+                ArrayList<TLRPC.PrivacyRule> current=contacts.getPrivacyRules(ContactsController.PRIVACY_RULES_TYPE_LASTSEEN);
+                if(current==null){contacts.loadPrivacySettings();continue;}
+                // Existing server rules remain valid across going offline and process restarts.
+                if(familyRulesMatch(current,desired)){
+                    activeFamilyPrivacy.add(privacyUid);
+                    p.edit().putBoolean(activeKey,true).apply();
+                    continue;
+                }
+                java.util.Set<Long> resolved=new java.util.HashSet<>();
+                for(Long id:desired){
+                    TLRPC.User user=messages.getUser(id);
+                    TLRPC.InputUser input=user==null?null:messages.getInputUser(user);
+                    if(input!=null&&!(input instanceof TLRPC.TL_inputUserEmpty))resolved.add(id);
+                }
+                // Wait for Telegram to load users. Omitting one would remove that exception on the server.
+                if(!org.telegram.messenger.family.FamilyPrivacyPolicy.canWrite(ConnectionsManager.getInstance(account).getConnectionState()==ConnectionsManager.ConnectionStateConnected,desired,resolved)){activeFamilyPrivacy.remove(privacyUid);contacts.loadPrivacySettings();continue;}
+                if (!p.contains(fullKey) && !p.contains(backupKey)) {
                     ArrayList<TLRPC.PrivacyRule> rules = contacts.getPrivacyRules(ContactsController.PRIVACY_RULES_TYPE_LASTSEEN);
-                    if (rules == null) {
-                        continue;
-                    }
-                    String kind = "nobody";
-                    for (int i = 0; i < rules.size(); i++) {
-                        TLRPC.PrivacyRule rule = rules.get(i);
-                        if (rule instanceof TLRPC.TL_privacyValueAllowAll) {
-                            kind = "all";
-                            break;
-                        } else if (rule instanceof TLRPC.TL_privacyValueAllowContacts) {
-                            kind = "contacts";
-                            break;
-                        } else if (rule instanceof TLRPC.TL_privacyValueDisallowAll) {
-                            kind = "nobody";
-                            break;
-                        }
-                    }
-                    p.edit().putString(backupKey, kind).apply();
+                    if (rules == null) { contacts.loadPrivacySettings(); continue; }
+                    try {
+                        String backup=org.telegram.messenger.family.FamilyPrivacyBackup.save(rules,messages);
+                        p.edit().putString(fullKey,backup).apply();
+                    } catch (Exception error) { FileLog.e(error); continue; }
                 }
                 TLRPC.TL_inputPrivacyValueAllowUsers users = new TLRPC.TL_inputPrivacyValueAllowUsers();
                 for (Long id : snapshot) {
@@ -370,29 +419,41 @@ public class FamilyController {
                 }
                 req.rules.add(new TLRPC.TL_inputPrivacyValueDisallowAll());
             } else {
-                String kind = p.getString(backupKey, null);
-                if (kind == null) {
-                    continue;
-                }
-                if ("all".equals(kind)) {
-                    req.rules.add(new TLRPC.TL_inputPrivacyValueAllowAll());
-                } else if ("contacts".equals(kind)) {
-                    req.rules.add(new TLRPC.TL_inputPrivacyValueAllowContacts());
-                } else {
-                    req.rules.add(new TLRPC.TL_inputPrivacyValueDisallowAll());
+                String full=p.getString(fullKey,null);
+                if(full!=null){
+                    try { req.rules.addAll(org.telegram.messenger.family.FamilyPrivacyBackup.read(full)); }
+                    catch(Exception error){FileLog.e(error);continue;}
+                }else{
+                    // Backward compatibility with backups made by older FamilyGram builds.
+                    String kind=p.getString(backupKey,null);if(kind==null)continue;
+                    if("all".equals(kind))req.rules.add(new TLRPC.TL_inputPrivacyValueAllowAll());
+                    else if("contacts".equals(kind))req.rules.add(new TLRPC.TL_inputPrivacyValueAllowContacts());
+                    else req.rules.add(new TLRPC.TL_inputPrivacyValueDisallowAll());
                 }
             }
-            ConnectionsManager.getInstance(account).sendRequest(req, (response, error) -> {
+            if(familyOnly) {
+                activeFamilyPrivacy.remove(privacyUid);
+                p.edit().putBoolean(activeKey,false).apply();
+                TL_account.updateStatus offline=new TL_account.updateStatus();offline.offline=true;
+                ConnectionsManager.getInstance(account).sendRequest(offline,(r,e)->{});
+            }
+            lastSeenRequests.put(account,privacyUid);
+            ConnectionsManager.getInstance(account).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                if(java.util.Objects.equals(lastSeenRequests.get(account),privacyUid))lastSeenRequests.remove(account);
+                if(UserConfig.getInstance(account).getClientUserId()!=privacyUid)return;
                 if (error == null && response instanceof TL_account.privacyRules) {
                     TL_account.privacyRules result = (TL_account.privacyRules) response;
                     messages.putUsers(result.users, false);
                     messages.putChats(result.chats, false);
+                    final boolean settingsChanged;
+                    synchronized(lock){settingsChanged=familyOnly!=wantsFamilyOnlyLastSeen()||!snapshot.equals(family);}
+                    if(familyOnly&&!settingsChanged)activeFamilyPrivacy.add(privacyUid);else activeFamilyPrivacy.remove(privacyUid);
+                    p.edit().putBoolean(activeKey,familyOnly&&!settingsChanged).apply();
+                    if (!familyOnly) p.edit().remove(backupKey).remove(fullKey).apply();
                     contacts.setPrivacyRules(result.rules, ContactsController.PRIVACY_RULES_TYPE_LASTSEEN);
-                    if (!familyOnly) {
-                        p.edit().remove(backupKey).apply();
-                    }
+                    if(settingsChanged)syncLastSeen();
                 }
-            });
+            }));
         }
     }
 
@@ -407,7 +468,8 @@ public class FamilyController {
     }
 
     public static void setTogetherSince(long millis) {
-        prefs().edit().putLong(KEY_TOGETHER, millis).apply();
+        prefs().edit().putLong(KEY_TOGETHER, millis).putLong("workspace_migration_owner",UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId()).apply();
+        org.telegram.messenger.family.FamilyDataController.legacyChanged(UserConfig.selectedAccount,millis,false);
     }
 
     public static long getPartnerId() {
@@ -419,7 +481,8 @@ public class FamilyController {
     }
 
     public static void setPartnerId(long id) {
-        prefs().edit().putLong(KEY_PARTNER, id).apply();
+        prefs().edit().putLong(KEY_PARTNER, id).putLong("workspace_migration_owner",UserConfig.getInstance(UserConfig.selectedAccount).getClientUserId()).apply();
+        org.telegram.messenger.family.FamilyDataController.legacyChanged(UserConfig.selectedAccount,id,true);
     }
 
     public static boolean isPartner(long id) {
